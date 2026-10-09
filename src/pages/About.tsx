@@ -1,6 +1,7 @@
 import { PenLine, ShieldCheck } from "lucide-react";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
+import SplitHeading from "../components/SplitHeading";
 import { ABOUT_PROMISE } from "../data/site";
 
 export default function About() {
@@ -16,7 +17,11 @@ export default function About() {
           <div className="grid gap-10 lg:grid-cols-2">
             <Reveal>
               <div className="rounded-3xl bg-navy p-8 text-white md:p-10">
-                <h2 className="font-display text-2xl font-bold">Our name says it all.</h2>
+                <SplitHeading
+                  as="h2"
+                  text="Our name says it all."
+                  className="font-display text-2xl font-bold leading-[1.15]"
+                />
                 <p className="mt-4 text-sm leading-relaxed text-white/80">
                   The <strong className="text-brand-bright">F</strong> is for speed and forward
                   motion, the <strong className="text-brand-bright">R</strong> is for the road
@@ -25,7 +30,11 @@ export default function About() {
                   and earn more.
                 </p>
               </div>
-              <h2 className="mt-10 font-display text-2xl font-bold text-navy">Our promise</h2>
+              <SplitHeading
+                as="h2"
+                text="Our promise"
+                className="mt-10 font-display text-2xl font-bold leading-[1.15] text-navy"
+              />
               <ul className="mt-4 space-y-3">
                 {ABOUT_PROMISE.map((p) => (
                   <li key={p} className="flex items-start gap-3 text-sm font-medium text-ink">

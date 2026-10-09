@@ -56,9 +56,10 @@ export const PUBLIC_FORMS: PublicForm[] = [
   {
     id: "ownership",
     title: "Financing application",
-    blurb: "Lease-to-own applications from the Ownership & Financing page.",
-    route: "/ownership",
-    pageLabel: "Ownership & financing",
+    blurb:
+      "Lease-to-own applications. Lives in the Ownership & financing section of the Fleet & Business page (the old /ownership page folded into /fleet).",
+    route: "/fleet",
+    pageLabel: "Fleet & business",
     anchor: "#apply-financing",
     kinds: ["financing"],
     fields: [

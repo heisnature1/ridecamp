@@ -68,9 +68,11 @@ function WhyGhana() {
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <Reveal>
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand">The sales case</p>
-          <h2 className="mt-3 max-w-2xl font-display text-3xl font-bold text-navy md:text-5xl">
-            Why Ghanaians are switching to electric.
-          </h2>
+          <SplitHeading
+            as="h2"
+            text="Why Ghanaians are switching to electric."
+            className="mt-3 max-w-2xl font-display text-3xl font-bold leading-[1.1] text-navy md:text-5xl"
+          />
         </Reveal>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {WHY_GHANA.map((w, i) => (
@@ -107,7 +109,11 @@ function Glance() {
           </Reveal>
           <div>
             <Reveal>
-              <h2 className="font-display text-3xl font-bold md:text-5xl">The Ekon 450 M1 at a glance.</h2>
+              <SplitHeading
+              as="h2"
+              text="The Ekon 450 M1 at a glance."
+              className="font-display text-3xl font-bold leading-[1.1] md:text-5xl"
+            />
             </Reveal>
             <div className="mt-8 grid grid-cols-2 gap-4">
               {GLANCE.map((g, i) => (
@@ -146,7 +152,11 @@ function HowItWorks() {
     <section className="bg-cloud py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <Reveal>
-          <h2 className="font-display text-3xl font-bold text-navy md:text-5xl">How it works.</h2>
+          <SplitHeading
+            as="h2"
+            text="How it works."
+            className="font-display text-3xl font-bold leading-[1.1] text-navy md:text-5xl"
+          />
         </Reveal>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {HOW_IT_WORKS.map((s, i) => {
@@ -173,7 +183,11 @@ function WaysToOwn() {
     <section className="bg-white py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <Reveal>
-          <h2 className="font-display text-3xl font-bold text-navy md:text-5xl">Ways to own.</h2>
+          <SplitHeading
+            as="h2"
+            text="Ways to own."
+            className="font-display text-3xl font-bold leading-[1.1] text-navy md:text-5xl"
+          />
         </Reveal>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {WAYS_TO_OWN.map((w, i) => (
@@ -186,7 +200,7 @@ function WaysToOwn() {
           ))}
         </div>
         <Reveal delay={0.2}>
-          <Link to="/ownership" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand hover:underline">
+          <Link to="/fleet#financing" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand hover:underline">
             Learn about financing <ArrowRight className="size-4" />
           </Link>
         </Reveal>
@@ -200,7 +214,11 @@ function Testimonials() {
     <section className="bg-mint py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <Reveal>
-          <h2 className="font-display text-3xl font-bold text-navy md:text-5xl">Real riders, real results.</h2>
+          <SplitHeading
+            as="h2"
+            text="Real riders, real results."
+            className="font-display text-3xl font-bold leading-[1.1] text-navy md:text-5xl"
+          />
           <p className="mt-3 text-sm text-slate">Rider stories from our pilot programme.</p>
         </Reveal>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
@@ -233,7 +251,11 @@ function FinalCta() {
   return (
     <section className="bg-navy py-16 text-white md:py-24">
       <div className="mx-auto max-w-3xl px-4 text-center md:px-8">
-        <h2 className="font-display text-3xl font-bold md:text-5xl">Ready to make the switch?</h2>
+        <SplitHeading
+          as="h2"
+          text="Ready to make the switch?"
+          className="font-display text-3xl font-bold leading-[1.1] md:text-5xl"
+        />
         <p className="mt-4 text-white/75">
           Leave your number and a Future Ride advisor will call you today.
         </p>

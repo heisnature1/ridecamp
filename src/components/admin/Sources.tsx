@@ -38,7 +38,17 @@ export default function Sources({
       <div className="grid gap-5 lg:grid-cols-2">
         {PUBLIC_FORMS.map((form, i) => {
           const path = form.route;
-          const count = leads.filter((l) => normalizePath(l.source) === path).length;
+          // Two forms can share a page (fleet quote + financing both live on
+          // /fleet), so an anchored form only counts leads carrying its anchor.
+          const anchoredElsewhere = PUBLIC_FORMS.filter((f) => f.route === path && f.anchor).map(
+            (f) => f.anchor!.replace("#", ""),
+          );
+          const count = leads.filter((l) => {
+            if (normalizePath(l.source) !== path) return false;
+            const hash = String(l.source).split("#")[1] ?? "";
+            if (form.anchor) return hash === form.anchor.replace("#", "");
+            return !hash || !anchoredElsewhere.includes(hash);
+          }).length;
           return (
             <motion.section
               key={form.id}
