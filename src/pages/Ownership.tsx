@@ -4,6 +4,7 @@ import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import { OWNERSHIP_DOCS, WAYS_TO_OWN } from "../data/site";
 import { dispatchLead, WA_DEFAULT } from "../lib/leads";
+import { formatGhanaPhone } from "../lib/leadKinds";
 import { Link } from "react-router-dom";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
@@ -11,6 +12,7 @@ function FinancingForm() {
   const [form, setForm] = useState({
     name: "",
     phone: "",
+    email: "",
     city: "",
     occupation: "",
     income: "",
@@ -45,7 +47,8 @@ function FinancingForm() {
         setSent(true);
         dispatchLead("financing", {
           Name: form.name,
-          Phone: `+233 ${form.phone}`,
+          Phone: formatGhanaPhone(form.phone),
+          Email: form.email,
           City: form.city,
           Occupation: form.occupation,
           "Income range": form.income || "Not provided",
@@ -58,6 +61,7 @@ function FinancingForm() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <input required value={form.name} onChange={set("name")} placeholder="Name" aria-label="Name" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand" />
         <input required type="tel" value={form.phone} onChange={set("phone")} placeholder="Phone (+233)" aria-label="Phone" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand" />
+        <input type="email" value={form.email} onChange={set("email")} placeholder="Email (optional)" aria-label="Email (optional)" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand" />
         <input required value={form.city} onChange={set("city")} placeholder="City" aria-label="City" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand" />
         <input required value={form.occupation} onChange={set("occupation")} placeholder="Occupation" aria-label="Occupation" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand" />
         <select value={form.income} onChange={set("income")} aria-label="Income range (optional)" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand">

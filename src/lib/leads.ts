@@ -26,29 +26,45 @@ export function mailtoLink(subject: string, body: string): string {
 
 export type Lead = Record<string, string>;
 
-/**
- * Front-end lead dispatch: opens WhatsApp with the lead pre-filled and an
- * email draft. A backend/CRM webhook can be added here later.
- */
-export function dispatchLead(kind: string, lead: Lead) {
-  // Save to local storage for Admin Dashboard
-  const existing = localStorage.getItem("ridecamp_leads");
-  const leads = existing ? JSON.parse(existing) : [];
-  leads.push({
-    id: crypto.randomUUID(),
-    kind,
-    timestamp: new Date().toISOString(),
-    data: lead,
-  });
-  localStorage.setItem("ridecamp_leads", JSON.stringify(leads));
+import { kindMeta, type LeadKind } from "./leadKinds";
+import { addLead, type LeadRecord } from "./leadsStore";
 
-  const lines = Object.entries(lead)
+/** Drop empty inputs so the admin never sees a row of blank fields. */
+function prune(lead: Lead): Lead {
+  const out: Lead = {};
+  for (const [key, value] of Object.entries(lead)) {
+    const v = String(value ?? "").trim();
+    if (v) out[key] = v;
+  }
+  return out;
+}
+
+/**
+ * Front-end lead dispatch.
+ *
+ * 1. Saves the submission to the local lead store — this is exactly what the
+ *    admin dashboard at `/admin` reads, and it happens *before* anything can
+ *    navigate the browser away.
+ * 2. Opens WhatsApp with the lead pre-filled and an email draft.
+ *
+ * A backend/CRM webhook can replace step 2 later without touching the forms.
+ */
+export function dispatchLead(kind: LeadKind, lead: Lead, source?: string): LeadRecord {
+  const record = addLead(kind, prune(lead), source);
+
+  const label = kindMeta(record.kind).label;
+  const lines = Object.entries(record.data)
     .map(([k, v]) => `${k}: ${v}`)
     .join("\n");
-  const wa = waLink(`New ${kind} lead — Future Ride website\n${lines}`);
+  const wa = waLink(`New ${label} lead — Future Ride website\nSource: ${record.source}\n${lines}`);
   window.open(wa, "_blank", "noopener");
   // Use a small delay before redirect to ensure open succeeds
   setTimeout(() => {
-    window.location.href = mailtoLink(`[${kind}] New lead from futureride.gh`, lines);
+    window.location.href = mailtoLink(
+      `[${label}] New lead from futureride.gh`,
+      `Source: ${record.source}\n\n${lines}`,
+    );
   }, 100);
+
+  return record;
 }

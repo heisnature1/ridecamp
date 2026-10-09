@@ -11,6 +11,7 @@ import Calculator from "../components/Calculator";
 import { GLANCE, HOW_IT_WORKS, TESTIMONIALS, TRUST_STRIP, WHY_GHANA, WAYS_TO_OWN } from "../data/site";
 import { useState } from "react";
 import { dispatchLead } from "../lib/leads";
+import { formatGhanaPhone } from "../lib/leadKinds";
 
 const TRUST_ICONS = [Route, BatteryCharging, ShieldCheck, MapPinned];
 
@@ -250,7 +251,12 @@ function FinalCta() {
             onSubmit={(e) => {
               e.preventDefault();
               setSent(true);
-              dispatchLead("callback", { Name: form.name, Phone: `+233 ${form.phone}`, City: form.city, Interest: "Call me back" });
+              dispatchLead("callback", {
+                Name: form.name,
+                Phone: formatGhanaPhone(form.phone),
+                City: form.city,
+                Interest: "Call me back",
+              });
             }}
           >
             <input
