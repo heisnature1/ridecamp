@@ -1,15 +1,15 @@
-# Future Ride — Energy on the Move
+# Future Ride — Spiro Electric Motorcycles in Ghana
 
-Marketing site for **Future Ride**, an electric-motorcycle + battery-swap network brand,
-built in the style of modern EV landing pages (dark theme, kinetic typography, animated
-counters, interactive savings calculator and coverage map).
+Marketing + sales site for **Future Ride**, sole distributor of Spiro electric motorcycles in
+Ghana, built from the company's content brief. Every page drives toward four actions:
+**Book a test ride · Request a quote · Apply for financing · Chat on WhatsApp.**
 
 ## Stack
 
 - [Vite](https://vitejs.dev) + React 19 + TypeScript
-- [Tailwind CSS v4](https://tailwindcss.com)
-- [Framer Motion](https://www.framer.com/motion/) for scroll/reveal animations
-- [React Router v7](https://reactrouter.com) for pages
+- [Tailwind CSS v4](https://tailwindcss.com) (brand: deep navy `#0a1f44` + fresh green `#16a34a`)
+- [Framer Motion](https://www.framer.com/motion/) for reveals and micro-interactions
+- [React Router v7](https://reactrouter.com)
 
 ## Getting started
 
@@ -20,22 +20,34 @@ npm run build      # typecheck + production build
 npm run preview    # serve the production build
 ```
 
-## Pages
+## Sitemap
 
-| Route               | Content                                             |
-| ------------------- | --------------------------------------------------- |
-| `/`                 | Hero, impact counters, bike showcase, savings calculator, network map, news, callback CTA |
-| `/bike`             | FR Volt 450 product page with full specifications   |
-| `/energy`           | Swap network explainer + interactive coverage map   |
-| `/technology`       | Battery, telemetry and security pillars             |
-| `/about`            | Values, timeline, leadership                        |
-| `/news`             | Newsroom grid                                       |
-| `/support`          | FAQ accordion + contact                             |
-| `/sustainability`   | Impact metrics                                      |
-| `/book-test-ride`   | Test-ride booking form                              |
+| Route            | Page                          |
+| ---------------- | ----------------------------- |
+| `/`              | Home (hero, trust strip, sales case, glance, how-it-works, calculator, ways to own, testimonials, callback CTA) |
+| `/ekon`          | The Ekon 450 M1 (specs, 12 feature blocks, colours, spec-sheet download) |
+| `/why-electric`  | Why Go Electric (8-argument sales case + Spiro scale) |
+| `/battery-swap`  | Battery Swap (swap-pay-ride, Ghana network map) |
+| `/calculator`    | Savings Calculator (GH₵, per brief §5 formulas) |
+| `/ownership`     | Ownership & Financing (lease-to-own, docs, financing form) |
+| `/fleet`         | Fleet & Business (benefits, audience, fleet-quote form) |
+| `/service`       | Service & Warranty |
+| `/about`         | About Future Ride (name meaning, promise, founder-note placeholder) |
+| `/faqs`          | FAQs (15 questions) |
+| `/contact`       | Contact / Book a Test Ride (short lead form, +233 default) |
+| `/spec-sheet`    | Print-friendly spec sheet ("Download Spec Sheet") |
+| `/privacy`, `/terms` | Legal pages |
 
-## Notes
+## Lead capture
 
-- All copy, branding and imagery are original (imagery is AI-generated placeholders).
-- The coverage map is a stylised dot-matrix projection of Africa — not survey data.
-- Savings figures are indicative; assumptions are listed in-app.
+Forms show an instant confirmation and dispatch the lead via WhatsApp deep-link
+(`wa.me`) plus an email draft — see `src/lib/leads.ts`. Point `BUSINESS` at the
+real number/email, or swap `dispatchLead` for a CRM webhook later.
+
+## Before launch (brief §8)
+
+`src/data/site.ts` and `src/lib/leads.ts` hold the placeholders that need real values:
+Ghana pricing, swap locations/hours/cost, financing partners, service centres, confirmed
+warranty terms, licensing wording, real testimonials, contact details, and written
+permission from Spiro for brand figures (80,000+ bikes, 9 countries, TIME100 2024).
+These are marked with `PLACEHOLDER`/asterisk notes in the UI.

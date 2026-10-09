@@ -1,176 +1,211 @@
-export type City = {
-  name: string;
-  lat: number;
-  lon: number;
-  swapStations: number;
-  serviceCentres: number;
-};
+/* Content model — copy supplied in the Future Ride content brief. */
 
-export type Country = {
-  code: string;
-  name: string;
-  flag: string;
-  dial: string;
-  currency: string;
-  /** petrol price per litre, local currency */
-  petrolPerLitre: number;
-  /** EV energy cost per km, local currency */
-  evPerKm: number;
-  cities: City[];
-};
+export const TRUST_STRIP = [
+  "Built for African roads",
+  "100 km range per battery swap",
+  "Up to 2 years warranty on key components*",
+  "GPS tracking built in",
+];
 
-export const COUNTRIES: Country[] = [
+export const WHY_GHANA = [
   {
-    code: "KE", name: "Kenya", flag: "🇰🇪", dial: "+254", currency: "KES",
-    petrolPerLitre: 178, evPerKm: 2.4,
-    cities: [
-      { name: "Nairobi", lat: -1.29, lon: 36.82, swapStations: 42, serviceCentres: 6 },
-      { name: "Mombasa", lat: -4.05, lon: 39.67, swapStations: 14, serviceCentres: 2 },
-      { name: "Kisumu", lat: -0.1, lon: 34.76, swapStations: 9, serviceCentres: 1 },
-      { name: "Nakuru", lat: -0.3, lon: 36.07, swapStations: 8, serviceCentres: 1 },
-      { name: "Thika", lat: -1.03, lon: 37.07, swapStations: 6, serviceCentres: 1 },
-    ],
+    title: "Stop paying for petrol",
+    text: "Every kilometre on an electric motorcycle costs far less than on a petrol bike. Fuel prices go up and down; your running cost stays low and predictable.",
   },
   {
-    code: "RW", name: "Rwanda", flag: "🇷🇼", dial: "+250", currency: "RWF",
-    petrolPerLitre: 1520, evPerKm: 20,
-    cities: [
-      { name: "Kigali", lat: -1.94, lon: 30.06, swapStations: 24, serviceCentres: 3 },
-    ],
+    title: "Spend less on repairs",
+    text: "No engine oil, no spark plugs, no clutch, no gearbox. Fewer moving parts means fewer breakdowns and less time in the workshop.",
   },
   {
-    code: "UG", name: "Uganda", flag: "🇺🇬", dial: "+256", currency: "UGX",
-    petrolPerLitre: 5350, evPerKm: 71,
-    cities: [
-      { name: "Kampala", lat: 0.31, lon: 32.58, swapStations: 18, serviceCentres: 2 },
-    ],
+    title: "Earn more every day",
+    text: "A bike that costs less to run and spends less time off the road means more trips and more income.",
   },
   {
-    code: "CM", name: "Cameroon", flag: "🇨🇲", dial: "+237", currency: "XAF",
-    petrolPerLitre: 670, evPerKm: 9,
-    cities: [
-      { name: "Douala", lat: 4.05, lon: 9.77, swapStations: 12, serviceCentres: 2 },
-      { name: "Yaoundé", lat: 3.87, lon: 11.52, swapStations: 8, serviceCentres: 1 },
-    ],
+    title: "Smooth, quiet, comfortable",
+    text: "No engine vibration and no noise. Long hours in the saddle are easier on the body.",
   },
   {
-    code: "NG", name: "Nigeria", flag: "🇳🇬", dial: "+234", currency: "NGN",
-    petrolPerLitre: 875, evPerKm: 12,
-    cities: [
-      { name: "Lagos", lat: 6.52, lon: 3.38, swapStations: 21, serviceCentres: 3 },
-      { name: "Abuja", lat: 9.06, lon: 7.49, swapStations: 10, serviceCentres: 1 },
-    ],
+    title: "Power when you need it",
+    text: "Instant acceleration in traffic, on hills and with a passenger. No gear shifting.",
   },
   {
-    code: "BJ", name: "Benin", flag: "🇧🇯", dial: "+229", currency: "XOF",
-    petrolPerLitre: 615, evPerKm: 8,
-    cities: [
-      { name: "Cotonou", lat: 6.36, lon: 2.43, swapStations: 7, serviceCentres: 1 },
-    ],
+    title: "Built for heavy use",
+    text: "Reinforced frame, tuned suspension and a load capacity of up to 300 kg.",
   },
   {
-    code: "TG", name: "Togo", flag: "🇹🇬", dial: "+228", currency: "XOF",
-    petrolPerLitre: 610, evPerKm: 8,
-    cities: [
-      { name: "Lomé", lat: 6.13, lon: 1.22, swapStations: 6, serviceCentres: 1 },
-    ],
+    title: "Safe and secure",
+    text: "GPS tracking helps prevent loss and theft. Bright LED lighting keeps you visible on the road.",
+  },
+  {
+    title: "Good for Ghana",
+    text: "Zero tailpipe emissions mean cleaner air in Accra, Kumasi, Takoradi, Tamale and every city we serve.",
   },
 ];
 
-export const DEFAULT_COUNTRY = "KE";
+export const GLANCE = [
+  { value: 100, unit: "km", label: "Range per battery swap" },
+  { value: 90, unit: "km/h", label: "Top speed" },
+  { value: 12, unit: "kW", label: "Peak power" },
+  { value: 300, unit: "kg", label: "Load capacity" },
+];
 
-export function getCountry(code: string): Country {
-  return COUNTRIES.find((c) => c.code === code) ?? COUNTRIES[0];
-}
+export const HOW_IT_WORKS = [
+  { title: "Choose your bike", text: "Pick your colour and ownership option." },
+  { title: "Ride", text: "Use the app to track your battery, bike and nearby swap points." },
+  { title: "Swap and go", text: "When the battery runs low, swap it for a fully charged one in minutes instead of waiting hours to charge." },
+];
 
-export const HERO_STATS = [
-  { label: "Kilometres Driven", value: 3_026_679_853, suffix: "", decimals: 0 },
-  { label: "Tonnes of CO₂ Saved", value: 222.4, suffix: " K", decimals: 1 },
-  { label: "Energy Distributed", value: 113.5, suffix: " GWh", decimals: 1 },
-  { label: "Battery Swaps", value: 55_906_658, suffix: "", decimals: 0 },
-] as const;
+export const WAYS_TO_OWN = [
+  { title: "Lease to own", text: "Start riding without a large upfront payment. Small, manageable instalments, subject to approval by our financing partners." },
+  { title: "Pay upfront", text: "Own it outright from day one. Price on request — talk to an advisor for today's figure." },
+  { title: "Fleet purchase", text: "Special terms, volume pricing and dedicated support for businesses." },
+];
 
-export const BIKE_SPECS = [
-  { label: "Range per swap", value: 110, unit: "km" },
-  { label: "Top Speed", value: 95, unit: "km/h" },
-  { label: "Peak Power", value: 12, unit: "kW" },
-  { label: "Load Capacity", value: 320, unit: "kg" },
-] as const;
+/* Placeholder rider stories — replace with real Ghanaian testimonials once first customers have ridden (brief §8). */
+export const TESTIMONIALS = [
+  {
+    name: "Kofi A.",
+    role: "Delivery rider, Accra",
+    quote: "I used to spend a big part of the morning on petrol before I earned anything. Now that money stays in my pocket.",
+  },
+  {
+    name: "Ama S.",
+    role: "Courier business owner, Kumasi",
+    quote: "Quiet, smooth and cheap to run. My riders are on the road more hours and the workshop sees them less.",
+  },
+  {
+    name: "Yaw M.",
+    role: "Owner-operator, Tema",
+    quote: "With 100 km on one battery I do more trips a day. The hills and traffic are no problem at all.",
+  },
+];
 
-export type NewsItem = {
-  source: string;
-  date: string;
-  title: string;
-  image: string;
-  excerpt: string;
-  external?: boolean;
+export const EKON_SPECS: [string, string][] = [
+  ["Range", "Up to 100 km per battery swap"],
+  ["Top speed", "90 km/h"],
+  ["Peak power", "12 kW"],
+  ["Load capacity", "300 kg"],
+  ["Ride modes", "Eco (maximum range), Normal (everyday), Sport (more power)"],
+  ["Charging", "Battery-swap system; charging slot in front storage"],
+  ["Lighting and display", "High-visibility LED lighting; modern LED display"],
+  ["Tracking", "GPS and companion app"],
+  ["Warranty", "Up to 2 years or 30,000 km depending on the component*"],
+  ["Colours", "Green, Black, Yellow, Red, Blue"],
+];
+
+export const EKON_FEATURES = [
+  { title: "Built for rough roads and heavy loads", text: "Handles bad roads, heavy loads and long hours. Designed and tested on real routes." },
+  { title: "Lower daily running cost", text: "No fuel. No oil changes. Fewer parts to replace." },
+  { title: "Instant power when needed", text: "Quick pickup in traffic, on hills and with a passenger." },
+  { title: "Strong electric performance", text: "Confident acceleration in traffic and smooth control at low speeds." },
+  { title: "Reinforced frame", text: "Balanced geometry for stability at speed." },
+  { title: "Tuned suspension", text: "Better control on uneven roads and potholes." },
+  { title: "Three ride modes", text: "Eco for the longest range, Normal for daily riding, Sport when you need more power." },
+  { title: "High-visibility LED lighting", text: "A strong road presence, day and night." },
+  { title: "Balanced riding posture", text: "Comfortable seat height and ergonomic positioning for long hours." },
+  { title: "Large front storage with charging slot", text: "Carry essentials securely and charge your phone on the go." },
+  { title: "Rear and side mounting options", text: "Flexible mounting for delivery boxes and bags." },
+  { title: "Companion app", text: "Track your bike, check battery level, find swap stations and get support alerts." },
+];
+
+export const WHY_ELECTRIC = [
+  { title: "The money argument", text: "Petrol is a daily expense you cannot avoid and cannot control. Electricity from a swap is cheaper per kilometre and more stable. Use the calculator to see your own numbers." },
+  { title: "The maintenance argument", text: "A petrol motorcycle has an engine with hundreds of moving parts. An electric motor has very few. That means fewer repairs, fewer surprises and more days working." },
+  { title: "The income argument", text: "A rider who spends less on running costs and loses less time to breakdowns keeps more of every cedi earned. One Spiro rider put it simply: with 100 km on a single battery, he can do more trips and earn more." },
+  { title: "The comfort argument", text: "No vibration and no engine roar. Riders report that long days feel easier, and that it is a better experience for passengers and women riders." },
+  { title: "The reliability argument", text: "A reinforced frame and tuned suspension, designed and tested for African conditions." },
+  { title: "The security argument", text: "GPS tracking and in-app monitoring help protect your bike and your livelihood." },
+  { title: "The planet and health argument", text: "No exhaust fumes in crowded streets. Cleaner air for riders, passengers and neighbourhoods." },
+  { title: "The future-proof argument", text: "Fuel prices and regulation are moving in one direction. Owning an electric bike now puts you ahead of the change." },
+];
+
+/* Spiro company figures — subject to written confirmation from Spiro before launch (brief §8). */
+export const SPIRO_SCALE = [
+  { value: "80,000+", label: "bikes running daily across cities*" },
+  { value: "9", label: "countries of operation*" },
+  { value: "TIME100", label: "Most Influential Companies, 2024*" },
+];
+
+export const SWAP_STEPS = [
+  { title: "Swap", text: "Pull into a swap point and exchange your battery." },
+  { title: "Pay", text: "Pay for the energy you use." },
+  { title: "Ride", text: "Back on the road with a full battery." },
+];
+
+export const SWAP_WHY = [
+  "No downtime waiting for a battery to charge.",
+  "No need for home charging infrastructure.",
+  "Battery health is managed professionally.",
+  "Locate the nearest swap point in the app.",
+];
+
+export const OWNERSHIP_DOCS = [
+  "Ghana Card",
+  "Driver's licence",
+  "Proof of address",
+  "Guarantor (for lease-to-own)",
+];
+
+export const FLEET_BENEFITS = [
+  "Lower and predictable cost per kilometre.",
+  "GPS tracking and app visibility for every bike.",
+  "Less downtime and lower maintenance bills.",
+  "Cargo-ready mounting for delivery boxes and bags.",
+  "Cleaner brand image and a clear ESG story.",
+  "Volume pricing, financing and dedicated account support.",
+];
+
+export const FLEET_AUDIENCE = [
+  "Food and parcel delivery",
+  "Courier and logistics firms",
+  "Banks and microfinance field officers",
+  "Utilities",
+  "NGOs",
+  "Schools and campuses",
+  "Estates and security companies",
+  "Government agencies",
+];
+
+export const SERVICE_ITEMS = [
+  { title: "Authorised service", text: "Ghana service centre locations will be listed here at launch. Accra first, then Kumasi and Takoradi." },
+  { title: "Genuine spare parts", text: "Authorised components available at our service centres." },
+  { title: "In-app support", text: "Report an issue and follow its resolution from the app." },
+  { title: "Warranty", text: "Up to 2 years on key components (motor, controller, frame and other key parts) depending on part and mileage, up to 30,000 km. Terms, mileage limits and exclusions apply." },
+  { title: "Insurance support", text: "We are confirming Ghanaian insurance partners for riders and fleets." },
+  { title: "Theft protection", text: "GPS tracking via the app helps protect your bike and your livelihood." },
+];
+
+export const ABOUT_PROMISE = [
+  "Genuine Spiro motorcycles with full manufacturer backing.",
+  "Honest advice and transparent pricing.",
+  "Fast after-sales service and genuine parts.",
+  "A partner who stays with you after the sale.",
+];
+
+export const FAQS: [string, string][] = [
+  ["What is the Ekon 450 M1?", "It is Spiro's electric motorcycle designed for African roads and commercial use, with up to 100 km range per swap, 90 km/h top speed and 300 kg load capacity."],
+  ["How far can it go on one battery?", "Up to 100 km per swap under standard test conditions. Real range depends on load, speed, terrain and ride mode. Eco mode gives the longest range."],
+  ["How do I charge it?", "You do not wait for charging. You swap your battery for a charged one at a swap point in minutes."],
+  ["Is it cheaper than a petrol motorcycle?", "For riders who ride every day, running costs are much lower because you do not buy petrol or engine oil and have fewer parts to repair. Use our calculator to estimate your own savings. Actual savings vary by route, usage and financing path."],
+  ["Can it carry passengers and cargo?", "Yes. It is designed for passenger and delivery use, with a load capacity of up to 300 kg and rear and side mounting options."],
+  ["Can it handle bad roads and rain?", "It is built with a reinforced frame and tuned suspension and tested on real African routes."],
+  ["What does the warranty cover?", "Up to 2 years or 30,000 km, depending on the component, covering key parts such as the motor, controller and frame. Terms and exclusions apply."],
+  ["Can I buy on instalments?", "Yes. Lease-to-own options are available, subject to approval by our financing partners. No large upfront payment is required."],
+  ["Where do I service the bike?", "At Future Ride authorised service centres in Ghana. You can also report issues and track them in the Spiro app."],
+  ["Are spare parts available?", "Yes, genuine spare parts are stocked at authorised service centres."],
+  ["What if the bike is stolen?", "The bike has GPS tracking through the app. Insurance support is available."],
+  ["Do I need a special licence?", "Electric motorcycles are registered and ridden like other motorcycles in Ghana. Our advisors will walk you through licence and registration requirements."],
+  ["Is it good for the environment?", "Yes. Electric motorcycles produce zero tailpipe emissions and are quiet, which means cleaner air and less noise."],
+  ["Can my company buy a fleet?", "Yes. We offer fleet pricing, financing and dedicated support. See the Fleet & Business page."],
+  ["Can I try before I buy?", "Yes. Book a test ride and see for yourself."],
+];
+
+/** Savings-calculator defaults (GH₵). Confirm constants with Spiro before launch (brief §5). */
+export const CALC = {
+  petrolPriceDefault: 12.0, // GH₵ per litre — update regularly
+  kmPerLitreDefault: 35,
+  daysPerMonthDefault: 26,
+  maintenanceDefault: 100, // current monthly maintenance spend, GH₵
+  evCostPerKm: 0.45, // PLACEHOLDER swap energy cost per km, GH₵
+  evMaintenancePerMonth: 40, // PLACEHOLDER, GH₵
 };
-
-export const NEWS: NewsItem[] = [
-  {
-    source: "The Star",
-    date: "Aug 7, 2026",
-    title: "Future Ride expands electric mobility network with mega battery swap hub in Nairobi",
-    image: "/images/swap-station.jpg",
-    excerpt:
-      "The new hub adds 480 battery slots and cuts average swap wait times to under a minute for riders in the capital.",
-  },
-  {
-    source: "Future Ride",
-    date: "Jul 21, 2026",
-    title: "Future Ride publishes its first Sustainability Report, confirming strong climate impact",
-    image: "/images/hero-rider.jpg",
-    excerpt:
-      "Our first ESG report details the economic, social and climate value created across seven markets.",
-  },
-  {
-    source: "TechCable",
-    date: "Jun 12, 2026",
-    title: "Inside the FR-1: the battery platform engineered for 2,000 swap cycles",
-    image: "/images/battery-tech.jpg",
-    excerpt:
-      "A look at the swappable pack, telemetry and thermal design behind the Future Ride energy network.",
-  },
-];
-
-export const PRESS = ["The Star", "TechCable", "Mobility Weekly", "GreenGrid", "City Ledger", "EV Journal"];
-
-export const NAV_LINKS = [
-  { to: "/bike", label: "FR Volt 450" },
-  { to: "/energy", label: "Swap Network" },
-  { to: "/technology", label: "Technology" },
-  { to: "/about", label: "About us" },
-] as const;
-
-export const DIAL_CODES: { name: string; dial: string }[] = [
-  { name: "Kenya", dial: "+254" },
-  { name: "Rwanda", dial: "+250" },
-  { name: "Uganda", dial: "+256" },
-  { name: "Cameroon", dial: "+237" },
-  { name: "Nigeria", dial: "+234" },
-  { name: "Benin", dial: "+229" },
-  { name: "Togo", dial: "+228" },
-  { name: "Tanzania", dial: "+255" },
-  { name: "Ghana", dial: "+233" },
-  { name: "Ethiopia", dial: "+251" },
-  { name: "South Africa", dial: "+27" },
-  { name: "United Kingdom", dial: "+44" },
-  { name: "United States", dial: "+1" },
-  { name: "France", dial: "+33" },
-  { name: "Germany", dial: "+49" },
-  { name: "India", dial: "+91" },
-];
-
-export const MODEL = {
-  name: "FR Volt 450",
-  tagline: "The bike that pays you back.",
-  blurb: "Every kilometre costs less. Every day earns more.",
-  priceNote: "Flexible financing and battery-subscription plans available in every market.",
-};
-
-export const ASSUMPTIONS = [
-  "Petrol bike consumes 2.5 L per 100 km at local pump prices.",
-  "Energy cost per km uses the standard battery-swap tariff, batteries included.",
-  "Savings assume riding 330 days per year.",
-  "Maintenance delta based on 40% fewer moving parts vs. an equivalent petrol bike.",
-];

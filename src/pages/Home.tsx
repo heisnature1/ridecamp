@@ -1,82 +1,83 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight, BatteryCharging, Bike, MapPinned, Route, ShieldCheck, Wrench,
+} from "lucide-react";
 import SplitHeading from "../components/SplitHeading";
 import Reveal from "../components/Reveal";
 import CountUp from "../components/CountUp";
-import SavingsCalculator from "../components/SavingsCalculator";
-import NetworkMap from "../components/NetworkMap";
-import Marquee from "../components/Marquee";
-import NewsGrid from "../components/NewsGrid";
-import CallbackForm from "../components/CallbackForm";
-import { useCountry } from "../components/CountryGate";
-import { BIKE_SPECS, HERO_STATS, MODEL } from "../data/site";
+import CtaRow from "../components/CtaRow";
+import Calculator from "../components/Calculator";
+import { GLANCE, HOW_IT_WORKS, TESTIMONIALS, TRUST_STRIP, WHY_GHANA, WAYS_TO_OWN } from "../data/site";
+import { useState } from "react";
+import { dispatchLead } from "../lib/leads";
+
+const TRUST_ICONS = [Route, BatteryCharging, ShieldCheck, MapPinned];
 
 function Hero() {
   return (
-    <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
+    <section className="relative overflow-hidden bg-navy text-white">
+      <div className="absolute inset-0">
         <img
-          src="/images/hero-rider.jpg"
-          alt="Rider on a Future Ride electric motorcycle at sunset"
-          className="size-full object-cover animate-kenburns"
+          src="/images/hero-accra.jpg"
+          alt="Rider on a Spiro Ekon electric motorcycle in Accra"
+          className="size-full object-cover opacity-60"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-ink/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-navy/30" />
       </div>
-
-      <div className="relative mx-auto w-full max-w-7xl px-5 pb-24 pt-40 md:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 md:px-8 md:pb-28 md:pt-28">
         <SplitHeading
           as="h1"
-          text="The road to earning, electrified."
-          className="max-w-4xl font-display text-5xl font-bold leading-[1.02] md:text-7xl lg:text-8xl"
+          text="The smarter way to ride and earn."
+          className="max-w-3xl font-display text-4xl font-bold leading-[1.05] sm:text-5xl md:text-7xl"
         />
-        <Reveal delay={0.35}>
-          <p className="mt-6 max-w-xl text-lg text-cream/85">
-            The electric motorcycle built for the riders who keep Africa’s cities moving.
+        <Reveal delay={0.3}>
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/85 md:text-lg">
+            Future Ride brings Spiro's Africa-built electric motorcycle to Ghana. No petrol. No oil
+            changes. Far fewer repairs. More money in your pocket every single day.
           </p>
         </Reveal>
-        <Reveal delay={0.5}>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Link
-              to="/bike"
-              className="inline-flex items-center gap-2 rounded-full bg-volt px-7 py-3.5 text-sm font-semibold text-ink hover:brightness-110"
-            >
-              Know more <ArrowRight className="size-4" />
-            </Link>
-            <Link
-              to="/book-test-ride"
-              className="inline-flex items-center gap-2 rounded-full border border-cream/30 px-7 py-3.5 text-sm font-semibold text-cream backdrop-blur hover:border-volt hover:text-volt"
-            >
-              Book test ride
-            </Link>
+        <Reveal delay={0.45}>
+          <div className="mt-8">
+            <CtaRow />
           </div>
         </Reveal>
       </div>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-cream/70">
-        <p className="text-center text-[10px] uppercase tracking-[0.3em]">Scroll to explore</p>
-        <ChevronDown className="mx-auto mt-1 size-5 animate-bob" />
+      {/* trust strip */}
+      <div className="relative border-t border-white/10 bg-navy-deep/80 backdrop-blur">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-5 md:grid-cols-4 md:px-8">
+          {TRUST_STRIP.map((t, i) => {
+            const Icon = TRUST_ICONS[i];
+            return (
+              <p key={t} className="flex items-center gap-2.5 text-[13px] font-semibold text-white/85">
+                <Icon className="size-5 shrink-0 text-brand-bright" /> {t}
+              </p>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
 }
 
-function ImpactStats() {
+function WhyGhana() {
   return (
-    <section className="bg-ink py-24">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+    <section className="bg-white py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
         <Reveal>
-          <p className="max-w-2xl font-display text-2xl font-semibold leading-snug text-cream/90 md:text-3xl">
-            Future Ride is driving the EV revolution across the continent.
-          </p>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand">The sales case</p>
+          <h2 className="mt-3 max-w-2xl font-display text-3xl font-bold text-navy md:text-5xl">
+            Why Ghanaians are switching to electric.
+          </h2>
         </Reveal>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {HERO_STATS.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.1}>
-              <div className="rounded-3xl border border-white/10 bg-coal p-7 transition-colors hover:border-volt/40">
-                <p className="font-display text-3xl font-bold tabular-nums text-volt xl:text-4xl">
-                  <CountUp value={s.value} decimals={s.decimals} suffix={s.suffix} />
-                </p>
-                <p className="mt-3 text-sm text-ash">{s.label}</p>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {WHY_GHANA.map((w, i) => (
+            <Reveal key={w.title} delay={(i % 4) * 0.08}>
+              <div className="h-full rounded-2xl border border-line bg-cloud p-6 transition hover:border-brand/50 hover:bg-mint">
+                <span className="font-display text-2xl font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="mt-3 font-display text-lg font-bold text-navy">{w.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate">{w.text}</p>
               </div>
             </Reveal>
           ))}
@@ -86,55 +87,50 @@ function ImpactStats() {
   );
 }
 
-function BikeShowcase() {
+function Glance() {
   return (
-    <section className="relative overflow-hidden bg-coal py-24">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <SplitHeading
-          text={MODEL.tagline}
-          className="font-display text-4xl font-bold leading-tight md:text-6xl"
-        />
-        <div className="mt-14 grid items-center gap-12 lg:grid-cols-2">
+    <section className="bg-navy py-16 text-white md:py-24">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
           <Reveal>
             <div className="relative">
-              <div className="absolute inset-x-10 bottom-4 h-10 rounded-full bg-volt/10 blur-2xl" />
               <img
                 src="/images/bike-studio.jpg"
-                alt={`${MODEL.name} electric motorcycle studio shot`}
-                className="relative w-full rounded-3xl object-cover"
+                alt="Spiro Ekon 450 M1 electric motorcycle"
+                className="w-full rounded-3xl object-cover"
               />
+              <span className="absolute left-4 top-4 rounded-full bg-brand px-4 py-1.5 text-xs font-bold text-white">
+                Ekon 450 M1
+              </span>
             </div>
           </Reveal>
           <div>
             <Reveal>
-              <p className="font-display text-xl font-semibold text-volt">{MODEL.name}</p>
-              <p className="mt-2 text-ash">{MODEL.blurb}</p>
+              <h2 className="font-display text-3xl font-bold md:text-5xl">The Ekon 450 M1 at a glance.</h2>
             </Reveal>
             <div className="mt-8 grid grid-cols-2 gap-4">
-              {BIKE_SPECS.map((s, i) => (
-                <Reveal key={s.label} delay={i * 0.08}>
-                  <div className="rounded-2xl border border-white/10 bg-ink p-5">
-                    <p className="font-display text-3xl font-bold tabular-nums text-cream">
-                      <CountUp value={s.value} duration={1200} />
-                      <span className="ml-1 text-base text-ash">{s.unit}</span>
+              {GLANCE.map((g, i) => (
+                <Reveal key={g.label} delay={i * 0.08}>
+                  <div className="rounded-2xl bg-white/5 p-6 ring-1 ring-white/10">
+                    <p className="font-display text-4xl font-bold tabular-nums text-brand-bright">
+                      <CountUp value={g.value} duration={1200} />
+                      <span className="ml-1 text-lg text-white/60">{g.unit}</span>
                     </p>
-                    <p className="mt-1.5 text-xs text-ash">{s.label}</p>
+                    <p className="mt-1.5 text-sm text-white/70">{g.label}</p>
                   </div>
                 </Reveal>
               ))}
             </div>
-            <Reveal delay={0.3}>
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <Link
-                  to="/bike"
-                  className="inline-flex items-center gap-2 rounded-full bg-volt px-6 py-3 text-sm font-semibold text-ink hover:brightness-110"
-                >
-                  Explore {MODEL.name.split(" ")[1]} <ArrowRight className="size-4" />
-                </Link>
-                <p className="text-[11px] text-ash">
-                  Specifications are indicative and tested under standard conditions.
-                </p>
-              </div>
+            <Reveal delay={0.25}>
+              <p className="mt-5 text-[11px] text-white/50">
+                Specifications are indicative and tested under standard test conditions.
+              </p>
+              <Link
+                to="/ekon"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-bright hover:underline"
+              >
+                Explore the full bike <ArrowRight className="size-4" />
+              </Link>
             </Reveal>
           </div>
         </div>
@@ -143,18 +139,173 @@ function BikeShowcase() {
   );
 }
 
+function HowItWorks() {
+  const icons = [Bike, MapPinned, BatteryCharging];
+  return (
+    <section className="bg-cloud py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
+        <Reveal>
+          <h2 className="font-display text-3xl font-bold text-navy md:text-5xl">How it works.</h2>
+        </Reveal>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {HOW_IT_WORKS.map((s, i) => {
+            const Icon = icons[i];
+            return (
+              <Reveal key={s.title} delay={i * 0.1}>
+                <div className="relative h-full rounded-3xl border border-line bg-white p-8">
+                  <span className="absolute right-6 top-6 font-display text-5xl font-bold text-line">0{i + 1}</span>
+                  <Icon className="size-8 text-brand" />
+                  <h3 className="mt-5 font-display text-xl font-bold text-navy">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate">{s.text}</p>
+                </div>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WaysToOwn() {
+  return (
+    <section className="bg-white py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
+        <Reveal>
+          <h2 className="font-display text-3xl font-bold text-navy md:text-5xl">Ways to own.</h2>
+        </Reveal>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {WAYS_TO_OWN.map((w, i) => (
+            <Reveal key={w.title} delay={i * 0.1}>
+              <div className="flex h-full flex-col rounded-3xl border border-line bg-cloud p-8">
+                <h3 className="font-display text-xl font-bold text-navy">{w.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate">{w.text}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={0.2}>
+          <Link to="/ownership" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand hover:underline">
+            Learn about financing <ArrowRight className="size-4" />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  return (
+    <section className="bg-mint py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
+        <Reveal>
+          <h2 className="font-display text-3xl font-bold text-navy md:text-5xl">Real riders, real results.</h2>
+          <p className="mt-3 text-sm text-slate">Rider stories from our pilot programme.</p>
+        </Reveal>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {TESTIMONIALS.map((t, i) => (
+            <Reveal key={t.name} delay={i * 0.1}>
+              <figure className="h-full rounded-3xl border border-line bg-white p-7">
+                <div className="flex items-center gap-3">
+                  <span className="grid size-11 place-items-center rounded-full bg-navy font-display text-sm font-bold text-brand-bright">
+                    {t.name.split(" ").map((p) => p[0]).join("")}
+                  </span>
+                  <div>
+                    <figcaption className="font-display text-sm font-bold text-navy">{t.name}</figcaption>
+                    <p className="text-xs text-slate">{t.role}</p>
+                  </div>
+                </div>
+                <blockquote className="mt-4 text-sm leading-relaxed text-ink">“{t.quote}”</blockquote>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalCta() {
+  const [form, setForm] = useState({ name: "", phone: "", city: "" });
+  const [sent, setSent] = useState(false);
+
+  return (
+    <section className="bg-navy py-16 text-white md:py-24">
+      <div className="mx-auto max-w-3xl px-4 text-center md:px-8">
+        <h2 className="font-display text-3xl font-bold md:text-5xl">Ready to make the switch?</h2>
+        <p className="mt-4 text-white/75">
+          Leave your number and a Future Ride advisor will call you today.
+        </p>
+        {sent ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mx-auto mt-8 max-w-md rounded-2xl bg-white/10 px-6 py-5 text-sm font-semibold"
+          >
+            Medaase, {form.name.split(" ")[0] || "rider"}! Your request is in — an advisor will call you today.
+          </motion.div>
+        ) : (
+          <form
+            className="mx-auto mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSent(true);
+              dispatchLead("callback", { Name: form.name, Phone: `+233 ${form.phone}`, City: form.city, Interest: "Call me back" });
+            }}
+          >
+            <input
+              required
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Name"
+              aria-label="Name"
+              className="rounded-full border border-white/20 bg-white/10 px-5 py-3.5 text-sm outline-none placeholder:text-white/50 focus:border-brand-bright"
+            />
+            <input
+              required
+              type="tel"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              placeholder="+233 24 000 0000"
+              aria-label="Phone"
+              className="flex-1 rounded-full border border-white/20 bg-white/10 px-5 py-3.5 text-sm outline-none placeholder:text-white/50 focus:border-brand-bright"
+            />
+            <input
+              required
+              value={form.city}
+              onChange={(e) => setForm({ ...form, city: e.target.value })}
+              placeholder="City"
+              aria-label="City"
+              className="rounded-full border border-white/20 bg-white/10 px-5 py-3.5 text-sm outline-none placeholder:text-white/50 focus:border-brand-bright"
+            />
+            <button className="rounded-full bg-brand px-7 py-3.5 text-sm font-bold text-white hover:bg-brand-dark">
+              I'm Interested
+            </button>
+          </form>
+        )}
+        <p className="mt-4 flex items-center justify-center gap-2 text-[11px] text-white/50">
+          <Wrench className="size-3.5" /> Genuine Spiro bikes · full manufacturer backing
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
-  const { code } = useCountry();
   return (
     <>
       <Hero />
-      <Marquee />
-      <ImpactStats />
-      <BikeShowcase />
-      <SavingsCalculator countryCode={code} />
-      <NetworkMap />
-      <NewsGrid />
-      <CallbackForm />
+      <WhyGhana />
+      <Glance />
+      <HowItWorks />
+      <section className="bg-cloud py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-4 md:px-8">
+          <Calculator />
+        </div>
+      </section>
+      <WaysToOwn />
+      <Testimonials />
+      <FinalCta />
     </>
   );
 }

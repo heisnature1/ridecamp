@@ -1,22 +1,26 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #0a0b09;
-  --color-coal: #11130f;
-  --color-slate: #1a1d18;
-  --color-moss: #242a20;
-  --color-paper: #f5f3ec;
-  --color-cream: #fbfaf7;
-  --color-volt: #c8f04b;
-  --color-volt-dim: #a5cc2f;
-  --color-ash: #9aa094;
+  /* Future Ride brand: deep navy + fresh green, lots of white space */
+  --color-navy: #0a1f44;
+  --color-navy-deep: #06142e;
+  --color-navy-soft: #16345f;
+  --color-brand: #16a34a;
+  --color-brand-dark: #12813b;
+  --color-brand-bright: #22c55e;
+  --color-mint: #edf8f0;
+  --color-paper: #ffffff;
+  --color-cloud: #f6f8f7;
+  --color-ink: #0d1b30;
+  --color-slate: #5c6b7c;
+  --color-line: #e3e9e6;
 
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  --animate-marquee: marquee 42s linear infinite;
+  --animate-marquee: marquee 40s linear infinite;
   --animate-kenburns: kenburns 18s ease-in-out infinite alternate;
-  --animate-pulse-ring: pulse-ring 2.6s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+  --animate-pulse-ring: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
   --animate-bob: bob 2.2s ease-in-out infinite;
 
   @keyframes marquee {
@@ -25,16 +29,16 @@
   }
   @keyframes kenburns {
     from { transform: scale(1) translateY(0); }
-    to { transform: scale(1.12) translateY(-2%); }
+    to { transform: scale(1.1) translateY(-2%); }
   }
   @keyframes pulse-ring {
-    0% { transform: scale(0.4); opacity: 0.9; }
-    80% { transform: scale(2.2); opacity: 0; }
-    100% { transform: scale(2.2); opacity: 0; }
+    0% { transform: scale(0.4); opacity: 0.8; }
+    80% { transform: scale(2.4); opacity: 0; }
+    100% { transform: scale(2.4); opacity: 0; }
   }
   @keyframes bob {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(8px); }
+    50% { transform: translateY(7px); }
   }
 }
 
@@ -43,32 +47,21 @@ html {
 }
 
 body {
-  @apply bg-ink text-cream font-body antialiased;
+  @apply bg-cloud text-ink font-body antialiased;
 }
 
 ::selection {
-  background: var(--color-volt);
-  color: var(--color-ink);
+  background: var(--color-brand-bright);
+  color: #fff;
 }
 
-/* slim dark scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #3a3f36 transparent;
-}
-
-/* range slider */
+/* range slider (light) */
 input[type="range"].fr-range {
-  @apply h-2 w-full cursor-pointer appearance-none rounded-full bg-moss;
+  @apply h-2 w-full cursor-pointer appearance-none rounded-full bg-line;
 }
 input[type="range"].fr-range::-webkit-slider-thumb {
-  @apply size-6 appearance-none rounded-full border-4 border-ink bg-volt shadow-[0_0_0_2px_var(--color-volt)];
+  @apply size-6 appearance-none rounded-full border-4 border-white bg-brand shadow-md;
 }
 input[type="range"].fr-range::-moz-range-thumb {
-  @apply size-6 rounded-full border-4 border-ink bg-volt shadow-[0_0_0_2px_var(--color-volt)];
-}
-
-.text-stroke {
-  -webkit-text-stroke: 1px rgb(200 240 75 / 0.35);
-  color: transparent;
+  @apply size-6 rounded-full border-4 border-white bg-brand shadow-md;
 }

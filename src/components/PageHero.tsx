@@ -1,5 +1,5 @@
-import SplitHeading from "./SplitHeading";
 import Reveal from "./Reveal";
+import SplitHeading from "./SplitHeading";
 
 export default function PageHero({
   kicker,
@@ -11,26 +11,19 @@ export default function PageHero({
   sub?: string;
 }) {
   return (
-    <section className="relative overflow-hidden bg-ink pt-40 pb-16">
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(70% 60% at 50% 0%, rgba(200,240,75,0.08), transparent 60%)",
-        }}
-      />
-      <div className="relative mx-auto max-w-7xl px-5 md:px-8">
+    <section className="bg-white">
+      <div className="mx-auto max-w-7xl px-4 pb-12 pt-14 md:px-8 md:pb-16 md:pt-20">
         <Reveal>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-volt">{kicker}</p>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand">{kicker}</p>
         </Reveal>
         <SplitHeading
           as="h1"
           text={title}
-          className="mt-4 max-w-4xl font-display text-5xl font-bold leading-[1.05] md:text-7xl"
+          className="mt-3 max-w-4xl font-display text-4xl font-bold leading-[1.05] text-navy md:text-6xl"
         />
         {sub && (
-          <Reveal delay={0.2}>
-            <p className="mt-6 max-w-2xl text-lg text-ash">{sub}</p>
+          <Reveal delay={0.15}>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate md:text-lg">{sub}</p>
           </Reveal>
         )}
       </div>

@@ -1,110 +1,92 @@
 import { Link } from "react-router-dom";
-import { useCountry } from "./CountryGate";
-import { getCountry } from "../data/site";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import Logo from "./Logo";
+import { BUSINESS, WA_DEFAULT } from "../lib/leads";
 
-function LinkedInIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden="true">
-      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.55V9h3.57v11.45Z" />
-    </svg>
-  );
-}
-
-function FacebookIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden="true">
-      <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12Z" />
-    </svg>
-  );
-}
-
-function XIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4" fill="currentColor" aria-hidden="true">
-      <path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93 6.07-6.93Zm-1.29 19.5h2.04L6.49 3.24H4.3l13.31 17.41Z" />
-    </svg>
-  );
-}
-
-const COLS = [
-  {
-    title: "Products",
-    links: [{ to: "/bike", label: "FR Volt 450" }],
-  },
-  {
-    title: "Ecosystem",
-    links: [
-      { to: "/energy", label: "Swap Network" },
-      { to: "/technology", label: "Technology" },
-    ],
-  },
-  {
-    title: "About us",
-    links: [
-      { to: "/about", label: "Our Team" },
-      { to: "/news", label: "News" },
-      { to: "/support", label: "Support" },
-      { to: "/sustainability", label: "Sustainability" },
-    ],
-  },
+const QUICK = [
+  { to: "/ekon", label: "Ekon 450 M1" },
+  { to: "/why-electric", label: "Why Go Electric" },
+  { to: "/battery-swap", label: "Battery Swap" },
+  { to: "/calculator", label: "Savings Calculator" },
+  { to: "/ownership", label: "Ownership & Financing" },
+  { to: "/fleet", label: "Fleet & Business" },
+  { to: "/service", label: "Service & Warranty" },
+  { to: "/faqs", label: "FAQs" },
+  { to: "/about", label: "About Future Ride" },
+  { to: "/contact", label: "Contact / Book a Test Ride" },
 ];
 
 export default function Footer() {
-  const { code } = useCountry();
-  const country = getCountry(code);
-
   return (
-    <footer className="border-t border-white/5 bg-ink">
-      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 md:px-8 lg:grid-cols-[1.2fr_2fr]">
+    <footer className="bg-navy-deep text-white">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:px-8 lg:grid-cols-[1.3fr_1fr_1.2fr]">
         <div>
-          <div className="flex items-center gap-2.5">
-            <svg viewBox="0 0 64 64" className="size-9" aria-hidden="true">
-              <rect width="64" height="64" rx="14" className="fill-volt" />
-              <path d="M36 8 18 36h12l-4 20 22-30H34l6-18z" className="fill-ink" />
-            </svg>
-            <span className="font-display text-lg font-bold tracking-tight">FUTURE RIDE</span>
-          </div>
-          <p className="mt-4 max-w-xs text-sm text-ash">
-            Electric motorcycles and a battery-swap network built for the riders who keep cities moving.
+          <Logo light />
+          <p className="mt-4 max-w-sm text-sm text-white/70">
+            Future Ride is the sole distributor of Spiro electric motorcycles in Ghana. Ride the
+            future. Keep your money.
           </p>
-          <div className="mt-6 flex gap-3">
-            <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="Future Ride on LinkedIn" className="rounded-full border border-white/10 p-2.5 text-cream/70 hover:border-volt hover:text-volt">
-              <LinkedInIcon />
-            </a>
-            <a href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Future Ride on Facebook" className="rounded-full border border-white/10 p-2.5 text-cream/70 hover:border-volt hover:text-volt">
-              <FacebookIcon />
-            </a>
-            <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="Future Ride on X" className="rounded-full border border-white/10 p-2.5 text-cream/70 hover:border-volt hover:text-volt">
-              <XIcon />
-            </a>
+          <div className="mt-5 flex flex-wrap gap-2 text-xs">
+            <a className="rounded-full border border-white/20 px-3 py-1.5 hover:border-brand-bright hover:text-brand-bright" href="https://www.facebook.com" target="_blank" rel="noreferrer">Facebook</a>
+            <a className="rounded-full border border-white/20 px-3 py-1.5 hover:border-brand-bright hover:text-brand-bright" href="https://www.instagram.com" target="_blank" rel="noreferrer">Instagram</a>
+            <a className="rounded-full border border-white/20 px-3 py-1.5 hover:border-brand-bright hover:text-brand-bright" href="https://www.tiktok.com" target="_blank" rel="noreferrer">TikTok</a>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-          {COLS.map((col) => (
-            <div key={col.title}>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ash">{col.title}</p>
-              <ul className="mt-4 space-y-2.5">
-                {col.links.map((l) => (
-                  <li key={l.to}>
-                    <Link to={l.to} className="text-sm text-cream/80 hover:text-volt">
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <nav aria-label="Footer">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">Quick links</p>
+          <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {QUICK.map((l) => (
+              <li key={l.to}>
+                <Link to={l.to} className="text-sm text-white/80 hover:text-brand-bright">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">Talk to us</p>
+          <ul className="mt-4 space-y-3 text-sm text-white/80">
+            <li>
+              <a href={`tel:${BUSINESS.phoneTel}`} className="flex items-center gap-3 hover:text-brand-bright">
+                <Phone className="size-4 text-brand-bright" /> {BUSINESS.phoneDisplay}
+              </a>
+            </li>
+            <li>
+              <a href={WA_DEFAULT} target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-brand-bright">
+                <span className="grid size-4 place-items-center rounded-full bg-[#25D366] text-[9px] font-black text-white">W</span>
+                WhatsApp us
+              </a>
+            </li>
+            <li>
+              <a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-3 hover:text-brand-bright">
+                <Mail className="size-4 text-brand-bright" /> {BUSINESS.email}
+              </a>
+            </li>
+            <li className="flex items-center gap-3">
+              <MapPin className="size-4 text-brand-bright" /> {BUSINESS.address}
+            </li>
+            <li className="flex items-center gap-3">
+              <Clock className="size-4 text-brand-bright" /> {BUSINESS.hours}
+            </li>
+          </ul>
         </div>
       </div>
 
-      <div className="border-t border-white/5">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 md:px-8">
-          <p className="text-xs text-ash">© 2026 Future Ride. All rights reserved.</p>
-          <span className="flex items-center gap-2 rounded-full border border-white/10 px-3.5 py-1.5 text-xs text-cream/80">
-            {country.flag} {country.name}
-          </span>
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-white/60 md:px-8">
+          <p>© 2026 Future Ride. All rights reserved. Authorised Spiro distributor in Ghana.*</p>
+          <p className="flex gap-4">
+            <Link to="/privacy" className="hover:text-white">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white">Terms</Link>
+          </p>
         </div>
+        <p className="mx-auto max-w-7xl px-4 pb-6 text-[11px] text-white/40 md:px-8">
+          *Distributor wording, product figures and specifications subject to written confirmation
+          from Spiro. Specifications are indicative and tested under standard test conditions.
+        </p>
       </div>
     </footer>
   );

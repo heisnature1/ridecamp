@@ -1,19 +1,15 @@
 /**
- * Rough equirectangular map of Africa rendered as a dot matrix.
- * The outline below is a hand-simplified polygon (lon, lat) used only
- * to place dots and city pins — it is not geographic survey data.
+ * Stylised dot-matrix map of Ghana (lon, lat outline — hand-simplified,
+ * not survey data) used for the swap-network section.
  */
-export const AFRICA_OUTLINE: [number, number][] = [
-  [-17, 15], [-16, 12], [-13, 9], [-8, 5], [-4, 5], [0, 5.8], [3, 6.4],
-  [8, 4.5], [9, 4], [9, 1], [12, -5], [12, -17], [14, -22], [17, -28],
-  [20, -34], [25, -34], [30, -31], [32, -28], [35, -24], [35, -17],
-  [40, -15], [40, -10], [39.5, -6.8], [39.7, -4], [42, -1.5], [45.3, 2],
-  [51.3, 11.8], [43.3, 11.5], [43.3, 12.5], [39, 15], [37, 22], [34, 28],
-  [32, 31], [25, 31.5], [20, 30.5], [15, 32.5], [10, 37], [3, 36.8],
-  [-2, 35], [-6, 35.8], [-9, 33], [-13, 27.7], [-17, 21], [-16, 16],
+export const GHANA_OUTLINE: [number, number][] = [
+  [-3.25, 5.1], [-2.7, 5.1], [-2.2, 4.9], [-1.6, 4.75], [-0.8, 5.0],
+  [-0.02, 5.55], [0.7, 5.7], [1.19, 6.1], [1.07, 6.9], [0.7, 7.0],
+  [0.5, 8.5], [0.35, 10.0], [0.05, 11.09], [-0.5, 10.99], [-1.5, 11.17],
+  [-2.9, 11.0], [-3.25, 9.5], [-2.9, 8.0], [-3.1, 6.7],
 ];
 
-export const MAP_BOUNDS = { minLon: -19, maxLon: 53, minLat: -36, maxLat: 38 };
+export const MAP_BOUNDS = { minLon: -3.8, maxLon: 1.7, minLat: 4.4, maxLat: 11.6 };
 
 export function project(lon: number, lat: number, w: number, h: number) {
   const x = ((lon - MAP_BOUNDS.minLon) / (MAP_BOUNDS.maxLon - MAP_BOUNDS.minLon)) * w;
@@ -23,10 +19,10 @@ export function project(lon: number, lat: number, w: number, h: number) {
 
 function inside(lon: number, lat: number): boolean {
   let ok = false;
-  const n = AFRICA_OUTLINE.length;
+  const n = GHANA_OUTLINE.length;
   for (let i = 0, j = n - 1; i < n; j = i++) {
-    const [xi, yi] = AFRICA_OUTLINE[i];
-    const [xj, yj] = AFRICA_OUTLINE[j];
+    const [xi, yi] = GHANA_OUTLINE[i];
+    const [xj, yj] = GHANA_OUTLINE[j];
     if (yi > lat !== yj > lat && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
       ok = !ok;
     }
@@ -34,8 +30,7 @@ function inside(lon: number, lat: number): boolean {
   return ok;
 }
 
-/** Dot grid inside the Africa outline, in map coordinates 0..w / 0..h */
-export function africaDots(w: number, h: number, stepDeg = 1.15): { x: number; y: number }[] {
+export function ghanaDots(w: number, h: number, stepDeg = 0.22): { x: number; y: number }[] {
   const dots: { x: number; y: number }[] = [];
   for (let lat = MAP_BOUNDS.minLat; lat <= MAP_BOUNDS.maxLat; lat += stepDeg) {
     for (let lon = MAP_BOUNDS.minLon; lon <= MAP_BOUNDS.maxLon; lon += stepDeg) {
@@ -44,3 +39,12 @@ export function africaDots(w: number, h: number, stepDeg = 1.15): { x: number; y
   }
   return dots;
 }
+
+export const GHANA_CITIES = [
+  { name: "Accra", lon: -0.19, lat: 5.6, status: "Launch city" },
+  { name: "Tema", lon: 0.01, lat: 5.67, status: "Launch city" },
+  { name: "Kumasi", lon: -1.62, lat: 6.69, status: "Coming soon" },
+  { name: "Takoradi", lon: -1.76, lat: 4.93, status: "Coming soon" },
+  { name: "Cape Coast", lon: -1.25, lat: 5.1, status: "Coming soon" },
+  { name: "Tamale", lon: -0.84, lat: 9.4, status: "Coming soon" },
+];
