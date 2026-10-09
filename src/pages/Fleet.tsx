@@ -4,6 +4,7 @@ import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import { FLEET_AUDIENCE, FLEET_BENEFITS } from "../data/site";
 import { dispatchLead } from "../lib/leads";
+import { formatGhanaPhone } from "../lib/leadKinds";
 
 function FleetForm() {
   const [form, setForm] = useState({
@@ -14,12 +15,13 @@ function FleetForm() {
     bikes: "5",
     city: "",
     useCase: "Food / parcel delivery",
+    notes: "",
   });
   const [sent, setSent] = useState(false);
 
   const set =
     (k: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm({ ...form, [k]: e.target.value });
 
   if (sent) {
@@ -41,14 +43,15 @@ function FleetForm() {
       onSubmit={(e) => {
         e.preventDefault();
         setSent(true);
-        dispatchLead("fleet-quote", {
+        dispatchLead("fleet", {
           Company: form.company,
           "Contact person": form.person,
-          Phone: `+233 ${form.phone}`,
+          Phone: formatGhanaPhone(form.phone),
           Email: form.email,
           "Number of bikes": form.bikes,
           City: form.city,
           "Use case": form.useCase,
+          Notes: form.notes,
         });
       }}
     >
@@ -66,6 +69,14 @@ function FleetForm() {
           <option key={u}>{u}</option>
         ))}
       </select>
+      <textarea
+        value={form.notes}
+        onChange={set("notes")}
+        rows={3}
+        placeholder="Tell us about your operation — routes, riders, current fuel spend (optional)"
+        aria-label="Tell us about your operation (optional)"
+        className="mt-4 w-full rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand"
+      />
       <button className="mt-6 w-full rounded-full bg-brand py-4 text-sm font-bold text-white hover:bg-brand-dark sm:w-auto sm:px-10">
         Request a Fleet Quote
       </button>

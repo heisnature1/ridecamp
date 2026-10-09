@@ -4,9 +4,17 @@ import { useSearchParams } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import { BUSINESS, dispatchLead, WA_DEFAULT } from "../lib/leads";
+import { formatGhanaPhone, type LeadKind } from "../lib/leadKinds";
 
 const CITIES = ["Accra", "Tema", "Kumasi", "Takoradi", "Cape Coast", "Tamale", "Other"];
 const RIDER_TYPES = ["Commercial rider", "Delivery rider", "Private commuter", "Fleet / business"];
+const INTENTS = ["Book a test ride", "Get a quote", "Apply for financing"] as const;
+/** The intent label maps onto the canonical lead type the admin dashboard files it under. */
+const KIND_BY_INTENT: Record<(typeof INTENTS)[number], LeadKind> = {
+  "Book a test ride": "test-ride",
+  "Get a quote": "quote",
+  "Apply for financing": "financing",
+};
 
 export default function Contact() {
   const [params] = useSearchParams();
@@ -15,10 +23,12 @@ export default function Contact() {
   const [form, setForm] = useState({
     name: "",
     phone: "",
+    email: "",
     city: "Accra",
     date: "",
     riderType: RIDER_TYPES[0],
     interest: intent,
+    notes: "",
   });
   const [sent, setSent] = useState(false);
 
@@ -28,7 +38,7 @@ export default function Contact() {
 
   const set =
     (k: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm({ ...form, [k]: e.target.value });
 
   return (
@@ -47,7 +57,7 @@ export default function Contact() {
                 <h2 className="mt-4 font-display text-2xl font-bold text-navy">You're in the book.</h2>
                 <p className="mt-3 text-sm text-slate">
                   Medaase, {form.name.split(" ")[0] || "rider"}! Your request ({form.interest.toLowerCase()}) has been
-                  sent. An advisor will call you on +233 {form.phone} to confirm.
+                  sent. An advisor will call you on {formatGhanaPhone(form.phone)} to confirm.
                 </p>
               </div>
             ) : (
@@ -56,18 +66,20 @@ export default function Contact() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   setSent(true);
-                  dispatchLead(form.interest.toLowerCase(), {
+                  dispatchLead(KIND_BY_INTENT[form.interest as (typeof INTENTS)[number]] ?? "quote", {
                     Name: form.name,
-                    Phone: `+233 ${form.phone}`,
+                    Phone: formatGhanaPhone(form.phone),
+                    Email: form.email,
                     City: form.city,
                     "Preferred date": form.date || "Flexible",
                     "Rider type": form.riderType,
                     Interest: form.interest,
+                    Notes: form.notes,
                   });
                 }}
               >
                 <div className="flex flex-wrap gap-2">
-                  {["Book a test ride", "Get a quote", "Apply for financing"].map((o) => (
+                  {INTENTS.map((o) => (
                     <button
                       key={o}
                       type="button"
@@ -89,6 +101,7 @@ export default function Contact() {
                     <span className="grid place-items-center border-r border-line bg-cloud px-3 text-sm font-semibold text-slate">+233</span>
                     <input required type="tel" value={form.phone} onChange={set("phone")} placeholder="24 000 0000" aria-label="Phone number" className="w-full px-4 py-3 text-sm outline-none" />
                   </div>
+                  <input type="email" value={form.email} onChange={set("email")} placeholder="Email (optional)" aria-label="Email (optional)" className="rounded-xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-brand" />
                   <select value={form.city} onChange={set("city")} aria-label="City" className="rounded-xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-brand">
                     {CITIES.map((c) => (
                       <option key={c}>{c}</option>
@@ -100,6 +113,14 @@ export default function Contact() {
                       <option key={r}>{r}</option>
                     ))}
                   </select>
+                  <textarea
+                    value={form.notes}
+                    onChange={set("notes")}
+                    rows={3}
+                    placeholder="Anything we should know? (optional)"
+                    aria-label="Anything we should know? (optional)"
+                    className="rounded-xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-brand sm:col-span-2"
+                  />
                 </div>
                 <button className="mt-6 w-full rounded-full bg-brand py-4 text-sm font-bold text-white hover:bg-brand-dark">
                   {form.interest === "Get a quote" ? "Request Quote" : "Confirm Booking"}

@@ -18,6 +18,7 @@ npm install
 npm run dev        # dev server on :5173
 npm run build      # typecheck + production build
 npm run preview    # serve the production build
+npm run smoke      # lead-pipeline + dashboard smoke check (no browser needed)
 ```
 
 ## Sitemap
@@ -36,13 +37,41 @@ npm run preview    # serve the production build
 | `/faqs`          | FAQs (15 questions) |
 | `/contact`       | Contact / Book a Test Ride (short lead form, +233 default) |
 | `/spec-sheet`    | Print-friendly spec sheet ("Download Spec Sheet") |
+| `/admin`         | Admin dashboard (internal — every public form submission, see below) |
 | `/privacy`, `/terms` | Legal pages |
 
-## Lead capture
+## Lead capture & admin dashboard
 
-Forms show an instant confirmation and dispatch the lead via WhatsApp deep-link
-(`wa.me`) plus an email draft — see `src/lib/leads.ts`. Point `BUSINESS` at the
-real number/email, or swap `dispatchLead` for a CRM webhook later.
+Every public form writes to a single lead store (`src/lib/leadsStore.ts`, key
+`ridecamp_leads`) *before* it dispatches, so nothing a visitor types is lost:
+
+| Form | Page | Lead types | Fields captured |
+| ---- | ---- | ---------- | --------------- |
+| Call-back | `/` | Call-back | name, phone, city |
+| Main lead form | `/contact` | Test ride · Quote · Financing | name, phone, email, city, preferred date, rider type, interest, notes |
+| Financing application | `/ownership` | Financing | name, phone, email, city, occupation, income range, preferred option |
+| Fleet quote | `/fleet` | Fleet | company, contact person, phone, email, bikes, city, use case, notes |
+
+`src/data/forms.ts` is the registry behind the dashboard's **Public forms** tab —
+it is checked against the form components by `npm run smoke`, so the two cannot
+silently drift apart. Phone numbers are normalised to `+233 …` on the way in
+(`formatGhanaPhone`), and lead types are canonicalised, so old records saved
+under labels such as `fleet-quote` still file correctly.
+
+`/admin` then shows that data:
+
+- **Overview** — KPIs, 7-day submission chart, pipeline, and breakdowns by lead
+  type, source page and city.
+- **All leads** — one merged table for all five lead types (filtered by type,
+  status, free text — not five separate tables). Clicking a row opens a drawer
+  with every field the visitor entered plus WhatsApp/call/email follow-up.
+- **Public forms** — which forms feed the dashboard and exactly what each captures.
+- **Data & export** — CSV/JSON export, JSON import, sample data, clear.
+
+Leads are stored in the browser's local storage, so the dashboard reflects
+submissions made on that device (including other tabs, which update live). Point
+`dispatchLead` in `src/lib/leads.ts` at a backend/CRM webhook to collect leads
+from every visitor; the dashboard needs no other change.
 
 ## Before launch (brief §8)
 
