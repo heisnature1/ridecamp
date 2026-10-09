@@ -31,10 +31,24 @@ export type Lead = Record<string, string>;
  * email draft. A backend/CRM webhook can be added here later.
  */
 export function dispatchLead(kind: string, lead: Lead) {
+  // Save to local storage for Admin Dashboard
+  const existing = localStorage.getItem("ridecamp_leads");
+  const leads = existing ? JSON.parse(existing) : [];
+  leads.push({
+    id: crypto.randomUUID(),
+    kind,
+    timestamp: new Date().toISOString(),
+    data: lead,
+  });
+  localStorage.setItem("ridecamp_leads", JSON.stringify(leads));
+
   const lines = Object.entries(lead)
     .map(([k, v]) => `${k}: ${v}`)
     .join("\n");
   const wa = waLink(`New ${kind} lead — Future Ride website\n${lines}`);
   window.open(wa, "_blank", "noopener");
-  window.location.href = mailtoLink(`[${kind}] New lead from futureride.gh`, lines);
+  // Use a small delay before redirect to ensure open succeeds
+  setTimeout(() => {
+    window.location.href = mailtoLink(`[${kind}] New lead from futureride.gh`, lines);
+  }, 100);
 }

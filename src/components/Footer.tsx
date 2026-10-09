@@ -14,6 +14,7 @@ const QUICK = [
   { to: "/faqs", label: "FAQs" },
   { to: "/about", label: "About Future Ride" },
   { to: "/contact", label: "Contact / Book a Test Ride" },
+  { to: "/admin", label: "Admin Dashboard" },
 ];
 
 export default function Footer() {
