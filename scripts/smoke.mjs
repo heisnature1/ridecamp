@@ -80,7 +80,10 @@ try {
   check("fleet bikes are summed", stats.fleetBikes === 45, `got ${stats.fleetBikes}`);
   check("kinds are bucketed", stats.byKind.length === 5, `got ${stats.byKind.length}`);
   check("home-page source keeps its path", normalizePath("/?intent=quote") === "/", normalizePath("/?intent=quote"));
-  check("source filter isolates the fleet form", filterLeads(samples, { ...EMPTY_FILTERS, source: "/fleet" }).length === 3);
+  check(
+    "source filter picks up every lead from the fleet page (fleet quote + financing)",
+    filterLeads(samples, { ...EMPTY_FILTERS, source: "/fleet" }).length === 6,
+  );
   check("source filter isolates the contact form", filterLeads(samples, { ...EMPTY_FILTERS, source: "/contact" }).length === 6);
   check("home page gets a readable label", sourceLabel("/") === "Home page", sourceLabel("/"));
   check("7-day series is produced", stats.last7.length === 7, `got ${stats.last7.length}`);
@@ -173,7 +176,8 @@ try {
   const PAGE_BY_ROUTE = {
     "/": "src/pages/Home.tsx",
     "/contact": "src/pages/Contact.tsx",
-    "/ownership": "src/pages/Ownership.tsx",
+    // Ownership & financing moved onto the Fleet & Business page, so both the
+    // fleet-quote form and the financing form live in Fleet.tsx.
     "/fleet": "src/pages/Fleet.tsx",
   };
   check("every public form is registered", PUBLIC_FORMS.length === 4, `got ${PUBLIC_FORMS.length}`);

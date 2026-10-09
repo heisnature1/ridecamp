@@ -55,7 +55,7 @@ const SEEDS: Seed[] = [
     hour: 16,
     kind: "financing",
     status: "qualified",
-    source: "/ownership#apply-financing",
+    source: "/fleet#apply-financing",
     data: {
       Name: "Yaw Owusu",
       Phone: "+233 55 208 1176",
@@ -127,7 +127,7 @@ const SEEDS: Seed[] = [
     hour: 17,
     kind: "financing",
     status: "lost",
-    source: "/ownership#apply-financing",
+    source: "/fleet#apply-financing",
     data: {
       Name: "Abena Sarpong",
       Phone: "+233 24 118 3345",
@@ -196,7 +196,7 @@ const SEEDS: Seed[] = [
     hour: 18,
     kind: "financing",
     status: "new",
-    source: "/ownership#apply-financing",
+    source: "/fleet#apply-financing",
     data: {
       Name: "Emmanuel Darko",
       Phone: "+233 55 002 7781",

@@ -1,6 +1,7 @@
 import { Zap } from "lucide-react";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
+import SplitHeading from "../components/SplitHeading";
 import CtaRow from "../components/CtaRow";
 import { EKON_FEATURES, EKON_SPECS } from "../data/site";
 
@@ -28,7 +29,11 @@ export default function Ekon() {
           <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_380px]">
             <div>
               <Reveal>
-                <h2 className="font-display text-2xl font-bold text-navy md:text-3xl">Key specifications</h2>
+                <SplitHeading
+                  as="h2"
+                  text="Key specifications"
+                  className="font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
+                />
               </Reveal>
               <Reveal delay={0.1}>
                 <dl className="mt-6 divide-y divide-line rounded-3xl border border-line bg-white">
@@ -46,7 +51,11 @@ export default function Ekon() {
               </Reveal>
 
               <Reveal delay={0.15}>
-                <h2 className="mt-12 font-display text-2xl font-bold text-navy md:text-3xl">What makes it work</h2>
+                <SplitHeading
+                  as="h2"
+                  text="What makes it work"
+                  className="mt-12 font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
+                />
               </Reveal>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {EKON_FEATURES.map((f, i) => (

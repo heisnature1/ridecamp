@@ -4,13 +4,14 @@ import Logo from "./Logo";
 import { BUSINESS, WA_DEFAULT } from "../lib/leads";
 
 const QUICK = [
+  { to: "/", label: "Home" },
   { to: "/ekon", label: "Ekon 450 M1" },
-  { to: "/why-electric", label: "Why Go Electric" },
   { to: "/battery-swap", label: "Battery Swap" },
   { to: "/calculator", label: "Savings Calculator" },
-  { to: "/ownership", label: "Ownership & Financing" },
   { to: "/fleet", label: "Fleet & Business" },
+  { to: "/fleet#financing", label: "Ownership & Financing" },
   { to: "/service", label: "Service & Warranty" },
+  { to: "/service#why-electric", label: "Why Go Electric" },
   { to: "/faqs", label: "FAQs" },
   { to: "/about", label: "About Future Ride" },
   { to: "/contact", label: "Contact / Book a Test Ride" },

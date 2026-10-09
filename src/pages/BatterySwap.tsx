@@ -1,6 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
+import SplitHeading from "../components/SplitHeading";
 import GhanaMap from "../components/GhanaMap";
 import { SWAP_STEPS, SWAP_WHY } from "../data/site";
 
@@ -38,9 +39,11 @@ export default function BatterySwap() {
               </div>
             </Reveal>
             <Reveal delay={0.1}>
-              <h2 className="font-display text-2xl font-bold text-navy md:text-3xl">
-                Why swapping beats plug-in charging.
-              </h2>
+              <SplitHeading
+                as="h2"
+                text="Why swapping beats plug-in charging."
+                className="font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
+              />
               <ul className="mt-6 space-y-3">
                 {SWAP_WHY.map((w) => (
                   <li key={w} className="flex items-start gap-3 text-sm font-medium text-ink">
@@ -53,7 +56,11 @@ export default function BatterySwap() {
 
           <div className="mt-16">
             <Reveal>
-              <h2 className="font-display text-2xl font-bold text-navy md:text-3xl">Our Ghana swap network.</h2>
+              <SplitHeading
+                as="h2"
+                text="Our Ghana swap network."
+                className="font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
+              />
               <p className="mt-2 max-w-2xl text-sm text-slate">
                 We are rolling out swap points city by city. Addresses, opening hours and cost per
                 swap will be published here at launch — starting with Accra and Tema.

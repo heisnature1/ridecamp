@@ -4,13 +4,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 
+/*
+ * Ownership & financing lives on the Fleet & Business page (/#financing) and
+ * Why Go Electric lives on the Service page (/#why-electric), so the tab bar
+ * stays short. The old /ownership and /why-electric URLs still redirect.
+ */
 const LINKS = [
+  { to: "/", label: "Home" },
   { to: "/ekon", label: "Ekon 450 M1" },
   { to: "/battery-swap", label: "Battery Swap" },
-  { to: "/ownership", label: "Financing" },
   { to: "/calculator", label: "Savings" },
   { to: "/fleet", label: "Fleet & Business" },
-  { to: "/why-electric", label: "Why Electric" },
   { to: "/service", label: "Service" },
   { to: "/about", label: "About" },
   { to: "/faqs", label: "FAQs" },
@@ -123,6 +127,7 @@ export default function Nav() {
                 >
                   <NavLink
                     to={l.to}
+                    end={l.to === "/"}
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${isActive ? "bg-mint text-brand" : "text-navy hover:bg-cloud"}`
                     }

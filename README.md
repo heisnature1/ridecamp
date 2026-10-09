@@ -27,18 +27,17 @@ npm run smoke      # lead-pipeline + dashboard smoke check (no browser needed)
 | ---------------- | ----------------------------- |
 | `/`              | Home (hero, trust strip, sales case, glance, how-it-works, calculator, ways to own, testimonials, callback CTA) |
 | `/ekon`          | The Ekon 450 M1 (specs, 12 feature blocks, colours, spec-sheet download) |
-| `/why-electric`  | Why Go Electric (8-argument sales case + Spiro scale) |
 | `/battery-swap`  | Battery Swap (swap-pay-ride, Ghana network map) |
 | `/calculator`    | Savings Calculator (GH₵, per brief §5 formulas) |
-| `/ownership`     | Ownership & Financing (lease-to-own, docs, financing form) |
-| `/fleet`         | Fleet & Business (benefits, audience, fleet-quote form) |
-| `/service`       | Service & Warranty |
+| `/fleet`         | Fleet & Business (benefits, audience, fleet-quote form) **+ Ownership & Financing** (ways to own, documents, financing form — see `#financing`) |
+| `/service`       | Service & Warranty **+ Why Go Electric** (8-argument sales case + Spiro scale — see `#why-electric`) |
 | `/about`         | About Future Ride (name meaning, promise, founder-note placeholder) |
 | `/faqs`          | FAQs (15 questions) |
 | `/contact`       | Contact / Book a Test Ride (short lead form, +233 default) |
 | `/spec-sheet`    | Print-friendly spec sheet ("Download Spec Sheet") |
 | `/admin`         | Admin dashboard (internal — every public form submission, see below) |
 | `/privacy`, `/terms` | Legal pages |
+| `/ownership` → `/fleet#financing`, `/why-electric` → `/service#why-electric` | Legacy URLs, kept as redirects |
 
 ## Lead capture & admin dashboard
 
@@ -49,7 +48,7 @@ Every public form writes to a single lead store (`src/lib/leadsStore.ts`, key
 | ---- | ---- | ---------- | --------------- |
 | Call-back | `/` | Call-back | name, phone, city |
 | Main lead form | `/contact` | Test ride · Quote · Financing | name, phone, email, city, preferred date, rider type, interest, notes |
-| Financing application | `/ownership` | Financing | name, phone, email, city, occupation, income range, preferred option |
+| Financing application | `/fleet` (`#apply-financing`) | Financing | name, phone, email, city, occupation, income range, preferred option |
 | Fleet quote | `/fleet` | Fleet | company, contact person, phone, email, bikes, city, use case, notes |
 
 `src/data/forms.ts` is the registry behind the dashboard's **Public forms** tab —
@@ -72,6 +71,13 @@ Leads are stored in the browser's local storage, so the dashboard reflects
 submissions made on that device (including other tabs, which update live). Point
 `dispatchLead` in `src/lib/leads.ts` at a backend/CRM webhook to collect leads
 from every visitor; the dashboard needs no other change.
+
+## Brand & photography
+
+The Future Ride logo lives in `src/components/Logo.tsx` (navigation, footer, spec sheet) and as
+raster artwork in `public/brand/`. Every photo in `public/images/` carries the logo lockup, which
+is stamped on by `scripts/brand/logo_watermark.py` — see `scripts/brand/README.md` to re-run it
+after swapping in new photography.
 
 ## Before launch (brief §8)
 
