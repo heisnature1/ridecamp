@@ -17,6 +17,8 @@ import Contact from "./pages/Contact";
 import SpecSheet from "./pages/SpecSheet";
 import { Privacy, Terms } from "./pages/Legal";
 
+import Admin from "./pages/Admin";
+
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -46,6 +48,7 @@ export default function App() {
           <Route path="/spec-sheet" element={<SpecSheet />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
