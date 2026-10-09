@@ -1,4 +1,5 @@
-import { Zap } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Zap, FileSpreadsheet, Download, Database } from "lucide-react";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import SplitHeading from "../components/SplitHeading";
@@ -85,6 +86,40 @@ export default function Ekon() {
                   </div>
                   <div className="mt-7 flex flex-col gap-3">
                     <CtaRow specSheet />
+                  </div>
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.16}>
+                <div className="mt-6 rounded-3xl border border-line bg-white p-6">
+                  <h3 className="font-display text-lg font-bold text-navy">Internal: data & export</h3>
+                  <p className="mt-1 text-sm text-slate">
+                    Leads captured by every public form on this device. Sign in to the admin
+                    dashboard to review, annotate and export them.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2">
+                    <Link
+                      to="/login"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-navy px-5 py-2.5 text-sm font-bold text-white transition hover:bg-navy-soft active:scale-95"
+                    >
+                      Open admin dashboard
+                    </Link>
+                    <Link
+                      to="/spec-sheet"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-navy ring-1 ring-line transition hover:ring-navy active:scale-95"
+                    >
+                      <FileSpreadsheet className="size-4" /> Download spec sheet
+                    </Link>
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 gap-3 text-center">
+                    <div className="rounded-2xl bg-cloud p-3">
+                      <Download className="mx-auto size-4 text-brand" />
+                      <p className="mt-1 text-[11px] font-bold text-navy">CSV export</p>
+                    </div>
+                    <div className="rounded-2xl bg-cloud p-3">
+                      <Database className="mx-auto size-4 text-brand" />
+                      <p className="mt-1 text-[11px] font-bold text-navy">Local storage</p>
+                    </div>
                   </div>
                 </div>
               </Reveal>

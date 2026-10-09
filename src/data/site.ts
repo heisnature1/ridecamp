@@ -183,20 +183,11 @@ export const ABOUT_PROMISE = [
 ];
 
 export const FAQS: [string, string][] = [
-  ["What is the Ekon 450 M1?", "It is Spiro's electric motorcycle designed for African roads and commercial use, with up to 100 km range per swap, 90 km/h top speed and 300 kg load capacity."],
   ["How far can it go on one battery?", "Up to 100 km per swap under standard test conditions. Real range depends on load, speed, terrain and ride mode. Eco mode gives the longest range."],
   ["How do I charge it?", "You do not wait for charging. You swap your battery for a charged one at a swap point in minutes."],
-  ["Is it cheaper than a petrol motorcycle?", "For riders who ride every day, running costs are much lower because you do not buy petrol or engine oil and have fewer parts to repair. Use our calculator to estimate your own savings. Actual savings vary by route, usage and financing path."],
-  ["Can it carry passengers and cargo?", "Yes. It is designed for passenger and delivery use, with a load capacity of up to 300 kg and rear and side mounting options."],
-  ["Can it handle bad roads and rain?", "It is built with a reinforced frame and tuned suspension and tested on real African routes."],
-  ["What does the warranty cover?", "Up to 2 years or 30,000 km, depending on the component, covering key parts such as the motor, controller and frame. Terms and exclusions apply."],
+  ["Is it cheaper than a petrol motorcycle?", "For riders who ride every day, running costs are much lower because you do not buy petrol or engine oil and have fewer parts to repair. Use our calculator to estimate your own savings."],
   ["Can I buy on instalments?", "Yes. Lease-to-own options are available, subject to approval by our financing partners. No large upfront payment is required."],
   ["Where do I service the bike?", "At Future Ride authorised service centres in Ghana. You can also report issues and track them in the Spiro app."],
-  ["Are spare parts available?", "Yes, genuine spare parts are stocked at authorised service centres."],
-  ["What if the bike is stolen?", "The bike has GPS tracking through the app. Insurance support is available."],
-  ["Do I need a special licence?", "Electric motorcycles are registered and ridden like other motorcycles in Ghana. Our advisors will walk you through licence and registration requirements."],
-  ["Is it good for the environment?", "Yes. Electric motorcycles produce zero tailpipe emissions and are quiet, which means cleaner air and less noise."],
-  ["Can my company buy a fleet?", "Yes. We offer fleet pricing, financing and dedicated support. See the Fleet & Business page."],
   ["Can I try before I buy?", "Yes. Book a test ride and see for yourself."],
 ];
 

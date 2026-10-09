@@ -13,6 +13,7 @@ type Seed = {
   status: LeadStatus;
   source: string;
   data: LeadData;
+  adminNotes?: string;
 };
 
 const SEEDS: Seed[] = [
@@ -32,6 +33,7 @@ const SEEDS: Seed[] = [
       Interest: "Book a test ride",
       Notes: "I ride Okada from Madina to Circle. Want to feel the bike before I commit.",
     },
+    adminNotes: "Called twice, no answer. Left a WhatsApp message — follow up Friday morning.",
   },
   {
     daysAgo: 0,
@@ -49,6 +51,7 @@ const SEEDS: Seed[] = [
       "Use case": "Food / parcel delivery",
       Notes: "Replacing 25 petrol bikes in January. Need swap coverage in East Legon.",
     },
+    adminNotes: "Sent fleet brochure + swap-network map. Customer wants a quote with 3 battery-subscription tiers. Follow up next week.",
   },
   {
     daysAgo: 1,
@@ -245,6 +248,7 @@ export function buildSampleLeads(): LeadRecord[] {
       createdAt: at.toISOString(),
       source: seed.source,
       data: seed.data,
+      adminNotes: seed.adminNotes ?? "",
     };
   });
 }

@@ -116,14 +116,17 @@ export const EMPTY_FILTERS: LeadFilters = { kinds: [], statuses: [], query: "", 
 
 /** One merged query across every lead type — the dashboard has a single table. */
 export function filterLeads(leads: LeadRecord[], filters: LeadFilters): LeadRecord[] {
-  const q = filters.query.trim().toLowerCase();
+  const raw = filters.query.trim();
+  const q = raw.toLowerCase();
+  const notesOnly = q === "has:notes";
   return leads
     .filter((lead) => (filters.kinds.length ? filters.kinds.includes(lead.kind) : true))
     .filter((lead) => (filters.statuses.length ? filters.statuses.includes(lead.status) : true))
     .filter((lead) => (filters.source ? normalizePath(lead.source) === normalizePath(filters.source) : true))
     .filter((lead) => {
+      if (notesOnly) return lead.adminNotes.trim().length > 0;
       if (!q) return true;
-      const haystack = [lead.kind, lead.status, lead.source, ...Object.values(lead.data)]
+      const haystack = [lead.kind, lead.status, lead.source, ...Object.values(lead.data), lead.adminNotes]
         .join(" ")
         .toLowerCase();
       return haystack.includes(q);

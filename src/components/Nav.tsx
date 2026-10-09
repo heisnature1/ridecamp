@@ -17,7 +17,6 @@ const LINKS = [
   { to: "/fleet", label: "Fleet & Business" },
   { to: "/service", label: "Service" },
   { to: "/about", label: "About" },
-  { to: "/faqs", label: "FAQs" },
 ];
 
 export default function Nav() {
@@ -74,10 +73,16 @@ export default function Nav() {
             );
           })}
         </nav>
-        <div className="flex items-center gap-3">
+<div className="flex items-center gap-3">
+          <Link
+            to="/login"
+            className="hidden text-[13px] font-semibold text-navy/80 transition hover:text-brand sm:inline-block"
+          >
+            Admin
+          </Link>
           <Link
             to="/contact"
-            className="hidden relative overflow-hidden rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-brand/25 transition-all hover:bg-brand-dark hover:scale-105 active:scale-95 sm:inline-block group"
+            className="hidden relative overflow-hidden rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-brand/25 transition-all hover:bg-brand-dark hover:scale-105 active:scale-105 sm:inline-block group"
           >
             <span className="relative z-10">Book Test Ride</span>
             <motion.div

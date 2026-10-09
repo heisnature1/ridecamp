@@ -31,6 +31,8 @@ export type LeadRecord = {
   source: string;
   /** exactly what the visitor typed, keyed by the form's own field labels */
   data: LeadData;
+  /** internal notes added by an admin on the dashboard — never mixed with visitor data */
+  adminNotes: string;
 };
 
 const canUseBrowser = typeof window !== "undefined";
@@ -67,6 +69,7 @@ export function normalizeRecord(raw: unknown): LeadRecord {
     createdAt: isoDate(r.createdAt ?? r.timestamp),
     source: typeof r.source === "string" && r.source ? r.source : "unknown",
     data: cleanData(r.data),
+    adminNotes: typeof r.adminNotes === "string" ? r.adminNotes : "",
   };
 }
 
@@ -112,7 +115,7 @@ export function addLead(kind: string, data: LeadData, source?: string): LeadReco
   return record;
 }
 
-export function updateLead(id: string, patch: Partial<Pick<LeadRecord, "status" | "data">>) {
+export function updateLead(id: string, patch: Partial<Pick<LeadRecord, "status" | "data" | "adminNotes">>) {
   write(
     readLeads().map((l) =>
       l.id === id
@@ -120,6 +123,7 @@ export function updateLead(id: string, patch: Partial<Pick<LeadRecord, "status" 
             ...l,
             status: patch.status ? normalizeStatus(patch.status) : l.status,
             data: patch.data ? cleanData(patch.data) : l.data,
+            adminNotes: patch.adminNotes !== undefined ? patch.adminNotes : l.adminNotes,
           }
         : l,
     ),
@@ -205,6 +209,11 @@ export function leadSummary(lead: LeadRecord): string {
   return parts.join(" · ") || "No contact details captured";
 }
 
+/** Whether an admin has attached an internal note to this lead. */
+export function leadHasNotes(lead: LeadRecord): boolean {
+  return lead.adminNotes.trim().length > 0;
+}
+
 /** WhatsApp deep-link that messages the *customer*, pre-filled with context. */
 export function leadWhatsAppLink(lead: LeadRecord): string | null {
   const digits = leadPhone(lead).replace(/\D/g, "");
@@ -241,13 +250,14 @@ export function leadsToCsv(leads: LeadRecord[]): string {
   for (const lead of leads) {
     for (const key of Object.keys(lead.data)) if (!dataKeys.includes(key)) dataKeys.push(key);
   }
-  const header = ["Submitted", "Type", "Status", "Source", ...dataKeys];
+  const header = ["Submitted", "Type", "Status", "Source", ...dataKeys, "Admin notes"];
   const rows = leads.map((lead) => [
     new Date(lead.createdAt).toLocaleString("en-GB"),
     kindMeta(lead.kind).label,
     statusMeta(lead.status).label,
     lead.source,
     ...dataKeys.map((key) => lead.data[key] ?? ""),
+    lead.adminNotes,
   ]);
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
 }

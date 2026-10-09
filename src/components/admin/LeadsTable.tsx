@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Download, Inbox, Search, SlidersHorizontal } from "lucide-react";
+import { ChevronRight, Download, Inbox, NotebookPen, Search, SlidersHorizontal } from "lucide-react";
 import { filterLeads, type LeadFilters } from "../../lib/leadStats";
 import {
   LEAD_KINDS,
@@ -10,7 +10,7 @@ import {
   type LeadKind,
   type LeadStatus,
 } from "../../lib/leadKinds";
-import { leadCity, leadName, leadOrg, leadPhone, type LeadRecord } from "../../lib/leadsStore";
+import { leadCity, leadHasNotes, leadName, leadOrg, leadPhone, type LeadRecord } from "../../lib/leadsStore";
 import { fmtShortDateTime, sourceLabel, timeAgo } from "../../lib/format";
 import { Chip, EASE, EmptyState, KindChip, Panel } from "./ui";
 
@@ -59,8 +59,8 @@ export default function LeadsTable({
       {/* type filters — one merged table, filtered rather than split into per-type tables */}
       <div className="flex flex-wrap items-center gap-2">
         <Chip
-          active={filters.kinds.length === 0}
-          onClick={() => onFilters({ ...filters, kinds: [] })}
+          active={filters.kinds.length === 0 && filters.query === "" && filters.source === ""}
+          onClick={() => onFilters({ ...filters, kinds: [], query: "", source: "" })}
           count={leads.length}
         >
           All leads
@@ -76,6 +76,19 @@ export default function LeadsTable({
             {k.plural}
           </Chip>
         ))}
+        <Chip
+          active={filters.query === "has:notes"}
+          onClick={() =>
+            onFilters({
+              ...filters,
+              query: filters.query === "has:notes" ? "" : "has:notes",
+            })
+          }
+          icon={<NotebookPen className="size-3" />}
+          count={leads.filter((l) => leadHasNotes(l)).length}
+        >
+          Has notes
+        </Chip>
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_auto_auto]">
@@ -207,6 +220,11 @@ export default function LeadsTable({
                           <span className="relative flex size-2">
                             <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-70" />
                             <span className="relative inline-flex size-2 rounded-full bg-brand" />
+                          </span>
+                        )}
+                        {leadHasNotes(lead) && (
+                          <span title="Has admin notes" className="inline-flex size-4 items-center justify-center rounded-full bg-navy/10 text-navy">
+                            <NotebookPen className="size-2.5" />
                           </span>
                         )}
                         <span className="truncate font-bold text-navy">{leadName(lead)}</span>

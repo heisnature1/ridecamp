@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarClock,
@@ -6,6 +7,7 @@ import {
   Mail,
   MessageCircle,
   Phone,
+  Save,
   Trash2,
   X,
 } from "lucide-react";
@@ -31,15 +33,25 @@ export default function LeadDrawer({
   onClose,
   onStatus,
   onDelete,
+  onNote,
 }: {
   lead: LeadRecord | null;
   onClose: () => void;
   onStatus: (id: string, status: LeadStatus) => void;
   onDelete: (id: string) => void;
+  onNote: (id: string, note: string) => void;
 }) {
   const wa = lead ? leadWhatsAppLink(lead) : null;
   const mail = lead ? leadEmailLink(lead) : null;
   const tel = lead && leadPhone(lead) ? `tel:${leadPhone(lead).replace(/\s/g, "")}` : null;
+  const [draft, setDraft] = useState(lead?.adminNotes ?? "");
+  const [dirty, setDirty] = useState(false);
+
+  // Reset the draft when a different lead is opened.
+  useEffect(() => {
+    setDraft(lead?.adminNotes ?? "");
+    setDirty(false);
+  }, [lead?.id]);
 
   return (
     <AnimatePresence>
@@ -144,6 +156,62 @@ export default function LeadDrawer({
                     <p className="px-4 py-3 text-sm text-slate">This submission captured no fields.</p>
                   )}
                 </dl>
+              </section>
+
+              <section>
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate">
+                    Admin notes
+                  </h3>
+                  {dirty && (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-600">
+                      <span className="size-1.5 rounded-full bg-amber-500" /> Unsaved changes
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1.5 text-xs text-slate">
+                  Internal only — never shown to the visitor and kept separate from what they typed.
+                </p>
+                <textarea
+                  value={draft}
+                  onChange={(e) => {
+                    setDraft(e.target.value);
+                    setDirty(true);
+                  }}
+                  rows={4}
+                  placeholder="e.g. Called twice, no answer — try WhatsApp on Friday. Interested in the fleet option for 12 bikes."
+                  className="mt-3 w-full resize-y rounded-2xl border border-line bg-cloud px-4 py-3 text-sm font-semibold text-navy outline-none transition focus:border-brand focus:bg-white"
+                />
+                <div className="mt-3 flex items-center gap-2">
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.96 }}
+                    disabled={!dirty}
+                    onClick={() => {
+                      onNote(lead.id, draft);
+                      setDirty(false);
+                    }}
+                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition ${
+                      dirty
+                        ? "bg-navy text-white hover:bg-navy-soft"
+                        : "cursor-not-allowed bg-cloud text-slate"
+                    }`}
+                  >
+                    <Save className="size-3.5" /> Save notes
+                  </motion.button>
+                  {draft.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDraft("");
+                        setDirty(true);
+                      }}
+                      className="rounded-full px-4 py-2 text-xs font-bold text-slate ring-1 ring-line transition hover:bg-white hover:text-navy"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </section>
 
               <section>

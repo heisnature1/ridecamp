@@ -58,12 +58,14 @@ export function Chip({
   children,
   count,
   dotClass,
+  icon,
 }: {
   active: boolean;
   onClick: () => void;
   children: ReactNode;
   count?: number;
   dotClass?: string;
+  icon?: ReactNode;
 }) {
   return (
     <motion.button
@@ -75,6 +77,7 @@ export function Chip({
       }`}
     >
       {dotClass && <span className={`size-1.5 rounded-full ${dotClass}`} />}
+      {icon}
       {children}
       {typeof count === "number" && (
         <span className={`tabular-nums ${active ? "text-white/70" : "text-slate"}`}>{count}</span>

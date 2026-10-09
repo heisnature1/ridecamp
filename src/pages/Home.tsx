@@ -1,15 +1,14 @@
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import {
-  ArrowRight, BatteryCharging, Bike, MapPinned, Route, ShieldCheck, Wrench,
-} from "lucide-react";
+import { ArrowRight, BatteryCharging, Bike, MapPinned, Route, ShieldCheck, Wrench } from "lucide-react";
 import SplitHeading from "../components/SplitHeading";
 import Reveal from "../components/Reveal";
 import CountUp from "../components/CountUp";
 import CtaRow from "../components/CtaRow";
 import Calculator from "../components/Calculator";
-import { GLANCE, HOW_IT_WORKS, TESTIMONIALS, TRUST_STRIP, WHY_GHANA, WAYS_TO_OWN } from "../data/site";
-import { useState } from "react";
+import { GLANCE, HOW_IT_WORKS, TESTIMONIALS, TRUST_STRIP, WHY_GHANA, WAYS_TO_OWN, FAQS } from "../data/site";
 import { dispatchLead } from "../lib/leads";
 import { formatGhanaPhone } from "../lib/leadKinds";
 
@@ -244,6 +243,62 @@ function Testimonials() {
   );
 }
 
+function Faqs() {
+  const [open, setOpen] = useState<number | null>(0);
+
+  return (
+    <section className="bg-white py-16 md:py-24">
+      <div className="mx-auto max-w-3xl px-4 md:px-8">
+        <Reveal>
+          <SplitHeading
+            as="h2"
+            text="Questions, answered straight."
+            className="font-display text-3xl font-bold leading-[1.1] text-navy md:text-5xl"
+          />
+          <p className="mt-3 text-sm text-slate">Everything riders ask us before booking a test ride.</p>
+        </Reveal>
+        <div className="mt-8 space-y-3">
+          {FAQS.map(([q, a], i) => (
+            <Reveal key={q} delay={Math.min(i, 5) * 0.04}>
+              <div className="overflow-hidden rounded-2xl border border-line bg-cloud">
+                <button
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                  aria-expanded={open === i}
+                >
+                  <span className="font-display text-[15px] font-bold text-navy">{q}</span>
+                  <ChevronDown className={`size-5 shrink-0 text-brand transition-transform ${open === i ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence initial={false}>
+                  {open === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.22 }}
+                    >
+                      <p className="px-6 pb-6 text-sm leading-relaxed text-slate">{a}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={0.1}>
+          <div className="mt-12 rounded-3xl bg-mint p-8 text-center">
+            <h2 className="font-display text-xl font-bold text-navy">Still wondering about something?</h2>
+            <p className="mt-2 text-sm text-slate">The fastest answer is a test ride — or a WhatsApp message.</p>
+            <div className="mt-6 flex justify-center">
+              <CtaRow />
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function FinalCta() {
   const [form, setForm] = useState({ name: "", phone: "", city: "" });
   const [sent, setSent] = useState(false);
@@ -333,6 +388,7 @@ export default function Home() {
       </section>
       <WaysToOwn />
       <Testimonials />
+      <Faqs />
       <FinalCta />
     </>
   );

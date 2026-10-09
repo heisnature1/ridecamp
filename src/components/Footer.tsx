@@ -12,10 +12,9 @@ const QUICK = [
   { to: "/fleet#financing", label: "Ownership & Financing" },
   { to: "/service", label: "Service & Warranty" },
   { to: "/service#why-electric", label: "Why Go Electric" },
-  { to: "/faqs", label: "FAQs" },
   { to: "/about", label: "About Future Ride" },
   { to: "/contact", label: "Contact / Book a Test Ride" },
-  { to: "/admin", label: "Admin Dashboard" },
+  { to: "/login", label: "Admin Dashboard" },
 ];
 
 export default function Footer() {
