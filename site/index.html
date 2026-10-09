@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RideCamp | Electric motorcycles for working riders</title>
+    <meta
+      name="description"
+      content="Electric motorcycles, quick battery swaps, running-cost estimates and a service network for daily riders."
+    />
+    <meta name="theme-color" content="#fff8f0" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Market picker, shown on first visit (see script.js) -->
+    <dialog class="market-dialog" id="market-dialog" aria-labelledby="market-title">
+      <form class="market-form" id="market-form" novalidate>
+        <h2 id="market-title">Choose your market</h2>
+        <p>Pick a country to see sample service points and running-cost estimates for your area.</p>
+        <div class="market-options" id="market-options" role="radiogroup" aria-labelledby="market-title"></div>
+        <div class="market-actions">
+          <button class="btn btn-ghost" type="button" id="market-skip">Skip for now</button>
+          <button class="btn btn-primary" type="submit">Continue</button>
+        </div>
+      </form>
+    </dialog>
+
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="#top" aria-label="RideCamp home">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="9" fill="#ff6a2b" />
+            <path d="M18.4 5.5 8.8 18h6.1l-1.6 8.5L23.2 14h-6.1z" fill="#14110f" />
+          </svg>
+          <span>RideCamp</span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <span class="sr-only">Menu</span>
+          <span class="bar bar-top" aria-hidden="true"></span>
+          <span class="bar bar-bottom" aria-hidden="true"></span>
+        </button>
+
+        <nav class="site-nav" id="site-nav" aria-label="Primary">
+          <a href="#product">Product</a>
+          <a href="#economics">Savings</a>
+          <a href="#network">Network</a>
+          <a href="#about">About</a>
+          <a class="btn btn-primary btn-small" href="#contact">Book a test ride</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="hero" id="top">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">Electric motorcycles for working riders</p>
+            <h1>Ride all day. Spend less on fuel.</h1>
+            <p class="lead">
+              Swap a spent battery in minutes and get back on the road. RideCamp pairs a rugged
+              electric motorcycle with a shared swap network designed for daily commercial use.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#product">See the bike</a>
+              <a class="btn btn-ghost" href="#contact">Book a test ride</a>
+            </div>
+            <a class="scroll-cue" href="#about">Keep scrolling</a>
+          </div>
+
+          <div class="hero-art">
+            <svg viewBox="0 0 560 480" role="img" aria-label="Illustration of an electric motorcycle on a road">
+              <defs>
+                <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#ffd6b8" />
+                  <stop offset="1" stop-color="#fff3e7" />
+                </linearGradient>
+              </defs>
+              <rect width="560" height="480" rx="40" fill="url(#sky)" />
+              <circle cx="412" cy="132" r="74" fill="#ff6a2b" />
+              <path d="M0 300C120 246 250 262 360 292S520 300 560 280V480H0Z" fill="#f0c09b" />
+              <path d="M-10 368C140 336 300 392 580 352V480H-10Z" fill="#4a4039" />
+              <path d="M40 428H520" stroke="#fff3e7" stroke-width="6" stroke-linecap="round" stroke-dasharray="28 26" />
+              <path d="M160 300 255 222h75l60 78" fill="none" stroke="#14110f" stroke-width="16" stroke-linejoin="round" stroke-linecap="round" />
+              <path d="M330 222 352 190M322 186h44" stroke="#14110f" stroke-width="12" stroke-linecap="round" />
+              <rect x="236" y="206" width="72" height="16" rx="8" fill="#ff6a2b" />
+              <rect x="214" y="234" width="98" height="54" rx="14" fill="#ffffff" stroke="#14110f" stroke-width="6" />
+              <path d="M268 244 252 266h12l-8 16 20-24h-12z" fill="#ff6a2b" />
+              <g>
+                <circle cx="160" cy="300" r="62" fill="#14110f" />
+                <circle cx="160" cy="300" r="30" fill="#fff3e7" />
+                <circle cx="160" cy="300" r="10" fill="#ff6a2b" />
+              </g>
+              <g>
+                <circle cx="390" cy="300" r="62" fill="#14110f" />
+                <circle cx="390" cy="300" r="30" fill="#fff3e7" />
+                <circle cx="390" cy="300" r="10" fill="#ff6a2b" />
+              </g>
+            </svg>
+            <div class="hero-badge">
+              <strong>Battery swap</strong>
+              <span>Minutes, not hours</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key figures -->
+      <section class="stats" aria-label="Key figures">
+        <div class="container">
+          <div class="stats-grid">
+            <div class="stat">
+              <span class="stat-value" data-count="1250000">1,250,000</span>
+              <span class="stat-label">Kilometres ridden</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-count="48000">48,000</span>
+              <span class="stat-label">kg of CO₂ avoided</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-count="2400000">2,400,000</span>
+              <span class="stat-label">kWh delivered</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-count="180000">180,000</span>
+              <span class="stat-label">Battery swaps</span>
+            </div>
+          </div>
+          <p class="stats-note">Sample figures. Replace with your own data before publishing.</p>
+        </div>
+      </section>
+
+      <!-- Story -->
+      <section class="section" id="about">
+        <div class="container split">
+          <div>
+            <p class="eyebrow">Why RideCamp</p>
+            <h2>Electric transport that pays for itself</h2>
+            <p>
+              Riders who earn a living on two wheels need machines that start every morning and cost
+              less per kilometre. We built around that reality: quick battery swaps, simple servicing
+              and running costs that are easy to predict.
+            </p>
+          </div>
+          <ul class="pillars">
+            <li>
+              <h3>Lower running costs</h3>
+              <p>Energy per kilometre is typically well below the cost of petrol for the same distance.</p>
+            </li>
+            <li>
+              <h3>Swap, don't wait</h3>
+              <p>Exchange a depleted battery in minutes instead of waiting hours for a charge.</p>
+            </li>
+            <li>
+              <h3>Service close to home</h3>
+              <p>Trained technicians and spare parts placed along common routes.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Product -->
+      <section class="section section-dark" id="product">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">The bike</p>
+            <h2>Built for the long shift</h2>
+            <p>
+              Light enough for busy streets, strong enough for daily loads, and ready to go again as
+              soon as a fresh battery is in.
+            </p>
+          </div>
+          <ul class="spec-grid">
+            <li class="spec">
+              <span class="spec-value">100 km</span>
+              <span class="spec-label">Range per battery swap</span>
+            </li>
+            <li class="spec">
+              <span class="spec-value">80 km/h</span>
+              <span class="spec-label">Top speed</span>
+            </li>
+            <li class="spec">
+              <span class="spec-value">10 kW</span>
+              <span class="spec-label">Peak power</span>
+            </li>
+            <li class="spec">
+              <span class="spec-value">200 kg</span>
+              <span class="spec-label">Load capacity</span>
+            </li>
+          </ul>
+          <div class="product-actions">
+            <a class="btn btn-primary" href="#contact">Book a test ride</a>
+            <p class="fine">Specifications are sample values for layout purposes.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Running-cost calculator -->
+      <section class="section" id="economics">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Running costs</p>
+            <h2>See what you could save</h2>
+            <p>
+              Compare a day on a petrol motorcycle with a day on an electric one. Adjust the inputs to
+              match your own route.
+            </p>
+          </div>
+
+          <div class="calc">
+            <div class="calc-card" role="group" aria-label="Savings inputs">
+              <div class="field">
+                <label for="km">Daily distance: <output id="km-out" for="km">80</output> km</label>
+                <input type="range" id="km" min="10" max="300" step="5" value="80" />
+              </div>
+              <div class="field">
+                <label for="kpl">Petrol bike fuel economy (km per litre)</label>
+                <input type="number" id="kpl" min="1" step="0.5" value="35" inputmode="decimal" />
+              </div>
+              <div class="field">
+                <label for="petrol">Petrol price per litre</label>
+                <input type="number" id="petrol" min="0" step="0.01" value="1.50" inputmode="decimal" />
+              </div>
+              <div class="field">
+                <label for="ekm">Electric cost per km (energy and swaps)</label>
+                <input type="number" id="ekm" min="0" step="0.01" value="0.02" inputmode="decimal" />
+              </div>
+              <div class="field">
+                <label for="days">Riding days per week</label>
+                <input type="number" id="days" min="0" max="7" step="1" value="6" inputmode="numeric" />
+              </div>
+              <div class="field">
+                <label for="currency">Currency</label>
+                <select id="currency"></select>
+              </div>
+            </div>
+
+            <div class="results">
+              <div class="result">
+                <span>Daily savings</span>
+                <strong id="daily">—</strong>
+              </div>
+              <div class="result">
+                <span>Monthly savings</span>
+                <strong id="monthly">—</strong>
+              </div>
+              <div class="result result-hero">
+                <span>Yearly savings</span>
+                <strong id="yearly">—</strong>
+              </div>
+              <p class="fine" id="calc-note" aria-live="polite">
+                Illustrative estimate. Each battery swap covers a limited range, so longer routes include
+                extra swaps in the cost per km. Actual savings depend on route, load and energy prices.
+              </p>
+              <a class="btn btn-primary" href="#contact">Book a test ride</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Network -->
+      <section class="section section-alt" id="network">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Network</p>
+            <h2>Swap stations and service centres</h2>
+            <p>Browse sample locations by country and type. Replace these entries with your real network.</p>
+          </div>
+
+          <div class="network-controls">
+            <div class="segmented" role="group" aria-label="Location type">
+              <button type="button" data-type="all" aria-pressed="true">All</button>
+              <button type="button" data-type="station" aria-pressed="false">Swap stations</button>
+              <button type="button" data-type="service" aria-pressed="false">Service centres</button>
+            </div>
+            <div class="field">
+              <label for="network-country">Country</label>
+              <select id="network-country"></select>
+            </div>
+          </div>
+
+          <ul class="location-list" id="location-list"></ul>
+          <p class="location-empty" id="location-empty" hidden>No locations match this filter yet.</p>
+        </div>
+      </section>
+
+      <!-- Callback request -->
+      <section class="section cta-band" id="contact">
+        <div class="container cta-grid">
+          <div>
+            <p class="eyebrow">Get started</p>
+            <h2>Ready for your test ride?</h2>
+            <p>Share your number and a team member will call you to arrange a test ride.</p>
+          </div>
+          <form class="contact-form" id="contact-form" novalidate>
+            <div class="phone-row">
+              <div class="field">
+                <label for="dial-code">Country code</label>
+                <select id="dial-code" name="dial"></select>
+              </div>
+              <div class="field">
+                <label for="phone">Phone number</label>
+                <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="700 123 456" />
+              </div>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Request a call</button>
+            <p class="form-status" id="form-status" role="status"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="#top">
+            <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+              <rect width="32" height="32" rx="9" fill="#ff6a2b" />
+              <path d="M18.4 5.5 8.8 18h6.1l-1.6 8.5L23.2 14h-6.1z" fill="#14110f" />
+            </svg>
+            <span>RideCamp</span>
+          </a>
+          <p class="footer-tag">Electric motorcycles and battery swapping for working riders.</p>
+        </div>
+        <nav aria-label="Product">
+          <h3>Product</h3>
+          <ul>
+            <li><a href="#product">The bike</a></li>
+            <li><a href="#economics">Savings estimate</a></li>
+            <li><a href="#contact">Test rides</a></li>
+          </ul>
+        </nav>
+        <nav aria-label="Network">
+          <h3>Network</h3>
+          <ul>
+            <li><a href="#network">Swap stations</a></li>
+            <li><a href="#network">Service centres</a></li>
+          </ul>
+        </nav>
+        <nav aria-label="Company">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="container footer-bottom">
+        <p>© 2026 RideCamp. Placeholder content: replace before publishing.</p>
+      </div>
+    </footer>
+  </body>
+</html>
