@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 @theme {
-  /* Future Ride brand: deep navy + fresh green, lots of white space */
   --color-navy: #0a1f44;
   --color-navy-deep: #06142e;
   --color-navy-soft: #16345f;
@@ -22,6 +21,10 @@
   --animate-kenburns: kenburns 18s ease-in-out infinite alternate;
   --animate-pulse-ring: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
   --animate-bob: bob 2.2s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-glow: glow 3s ease-in-out infinite alternate;
+  --animate-shimmer: shimmer 2s ease-in-out infinite;
+  --animate-rotate-slow: rotate-slow 20s linear infinite;
 
   @keyframes marquee {
     from { transform: translateX(0); }
@@ -40,6 +43,23 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(7px); }
   }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(5px) rotate(-1deg); }
+  }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.3), 0 0 40px rgba(34, 197, 94, 0.1); }
+    50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.5), 0 0 80px rgba(34, 197, 94, 0.2); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 }
 
 html {
@@ -55,7 +75,202 @@ body {
   color: #fff;
 }
 
-/* range slider (light) */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(10, 31, 68, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--color-brand), var(--color-brand-bright), #06b6d4);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+.btn-3d {
+  @apply relative overflow-hidden rounded-full px-6 py-3 font-bold transition-all duration-300;
+  transform-style: preserve-3d;
+}
+.btn-3d::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-brand via-brand-bright to-cyan-500 opacity-0 transition-opacity duration-300;
+  z-index: -1;
+}
+.btn-3d:hover::before {
+  opacity: 1;
+}
+.btn-3d:active {
+  transform: translateZ(-2px) scale(0.98);
+}
+
+.card-3d {
+  @apply relative rounded-2xl transition-all duration-500;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+.card-3d:hover {
+  transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(34, 197, 94, 0.1);
+}
+
+.card-3d-inner {
+  @apply relative rounded-2xl bg-white p-6;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.parallax-layer {
+  transform-style: preserve-3d;
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-brand via-brand-bright to-cyan-500 bg-clip-text text-transparent;
+}
+
+.animate-float {
+  animation: var(--animate-float);
+}
+
+.animate-glow {
+  animation: var(--animate-glow);
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+.animate-rotate-slow {
+  animation: var(--animate-rotate-slow);
+}
+
+.hero-bg-pattern {
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 197, 94, 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(6, 182, 212, 0.1), transparent),
+    radial-gradient(ellipse 50% 30% at 0% 100%, rgba(16, 185, 129, 0.08), transparent);
+}
+
+.nav-link-3d {
+  @apply relative inline-block transition-all duration-300;
+  transform-style: preserve-3d;
+}
+.nav-link-3d::after {
+  content: attr(data-text);
+  @apply absolute inset-0 bg-gradient-to-r from-brand to-brand-bright bg-clip-text text-transparent opacity-0;
+  transform: translateZ(20px) rotateX(-90deg);
+  transform-origin: bottom;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.nav-link-3d:hover::after {
+  opacity: 1;
+  transform: translateZ(20px) rotateX(0deg);
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px) rotateX(10deg);
+  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.scroll-reveal.visible {
+  opacity: 1;
+  transform: translateY(0) rotateX(0);
+}
+
+.input-3d {
+  @apply relative rounded-xl border border-line bg-white px-4 py-3 text-sm outline-none transition-all duration-300;
+  background: linear-gradient(145deg, #ffffff, #f0f4f2);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.05),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.5);
+}
+.input-3d:focus {
+  @apply border-brand;
+  box-shadow: 
+    0 0 0 3px rgba(34, 197, 94, 0.15),
+    inset 2px 2px 4px rgba(0, 0, 0, 0.03),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.range-3d {
+  @apply h-3 w-full cursor-pointer appearance-none rounded-full;
+  background: linear-gradient(145deg, #e3e9e6, #d0d8d4);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.range-3d::-webkit-slider-thumb {
+  @apply appearance-none size-7 rounded-full border-4 border-white bg-gradient-to-br from-brand to-brand-bright;
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3), 0 0 0 2px rgba(34, 197, 94, 0.1);
+  transition: all 0.2s ease;
+}
+.range-3d::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.4), 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+.range-3d::-moz-range-thumb {
+  @apply size-7 rounded-full border-4 border-white bg-gradient-to-br from-brand to-brand-bright;
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3), 0 0 0 2px rgba(34, 197, 94, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-cloud;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-gradient-to-b from-brand to-brand-bright;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply from-brand-dark to-brand;
+}
+
 input[type="range"].fr-range {
   @apply h-2 w-full cursor-pointer appearance-none rounded-full bg-line;
 }

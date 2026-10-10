@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   LogOut,
   NotebookPen,
+  GalleryHorizontal,
   SlidersHorizontal,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -14,6 +15,7 @@ import LeadDrawer from "../components/admin/LeadDrawer";
 import LeadsTable from "../components/admin/LeadsTable";
 import Overview from "../components/admin/Overview";
 import Sources from "../components/admin/Sources";
+import GalleryPanel from "../components/admin/GalleryPanel";
 import { Toasts, type ToastMessage } from "../components/admin/ui";
 import useLeads from "../lib/useLeads";
 import { EMPTY_FILTERS, type LeadFilters } from "../lib/leadStats";
@@ -28,23 +30,33 @@ import {
   updateLead,
 } from "../lib/leadsStore";
 import { buildSampleLeads } from "../data/sampleLeads";
+import { getGallery, subscribe, seedGallery, type GalleryPost } from "../lib/galleryStore";
 
-type TabId = "overview" | "leads" | "sources";
+type TabId = "overview" | "leads" | "sources" | "gallery";
 
 const TABS: { id: TabId; label: string; icon: typeof Inbox }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "leads", label: "All leads", icon: Inbox },
   { id: "sources", label: "Public forms", icon: NotebookPen },
+  { id: "gallery", label: "Gallery", icon: GalleryHorizontal },
 ];
 
 export default function Admin() {
   const leads = useLeads();
+  const [gallery, setGallery] = useState<GalleryPost[]>([]);
   const [tab, setTab] = useState<TabId>("overview");
   const [filters, setFilters] = useState<LeadFilters>(EMPTY_FILTERS);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const prevCount = useRef(leads.length);
   const seenIds = useRef<string[]>(leads.map((l) => l.id));
+
+  useEffect(() => {
+    setGallery(getGallery());
+    const off = subscribe(() => setGallery(getGallery()));
+    seedGallery();
+    return off;
+  }, []);
 
   const toast = useCallback((text: string, tone: "ok" | "warn" = "ok") => {
     const id = Date.now() + Math.random();
@@ -246,6 +258,23 @@ export default function Admin() {
                 onViewLeads={(route) => {
                   setFilters({ ...EMPTY_FILTERS, source: route });
                   setTab("leads");
+                }}
+              />
+            )}
+            {tab === "gallery" && (
+              <GalleryPanel
+                posts={gallery}
+                onToast={toast}
+                onAdd={(p) => {
+                  setGallery((g) => [p, ...g]);
+                }}
+                onUpdate={(id, patch) => {
+                  setGallery((g) =>
+                    g.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+                  );
+                }}
+                onDelete={(id) => {
+                  setGallery((g) => g.filter((p) => p.id !== id));
                 }}
               />
             )}

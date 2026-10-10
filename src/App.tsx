@@ -12,6 +12,7 @@ import Service from "./pages/Service";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import SpecSheet from "./pages/SpecSheet";
+import Gallery from "./pages/Gallery";
 import { Privacy, Terms } from "./pages/Legal";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/ekon" element={<Ekon />} />
           <Route path="/battery-swap" element={<BatterySwap />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/calculator" element={<CalculatorPage />} />
           <Route path="/fleet" element={<Fleet />} />
           <Route path="/ownership" element={<Navigate to="/fleet#financing" replace />} />
