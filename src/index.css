@@ -222,6 +222,10 @@ body {
     inset 2px 2px 4px rgba(0, 0, 0, 0.05),
     inset -2px -2px 4px rgba(255, 255, 255, 0.5);
 }
+.input-3d::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
 .input-3d:focus {
   @apply border-brand;
   box-shadow: 
