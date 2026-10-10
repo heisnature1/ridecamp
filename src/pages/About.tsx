@@ -57,7 +57,7 @@ export default function About() {
                   would rather show you the bike than tell you about it.
                 </p>
                 <div className="mt-auto overflow-hidden rounded-2xl pt-8">
-                  <img src="/images/hero-accra.jpg" alt="Accra street scene" className="h-56 w-full rounded-2xl object-cover" />
+                  <img src="/images/rider.jpg" alt="Our founder" className="h-56 w-full rounded-2xl object-cover" />
                 </div>
               </div>
             </Reveal>
