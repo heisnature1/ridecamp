@@ -44,9 +44,6 @@ export default function Login() {
           <div className="flex flex-col items-center text-center">
             <Logo />
             <h1 className="mt-6 font-display text-2xl font-bold text-navy">Admin login</h1>
-            <p className="mt-2 text-sm text-slate">
-              Internal dashboard — leads captured by the public site.
-            </p>
           </div>
 
           <form className="mt-8 space-y-4" onSubmit={onSubmit}>
@@ -95,13 +92,6 @@ export default function Login() {
             </Link>
           </p>
         </div>
-
-        <p className="mt-4 text-center text-[11px] text-slate">
-          Default credentials are configured via{" "}
-          <code className="rounded bg-white px-1 py-0.5 font-mono">VITE_ADMIN_USER</code>{" "}
-          and{" "}
-          <code className="rounded bg-white px-1 py-0.5 font-mono">VITE_ADMIN_PASS</code>.
-        </p>
       </div>
     </div>
   );
