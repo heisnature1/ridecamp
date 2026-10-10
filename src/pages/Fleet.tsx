@@ -185,7 +185,7 @@ export default function Fleet() {
           <div className="grid items-start gap-10 lg:grid-cols-2">
             <Reveal>
               <div className="overflow-hidden rounded-3xl">
-                <img src="/images/fleet-delivery.jpg" alt="Delivery fleet of electric motorcycles" className="h-[320px] w-full object-cover" />
+                <img src="/images/group.jpg" alt="Delivery fleet of electric motorcycles" className="h-[320px] w-full object-cover" />
               </div>
               <h2 className="mt-8 font-display text-xl font-bold text-navy">Benefits for fleets</h2>
               <ul className="mt-4 space-y-3">
