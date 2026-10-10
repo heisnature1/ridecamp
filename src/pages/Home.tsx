@@ -19,8 +19,8 @@ function Hero() {
     <section className="relative overflow-hidden bg-navy text-white">
       <div className="absolute inset-0">
         <img
-          src="/images/hero-accra.jpg"
-          alt="Rider on a Spiro Ekon electric motorcycle in Accra"
+          src="/images/motor.jpg"
+          alt="Spiro Ekon electric motorcycle on a Ghanaian road"
           className="size-full object-cover opacity-60"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-navy/30" />
