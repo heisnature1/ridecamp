@@ -3,7 +3,7 @@ import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import SplitHeading from "../components/SplitHeading";
 import CtaRow from "../components/CtaRow";
-import { EKON_FEATURES, EKON_SPECS } from "../data/site";
+import { EKON_FEATURES } from "../data/site";
 
 export default function Ekon() {
   return (
@@ -28,27 +28,26 @@ export default function Ekon() {
 
           <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_380px]">
             <div>
-              <Reveal>
-                <SplitHeading
-                  as="h2"
-                  text="Key specifications"
-                  className="font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
-                />
-              </Reveal>
-              <Reveal delay={0.1}>
-                <dl className="mt-6 divide-y divide-line rounded-3xl border border-line bg-white">
-                  {EKON_SPECS.map(([k, v]) => (
-                    <div key={k} className="grid grid-cols-[130px_1fr] gap-4 px-6 py-4 text-sm sm:grid-cols-[180px_1fr]">
-                      <dt className="font-semibold text-slate">{k}</dt>
-                      <dd className="font-medium text-ink">{v}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="mt-3 text-[11px] text-slate">
-                  *Coverage varies by component. Terms, mileage limits and exclusions apply.
-                  Specifications are indicative and tested under standard test conditions.
-                </p>
-              </Reveal>
+          <Reveal>
+            <SplitHeading
+              as="h2"
+              text="Key specifications"
+              className="font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
+            />
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="space-y-4">
+              <img 
+                src="/images/specification.jpg" 
+                alt="Ekon 450 M1 specifications" 
+                className="w-full rounded-xl"
+              />
+              <p className="mt-3 text-[11px] text-slate">
+                *Coverage varies by component. Terms, mileage limits and exclusions apply.
+                Specifications are indicative and tested under standard test conditions.
+              </p>
+            </div>
+          </Reveal>
 
               <Reveal delay={0.15}>
                 <SplitHeading
