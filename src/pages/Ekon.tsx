@@ -3,6 +3,7 @@ import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import SplitHeading from "../components/SplitHeading";
 import CtaRow from "../components/CtaRow";
+import Calculator from "../components/Calculator";
 import { EKON_FEATURES } from "../data/site";
 
 export default function Ekon() {
@@ -48,6 +49,13 @@ export default function Ekon() {
               </p>
             </div>
           </Reveal>
+          
+          <Reveal delay={0.05}>
+            <div className="mt-8">
+              <Calculator />
+            </div>
+          </Reveal>
+
 
               <Reveal delay={0.15}>
                 <SplitHeading
