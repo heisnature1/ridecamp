@@ -691,7 +691,7 @@ function FinalCta() {
                 type="tel"
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="+233 24 000 0000"
+                placeholder="055 894 1297"
                 aria-label="Phone"
                 className="input-3d w-full rounded-full px-5 py-3.5 text-sm"
               />

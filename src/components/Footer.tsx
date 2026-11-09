@@ -126,17 +126,24 @@ export default function Footer() {
                 <span>{BUSINESS.email}</span>
               </a>
             </li>
-            <li className="flex items-center gap-3">
-              <span className="relative flex size-9 items-center justify-center rounded-xl bg-white/5">
-                <MapPin className="size-4 text-brand-bright" />
-              </span>
-              <span>{BUSINESS.address}</span>
+            <li>
+              <a
+                href={BUSINESS.mapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="group flex items-start gap-3 hover:text-brand-bright transition-colors"
+              >
+                <span className="relative flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/5 group-hover:bg-brand/20 transition-colors">
+                  <MapPin className="size-4 text-brand-bright" />
+                </span>
+                <span>{BUSINESS.addressLine}</span>
+              </a>
             </li>
             <li className="flex items-center gap-3">
-              <span className="relative flex size-9 items-center justify-center rounded-xl bg-white/5">
+              <span className="relative flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/5">
                 <Clock className="size-4 text-brand-bright" />
               </span>
-              <span>{BUSINESS.hours}</span>
+              <span>Open {BUSINESS.hours}</span>
             </li>
           </ul>
         </motion.div>

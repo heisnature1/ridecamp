@@ -81,8 +81,13 @@ after swapping in new photography.
 
 ## Before launch (brief §8)
 
-`src/data/site.ts` and `src/lib/leads.ts` hold the placeholders that need real values:
+`src/data/site.ts` and `src/lib/leads.ts` hold the values that still need confirming:
 Ghana pricing, swap locations/hours/cost, financing partners, service centres, confirmed
-warranty terms, licensing wording, real testimonials, contact details, and written
-permission from Spiro for brand figures (80,000+ bikes, 9 countries, TIME100 2024).
-These are marked with `PLACEHOLDER`/asterisk notes in the UI.
+warranty terms, licensing wording, real testimonials, and written permission from Spiro
+for brand figures (80,000+ bikes, 9 countries, TIME100 2024). These are marked with
+`PLACEHOLDER`/asterisk notes in the UI.
+
+Confirmed business details live in `src/lib/leads.ts` (`BUSINESS`): phone `055 894 1297`,
+WhatsApp link `wa.me/message/P3GMWJXUIXIEC1`, address `Adjetey, Kwabla Ave, East Legon,
+Accra` (with a Google Maps link) and hours `8:00am – 5:00pm`. The email address is still a
+placeholder.
