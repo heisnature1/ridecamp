@@ -75,7 +75,7 @@ function Hero() {
           }}
         >
           <p className="mt-6 max-w-xl text-base leading-relaxed text-white/85 md:text-lg">
-            Future Ride Ltd brings Spiro's Africa-built electric motorcycle to Ghana. No petrol. No oil
+            Future Ride Ltd brings Spiro's Africa built electric motorcycle to Ghana. No petrol. No oil
             changes. Far fewer repairs. More money in your pocket every single day.
           </p>
         </motion.div>
@@ -299,7 +299,7 @@ function HowItWorks() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
         >
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand">Simple as 1-2-3</p>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand">Simple as 1 2 3</p>
           <SplitHeading
             as="h2"
             text="How it works."

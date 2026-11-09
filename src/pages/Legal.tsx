@@ -21,7 +21,7 @@ export function Privacy() {
             process a financing application you have requested.
           </p>
           <p>
-            We use basic, privacy-respecting analytics to understand which pages help riders most.
+            We use basic, privacy respecting analytics to understand which pages help riders most.
             You may ask us at any time to correct or delete your details by emailing us or sending
             a WhatsApp message.
           </p>
@@ -37,7 +37,7 @@ export function Terms() {
       <PageHero
         kicker="Legal"
         title="Terms of Use."
-        sub="The plain-English rules for using this website."
+        sub="The plain English rules for using this website."
       />
       <section className="bg-white pb-20">
         <div className="mx-auto max-w-3xl space-y-5 px-4 text-sm leading-relaxed text-slate md:px-8">
@@ -49,7 +49,7 @@ export function Terms() {
           <p>
             Warranty terms, financing approval and insurance options are subject to the written
             terms of Future Ride Ltd, Spiro and our financing partners. Nothing on this website is an
-            offer of credit; lease-to-own plans are subject to approval.
+            offer of credit; lease to own plans are subject to approval.
           </p>
           <p>
             Content and branding on this site belong to Future Ride Ltd. Spiro product names and marks

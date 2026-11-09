@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
  *   `light = false` → navy ink on white  (Nav, SpecSheet, light pages)
  *   `light = true`  → white ink on navy  (Footer, dark sections)
  *
- * The mark is the cropped tile (navy square, forward-leaning F, green plug); the
+ * The mark is the cropped tile (navy square, forward leaning F, green plug); the
  * "Future Ride Ltd" wordmark beside it is the site name, kept in type so it stays
  * readable at every breakpoint.
  */

@@ -118,7 +118,7 @@ export default function Settings({
             onClick={exportJson}
             icon={<Download className="size-5" />}
             title="Download JSON"
-            body="Full backup, re-importable on another device."
+            body="Full backup, re importable on another device."
           />
         </div>
       </Panel>
@@ -169,7 +169,7 @@ export default function Settings({
               dispatchLead
             </code>{" "}
             in <code className="rounded bg-white px-1.5 py-0.5 font-mono text-[11px] text-navy">src/lib/leads.ts</code>{" "}
-            at a backend or CRM webhook. Until then, use the export above as the hand-over format.
+            at a backend or CRM webhook. Until then, use the export above as the handover format.
           </p>
         </div>
       </Panel>

@@ -155,7 +155,7 @@ function FinancingForm() {
         <input required value={form.occupation} onChange={set("occupation")} placeholder="Occupation" aria-label="Occupation" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand" />
         <select value={form.income} onChange={set("income")} aria-label="Income range (optional)" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand">
           <option value="">Income range (optional)</option>
-          {["Under GH₵ 2,000 / month", "GH₵ 2,000 – 5,000", "GH₵ 5,000 – 10,000", "Above GH₵ 10,000"].map((o) => (
+          {["Under GH₵ 2,000 / month", "GH₵ 2,000 to 5,000", "GH₵ 5,000 to 10,000", "Above GH₵ 10,000"].map((o) => (
             <option key={o}>{o}</option>
           ))}
         </select>
@@ -227,7 +227,7 @@ export default function Fleet() {
           <Reveal delay={0.12}>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate">
               Flexible ownership paths designed around how riders and businesses actually earn — from
-              a single bike on lease-to-own to a whole fleet on volume terms.
+              a single bike on lease to own to a whole fleet on volume terms.
             </p>
           </Reveal>
 

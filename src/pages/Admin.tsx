@@ -176,7 +176,7 @@ export default function Admin() {
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate md:text-base">
             Everything visitors type into the public site — test rides, quotes, financing
-            applications, fleet requests and call-backs — lands here as it is submitted.
+            applications, fleet requests and call backs — lands here as it is submitted.
           </p>
         </div>
       </header>

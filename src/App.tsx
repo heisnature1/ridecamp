@@ -47,7 +47,7 @@ function AdminGuard() {
 }
 
 /**
- * Routes that stand on their own: the admin login is a full-screen screen with
+ * Routes that stand on their own: the admin login is a full screen screen with
  * no public site chrome (nav, footer, floating call/WhatsApp buttons).
  */
 const STANDALONE_ROUTES = ["/login"];

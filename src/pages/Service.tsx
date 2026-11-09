@@ -12,7 +12,7 @@ export default function Service() {
       <PageHero
         kicker="Service & warranty"
         title="Support that keeps you moving."
-        sub="Genuine parts, authorised service and in-app support — because a bike in the workshop is money out of your pocket."
+        sub="Genuine parts, authorised service and in app support — because a bike in the workshop is money out of your pocket."
       />
       <section className="bg-white pb-16 md:pb-24">
         <div className="mx-auto max-w-7xl px-4 md:px-8">
