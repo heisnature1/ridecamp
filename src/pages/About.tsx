@@ -8,9 +8,9 @@ export default function About() {
   return (
     <>
       <PageHero
-        kicker="About Future Ride"
+        kicker="About Future Ride Ltd"
         title="Moving Ghana forward, one ride at a time."
-        sub="Future Ride is the exclusive distributor of Spiro electric motorcycles in Ghana. We exist to put reliable, affordable, clean transport in the hands of Ghanaians who work for a living: riders, delivery agents, small businesses and fleets."
+        sub="Future Ride Ltd is the exclusive distributor of Spiro electric motorcycles in Ghana. We exist to put reliable, affordable, clean transport in the hands of Ghanaians who work for a living: riders, delivery agents, small businesses and fleets."
       />
       <section className="bg-white pb-16 md:pb-24">
         <div className="mx-auto max-w-7xl px-4 md:px-8">

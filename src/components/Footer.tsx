@@ -13,7 +13,7 @@ const QUICK = [
   { to: "/fleet#financing", label: "Ownership & Financing" },
   { to: "/service", label: "Service & Warranty" },
   { to: "/service#why-electric", label: "Why Go Electric" },
-  { to: "/about", label: "About Future Ride" },
+  { to: "/about", label: "About Future Ride Ltd" },
   { to: "/contact", label: "Contact / Book a Test Ride" },
 ];
 
@@ -41,7 +41,7 @@ export default function Footer() {
         >
           <Logo light />
           <p className="mt-4 max-w-sm text-sm text-white/70 leading-relaxed">
-            Future Ride is the sole distributor of Spiro electric motorcycles in Ghana. Ride the
+            Future Ride Ltd is the sole distributor of Spiro electric motorcycles in Ghana. Ride the
             future. Keep your money.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
@@ -144,7 +144,7 @@ export default function Footer() {
 
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-white/60 md:px-8">
-          <p>© 2026 Future Ride. All rights reserved. Authorised Spiro distributor in Ghana.*</p>
+          <p>© 2026 Future Ride Ltd. All rights reserved. Authorised Spiro distributor in Ghana.*</p>
           <p className="flex gap-4">
             <Link to="/privacy" className="hover:text-brand-bright transition-colors">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-brand-bright transition-colors">Terms</Link>

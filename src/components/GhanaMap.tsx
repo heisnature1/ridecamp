@@ -14,7 +14,7 @@ export default function GhanaMap() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="overflow-hidden rounded-3xl bg-navy p-4">
-        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Future Ride swap network map of Ghana">
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Future Ride Ltd swap network map of Ghana">
           {dots.map((d, i) => (
             <circle key={i} cx={d.x} cy={d.y} r={2.1} className="fill-white/12" />
           ))}

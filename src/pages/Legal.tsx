@@ -11,7 +11,7 @@ export function Privacy() {
       <section className="bg-white pb-20">
         <div className="mx-auto max-w-3xl space-y-5 px-4 text-sm leading-relaxed text-slate md:px-8">
           <p>
-            Future Ride collects the details you enter in our forms — name, phone number, city and
+            Future Ride Ltd collects the details you enter in our forms — name, phone number, city and
             your interest in our products — solely to respond to your request and to arrange test
             rides, quotes, financing and fleet proposals.
           </p>
@@ -48,11 +48,11 @@ export function Terms() {
           </p>
           <p>
             Warranty terms, financing approval and insurance options are subject to the written
-            terms of Future Ride, Spiro and our financing partners. Nothing on this website is an
+            terms of Future Ride Ltd, Spiro and our financing partners. Nothing on this website is an
             offer of credit; lease-to-own plans are subject to approval.
           </p>
           <p>
-            Content and branding on this site belong to Future Ride. Spiro product names and marks
+            Content and branding on this site belong to Future Ride Ltd. Spiro product names and marks
             are used under our distributor relationship and remain the property of their owner.
           </p>
         </div>

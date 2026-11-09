@@ -1,4 +1,4 @@
-/* Content model — copy supplied in the Future Ride content brief. */
+/* Content model — copy supplied in the Future Ride Ltd content brief. */
 
 export const TRUST_STRIP = [
   "Built for African roads",
@@ -187,7 +187,7 @@ export const FAQS: [string, string][] = [
   ["How do I charge it?", "You do not wait for charging. You swap your battery for a charged one at a swap point in minutes."],
   ["Is it cheaper than a petrol motorcycle?", "For riders who ride every day, running costs are much lower because you do not buy petrol or engine oil and have fewer parts to repair. Use our calculator to estimate your own savings."],
   ["Can I buy on instalments?", "Yes. Lease-to-own options are available, subject to approval by our financing partners. No large upfront payment is required."],
-  ["Where do I service the bike?", "At Future Ride authorised service centres in Ghana. You can also report issues and track them in the Spiro app."],
+  ["Where do I service the bike?", "At Future Ride Ltd authorised service centres in Ghana. You can also report issues and track them in the Spiro app."],
   ["Can I try before I buy?", "Yes. Book a test ride and see for yourself."],
 ];
 

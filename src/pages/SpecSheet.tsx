@@ -14,7 +14,7 @@ export default function SpecSheet() {
       <h1 className="mt-6 font-display text-3xl font-bold text-navy">Ekon 450 M1</h1>
       <p className="mt-2 text-sm text-slate">
         The electric motorcycle designed for African roads and commercial use. Distributed in
-        Ghana by Future Ride.
+        Ghana by Future Ride Ltd.
       </p>
 
       <table className="mt-6 w-full border-collapse text-sm">
