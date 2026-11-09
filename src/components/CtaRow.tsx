@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, FileDown, MessageCircle } from "lucide-react";
 import { WA_DEFAULT } from "../lib/leads";
 
-/** The four site-wide conversion actions, as a reusable button row. */
+/** The four sitewide conversion actions, as a reusable button row. */
 export default function CtaRow({ specSheet = false }: { specSheet?: boolean }) {
   return (
     <div className="flex flex-wrap gap-3">

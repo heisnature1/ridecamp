@@ -24,7 +24,7 @@ export type PublicForm = {
 export const PUBLIC_FORMS: PublicForm[] = [
   {
     id: "home-callback",
-    title: "Call-back request",
+    title: "Call back request",
     blurb: "The “Ready to make the switch?” strip at the bottom of the home page.",
     route: "/",
     pageLabel: "Home",
@@ -57,7 +57,7 @@ export const PUBLIC_FORMS: PublicForm[] = [
     id: "ownership",
     title: "Financing application",
     blurb:
-      "Lease-to-own applications. Lives in the Ownership & financing section of the Fleet & Business page (the old /ownership page folded into /fleet).",
+      "Lease to own applications. Lives in the Ownership & financing section of the Fleet & Business page (the old /ownership page folded into /fleet).",
     route: "/fleet",
     pageLabel: "Fleet & business",
     anchor: "#apply-financing",

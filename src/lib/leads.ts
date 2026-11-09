@@ -21,7 +21,7 @@ export const BUSINESS = {
   addressLine: "Adjetey, Kwabla Ave, East Legon, Accra",
   /** Opens Google Maps on the office. */
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Kwabla+Ave%2C+East+Legon%2C+Accra%2C+Ghana",
-  hours: "8:00am – 5:00pm",
+  hours: "8:00am to 5:00pm",
 };
 
 /**

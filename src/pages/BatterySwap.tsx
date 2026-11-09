@@ -11,7 +11,7 @@ export default function BatterySwap() {
       <PageHero
         kicker="Battery swap"
         title="Swap. Pay. Ride."
-        sub="Forget waiting hours for a battery to charge. With Spiro's battery-swap system, you ride in, swap your low battery for a fully charged one, pay and ride out. Swaps take just minutes, so you spend your day earning, not waiting."
+        sub="Forget waiting hours for a battery to charge. With Spiro's battery swap system, you ride in, swap your low battery for a fully charged one, pay and ride out. Swaps take just minutes, so you spend your day earning, not waiting."
       />
 
       <section className="bg-white pb-16 md:pb-24">
@@ -41,7 +41,7 @@ export default function BatterySwap() {
             <Reveal delay={0.1}>
               <SplitHeading
                 as="h2"
-                text="Why swapping beats plug-in charging."
+                text="Why swapping beats plug in charging."
                 className="font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
               />
               <ul className="mt-6 space-y-3">

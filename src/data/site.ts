@@ -75,7 +75,7 @@ export const TESTIMONIALS = [
   },
   {
     name: "Yaw M.",
-    role: "Owner-operator, Tema",
+    role: "Owner operator, Tema",
     quote: "With 100 km on one battery I do more trips a day. The hills and traffic are no problem at all.",
   },
 ];
@@ -86,8 +86,8 @@ export const EKON_SPECS: [string, string][] = [
   ["Peak power", "12 kW"],
   ["Load capacity", "300 kg"],
   ["Ride modes", "Eco (maximum range), Normal (everyday), Sport (more power)"],
-  ["Charging", "Battery-swap system; charging slot in front storage"],
-  ["Lighting and display", "High-visibility LED lighting; modern LED display"],
+  ["Charging", "Battery swap system; charging slot in front storage"],
+  ["Lighting and display", "High visibility LED lighting; modern LED display"],
   ["Tracking", "GPS and companion app"],
   ["Warranty", "Up to 2 years or 30,000 km depending on the component*"],
   ["Colours", "Green, Black, Yellow, Red, Blue"],
@@ -101,7 +101,7 @@ export const EKON_FEATURES = [
   { title: "Reinforced frame", text: "Balanced geometry for stability at speed." },
   { title: "Tuned suspension", text: "Better control on uneven roads and potholes." },
   { title: "Three ride modes", text: "Eco for the longest range, Normal for daily riding, Sport when you need more power." },
-  { title: "High-visibility LED lighting", text: "A strong road presence, day and night." },
+  { title: "High visibility LED lighting", text: "A strong road presence, day and night." },
   { title: "Balanced riding posture", text: "Comfortable seat height and ergonomic positioning for long hours." },
   { title: "Large front storage with charging slot", text: "Carry essentials securely and charge your phone on the go." },
   { title: "Rear and side mounting options", text: "Flexible mounting for delivery boxes and bags." },
@@ -114,9 +114,9 @@ export const WHY_ELECTRIC = [
   { title: "The income argument", text: "A rider who spends less on running costs and loses less time to breakdowns keeps more of every cedi earned. One Spiro rider put it simply: with 100 km on a single battery, he can do more trips and earn more." },
   { title: "The comfort argument", text: "No vibration and no engine roar. Riders report that long days feel easier, and that it is a better experience for passengers and women riders." },
   { title: "The reliability argument", text: "A reinforced frame and tuned suspension, designed and tested for African conditions." },
-  { title: "The security argument", text: "GPS tracking and in-app monitoring help protect your bike and your livelihood." },
+  { title: "The security argument", text: "GPS tracking and in app monitoring help protect your bike and your livelihood." },
   { title: "The planet and health argument", text: "No exhaust fumes in crowded streets. Cleaner air for riders, passengers and neighbourhoods." },
-  { title: "The future-proof argument", text: "Fuel prices and regulation are moving in one direction. Owning an electric bike now puts you ahead of the change." },
+  { title: "The future proof argument", text: "Fuel prices and regulation are moving in one direction. Owning an electric bike now puts you ahead of the change." },
 ];
 
 /* Spiro company figures — subject to written confirmation from Spiro before launch (brief §8). */
@@ -143,14 +143,14 @@ export const OWNERSHIP_DOCS = [
   "Ghana Card",
   "Driver's licence",
   "Proof of address",
-  "Guarantor (for lease-to-own)",
+  "Guarantor (for lease to own)",
 ];
 
 export const FLEET_BENEFITS = [
   "Lower and predictable cost per kilometre.",
   "GPS tracking and app visibility for every bike.",
   "Less downtime and lower maintenance bills.",
-  "Cargo-ready mounting for delivery boxes and bags.",
+  "Cargo ready mounting for delivery boxes and bags.",
   "Cleaner brand image and a clear ESG story.",
   "Volume pricing, financing and dedicated account support.",
 ];
@@ -169,7 +169,7 @@ export const FLEET_AUDIENCE = [
 export const SERVICE_ITEMS = [
   { title: "Authorised service", text: "Ghana service centre locations will be listed here at launch. Accra first, then Kumasi and Takoradi." },
   { title: "Genuine spare parts", text: "Authorised components available at our service centres." },
-  { title: "In-app support", text: "Report an issue and follow its resolution from the app." },
+  { title: "In app support", text: "Report an issue and follow its resolution from the app." },
   { title: "Warranty", text: "Up to 2 years on key components (motor, controller, frame and other key parts) depending on part and mileage, up to 30,000 km. Terms, mileage limits and exclusions apply." },
   { title: "Insurance support", text: "We are confirming Ghanaian insurance partners for riders and fleets." },
   { title: "Theft protection", text: "GPS tracking via the app helps protect your bike and your livelihood." },
@@ -178,7 +178,7 @@ export const SERVICE_ITEMS = [
 export const ABOUT_PROMISE = [
   "Genuine Spiro motorcycles with full manufacturer backing.",
   "Honest advice and transparent pricing.",
-  "Fast after-sales service and genuine parts.",
+  "Fast after sales service and genuine parts.",
   "A partner who stays with you after the sale.",
 ];
 
@@ -186,7 +186,7 @@ export const FAQS: [string, string][] = [
   ["How far can it go on one battery?", "Up to 100 km per swap under standard test conditions. Real range depends on load, speed, terrain and ride mode. Eco mode gives the longest range."],
   ["How do I charge it?", "You do not wait for charging. You swap your battery for a charged one at a swap point in minutes."],
   ["Is it cheaper than a petrol motorcycle?", "For riders who ride every day, running costs are much lower because you do not buy petrol or engine oil and have fewer parts to repair. Use our calculator to estimate your own savings."],
-  ["Can I buy on instalments?", "Yes. Lease-to-own options are available, subject to approval by our financing partners. No large upfront payment is required."],
+  ["Can I buy on instalments?", "Yes. Lease to own options are available, subject to approval by our financing partners. No large upfront payment is required."],
   ["Where do I service the bike?", "At Future Ride Ltd authorised service centres in Ghana. You can also report issues and track them in the Spiro app."],
   ["Can I try before I buy?", "Yes. Book a test ride and see for yourself."],
 ];

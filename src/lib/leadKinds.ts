@@ -66,8 +66,8 @@ export const LEAD_KINDS: KindMeta[] = [
   },
   {
     id: "callback",
-    label: "Call-back",
-    plural: "Call-backs",
+    label: "Call back",
+    plural: "Call backs",
     chip: "bg-sky-50 text-sky-700 ring-1 ring-sky-500/25",
     dot: "bg-sky-500",
     bar: "bg-sky-500",

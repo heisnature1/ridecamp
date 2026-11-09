@@ -98,7 +98,7 @@ try {
   );
   const csv = leadsToCsv(samples);
   check("csv has a header + one row per lead", csv.split("\r\n").length === 16, `got ${csv.split("\r\n").length}`);
-  check("csv quotes values containing commas", csv.includes('"GH\u20b5 2,000 \u2013 5,000"'), "income band not quoted");
+  check("csv quotes values containing commas", csv.includes('"GH\u20b5 2,000 to 5,000"'), "income band not quoted");
 
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");
@@ -136,7 +136,7 @@ try {
   const sources = renderToStaticMarkup(
     React.createElement(MemoryRouter, null, React.createElement(Sources, { leads: samples, onViewLeads: noop })),
   );
-  check("sources tab lists all four public forms", /Fleet quote/.test(sources) && /Call-back request/.test(sources));
+  check("sources tab lists all four public forms", /Fleet quote/.test(sources) && /Call back request/.test(sources));
   check("sources tab lists captured fields", /Rider type/.test(sources) && /Number of bikes/.test(sources));
   const threeLeads = (sources.match(/3 leads/g) ?? []).length;
   const sixLeads = (sources.match(/6 leads/g) ?? []).length;

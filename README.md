@@ -46,7 +46,7 @@ Every public form writes to a single lead store (`src/lib/leadsStore.ts`, key
 
 | Form | Page | Lead types | Fields captured |
 | ---- | ---- | ---------- | --------------- |
-| Call-back | `/` | Call-back | name, phone, city |
+| Call back | `/` | Call back | name, phone, city |
 | Main lead form | `/contact` | Test ride · Quote · Financing | name, phone, email, city, preferred date, rider type, interest, notes |
 | Financing application | `/fleet` (`#apply-financing`) | Financing | name, phone, email, city, occupation, income range, preferred option |
 | Fleet quote | `/fleet` | Fleet | company, contact person, phone, email, bikes, city, use case, notes |
@@ -89,5 +89,5 @@ for brand figures (80,000+ bikes, 9 countries, TIME100 2024). These are marked w
 
 Confirmed business details live in `src/lib/leads.ts` (`BUSINESS`): phone `055 894 1297`,
 WhatsApp link `wa.me/message/P3GMWJXUIXIEC1`, address `Adjetey, Kwabla Ave, East Legon,
-Accra` (with a Google Maps link) and hours `8:00am – 5:00pm`. The email address is still a
+Accra` (with a Google Maps link) and hours `8:00am to 5:00pm`. The email address is still a
 placeholder.

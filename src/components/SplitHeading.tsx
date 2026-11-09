@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { motion } from "framer-motion";
 
 /**
- * Word-by-word staggered heading, like the reference site's kinetic titles.
+ * Word by word staggered heading, like the reference site's kinetic titles.
  *
  * Each word rides in its own clipped box; the spaces *between* words are real
  * text nodes rendered outside those boxes (a trailing space inside an
