@@ -1,24 +1,35 @@
 /**
  * Business contact + lead-capture configuration.
- * PLACEHOLDERS — replace with confirmed details before launch (see brief §8).
+ * Phone/email/address are PLACEHOLDERS — replace with confirmed details before
+ * launch (see brief §8). The WhatsApp link is the live business link.
  */
 export const BUSINESS = {
   phoneDisplay: "+233 24 000 0000",
   phoneTel: "+233240000000",
-  /** WhatsApp number in international format without "+" */
+  /** WhatsApp number in international format without "+" — kept for reference only. */
   whatsapp: "233240000000",
+  /**
+   * Live WhatsApp short link (wa.me/message/…). Always prefer this over a
+   * number-based link so visitors reach the business inbox directly.
+   */
+  whatsappLink: "https://wa.me/message/P3GMWJXUIXIEC1",
   email: "hello@futureride.gh",
   address: "Spintex Road, Accra, Ghana",
   hours: "Mon–Sat, 8:00–18:00",
 };
 
-export function waLink(message: string): string {
-  return `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(message)}`;
+/**
+ * Build a WhatsApp deep link. A message can only be pre-filled on a
+ * number-based link; `wa.me/message/…` short links cannot carry `?text=`, so
+ * they open the chat directly with the business.
+ */
+export function waLink(message?: string): string {
+  const text = message?.trim();
+  if (!text) return BUSINESS.whatsappLink;
+  return `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(text)}`;
 }
 
-export const WA_DEFAULT = waLink(
-  "Hello Future Ride! I'd like to know more about the Spiro Ekon 450 M1.",
-);
+export const WA_DEFAULT = BUSINESS.whatsappLink;
 
 export function mailtoLink(subject: string, body: string): string {
   return `mailto:${BUSINESS.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -56,8 +67,10 @@ export function dispatchLead(kind: LeadKind, lead: Lead, source?: string): LeadR
   const lines = Object.entries(record.data)
     .map(([k, v]) => `${k}: ${v}`)
     .join("\n");
-  const wa = waLink(`New ${label} lead — Future Ride website\nSource: ${record.source}\n${lines}`);
-  window.open(wa, "_blank", "noopener");
+  // The business WhatsApp is a `wa.me/message/…` short link, which cannot carry
+  // a pre-filled message — it opens the real inbox directly. The lead detail is
+  // still captured in the admin store and the email draft below.
+  window.open(BUSINESS.whatsappLink, "_blank", "noopener");
   // Use a small delay before redirect to ensure open succeeds
   setTimeout(() => {
     window.location.href = mailtoLink(

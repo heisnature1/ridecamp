@@ -1,6 +1,6 @@
-# Future Ride — Spiro Electric Motorcycles in Ghana
+# Future Ride Ltd — Spiro Electric Motorcycles in Ghana
 
-Marketing + sales site for **Future Ride**, sole distributor of Spiro electric motorcycles in
+Marketing + sales site for **Future Ride Ltd**, sole distributor of Spiro electric motorcycles in
 Ghana, built from the company's content brief. Every page drives toward four actions:
 **Book a test ride · Request a quote · Apply for financing · Chat on WhatsApp.**
 
@@ -31,7 +31,7 @@ npm run smoke      # lead-pipeline + dashboard smoke check (no browser needed)
 | `/calculator`    | Savings Calculator (GH₵, per brief §5 formulas) |
 | `/fleet`         | Fleet & Business (benefits, audience, fleet-quote form) **+ Ownership & Financing** (ways to own, documents, financing form — see `#financing`) |
 | `/service`       | Service & Warranty **+ Why Go Electric** (8-argument sales case + Spiro scale — see `#why-electric`) |
-| `/about`         | About Future Ride (name meaning, promise, founder-note placeholder) |
+| `/about`         | About Future Ride Ltd (name meaning, promise, founder-note placeholder) |
 | `/faqs`          | FAQs (15 questions) |
 | `/contact`       | Contact / Book a Test Ride (short lead form, +233 default) |
 | `/spec-sheet`    | Print-friendly spec sheet ("Download Spec Sheet") |
@@ -74,7 +74,7 @@ from every visitor; the dashboard needs no other change.
 
 ## Brand & photography
 
-The Future Ride logo lives in `src/components/Logo.tsx` (navigation, footer, spec sheet) and as
+The Future Ride Ltd logo lives in `src/components/Logo.tsx` (navigation, footer, spec sheet) and as
 raster artwork in `public/brand/`. Every photo in `public/images/` carries the logo lockup, which
 is stamped on by `scripts/brand/logo_watermark.py` — see `scripts/brand/README.md` to re-run it
 after swapping in new photography.

@@ -75,7 +75,7 @@ function Hero() {
           }}
         >
           <p className="mt-6 max-w-xl text-base leading-relaxed text-white/85 md:text-lg">
-            Future Ride brings Spiro's Africa-built electric motorcycle to Ghana. No petrol. No oil
+            Future Ride Ltd brings Spiro's Africa-built electric motorcycle to Ghana. No petrol. No oil
             changes. Far fewer repairs. More money in your pocket every single day.
           </p>
         </motion.div>
@@ -237,10 +237,13 @@ function Glance() {
                       />
                       <span className="text-xs font-bold uppercase tracking-wide text-brand-bright">{g.unit}</span>
                     </div>
-                    <p className="font-display text-4xl font-bold tabular-nums text-white" style={{ transform: "translateZ(30px)" }}>
+                    <p
+                      className="font-display text-4xl font-bold leading-none tabular-nums text-navy"
+                      style={{ transform: "translateZ(30px)" }}
+                    >
                       <CountUp value={g.value} duration={1500} />
                     </p>
-                    <p className="mt-2 text-sm text-white/70" style={{ transform: "translateZ(10px)" }}>{g.label}</p>
+                    <p className="mt-2 text-sm leading-snug text-slate" style={{ transform: "translateZ(10px)" }}>{g.label}</p>
                     <motion.div
                       className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-brand to-brand-bright scale-x-0 origin-left"
                       initial={{ scaleX: 0 }}
@@ -644,7 +647,7 @@ function FinalCta() {
           transition={{ duration: 0.6, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
           className="mt-4 text-white/75"
         >
-          Leave your number and a Future Ride advisor will call you today.
+          Leave your number and a Future Ride Ltd advisor will call you today.
         </motion.p>
         {sent ? (
           <motion.div

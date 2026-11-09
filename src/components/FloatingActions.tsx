@@ -14,7 +14,7 @@ export default function FloatingActions() {
     <div className="fixed bottom-4 right-4 z-50 flex gap-3">
       <a
         href={`tel:${BUSINESS.phoneTel}`}
-        aria-label={`Call Future Ride on ${BUSINESS.phoneDisplay}`}
+        aria-label={`Call Future Ride Ltd on ${BUSINESS.phoneDisplay}`}
         className="flex size-13 items-center justify-center rounded-full bg-navy text-white shadow-lg shadow-navy/30 transition hover:scale-105"
       >
         <Phone className="size-5" />
@@ -23,7 +23,7 @@ export default function FloatingActions() {
         href={WA_DEFAULT}
         target="_blank"
         rel="noreferrer"
-        aria-label="Chat with Future Ride on WhatsApp"
+        aria-label="Chat with Future Ride Ltd on WhatsApp"
         className="flex h-13 items-center gap-2 rounded-full bg-[#25D366] px-5 font-semibold text-white shadow-lg shadow-[#25D366]/30 transition hover:scale-105"
       >
         <WhatsAppIcon className="size-5" />

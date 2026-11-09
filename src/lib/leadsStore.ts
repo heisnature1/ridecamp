@@ -219,7 +219,7 @@ export function leadWhatsAppLink(lead: LeadRecord): string | null {
   const digits = leadPhone(lead).replace(/\D/g, "");
   if (!digits) return null;
   const name = leadName(lead).split(" ")[0];
-  const text = `Hello ${name}, this is Future Ride (Spiro electric motorcycles, Ghana). We received your ${kindMeta(
+  const text = `Hello ${name}, this is Future Ride Ltd (Spiro electric motorcycles, Ghana). We received your ${kindMeta(
     lead.kind,
   ).label.toLowerCase()} request on our website and would love to help. When is a good time to talk?`;
   return `https://wa.me/${digits.startsWith("233") ? digits : `233${digits}`}?text=${encodeURIComponent(text)}`;
@@ -232,7 +232,7 @@ export function leadEmailLink(lead: LeadRecord): string | null {
     .map(([k, v]) => `${k}: ${v}`)
     .join("\n");
   return `mailto:${to}?subject=${encodeURIComponent(
-    `Following up on your ${kindMeta(lead.kind).label.toLowerCase()} request — Future Ride`,
+    `Following up on your ${kindMeta(lead.kind).label.toLowerCase()} request — Future Ride Ltd`,
   )}&body=${encodeURIComponent(`Hi ${leadName(lead).split(" ")[0]},\n\nThank you for your interest.\n\nYour details:\n${body}`)}`;
 }
 
@@ -286,7 +286,7 @@ export function importLeadsJson(json: string): { added: number; skipped: number 
     : Array.isArray((parsed as { leads?: unknown })?.leads)
       ? ((parsed as { leads: unknown[] }).leads)
       : null;
-  if (!list) throw new Error("That file does not look like a Future Ride lead export.");
+  if (!list) throw new Error("That file does not look like a Future Ride Ltd lead export.");
   const existing = readLeads();
   const known = new Set(existing.map((l) => l.id));
   const incoming = list.map(normalizeRecord);
