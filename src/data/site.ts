@@ -191,7 +191,7 @@ export const FAQS: [string, string][] = [
   ["Can I try before I buy?", "Yes. Book a test ride and see for yourself."],
 ];
 
-/** Savings-calculator defaults (GH₵). Confirm constants with Spiro before launch (brief §5). */
+/** Savings calculator defaults (GH₵). Confirm constants with Spiro before launch (brief §5). */
 export const CALC = {
   petrolPriceDefault: 12.0, // GH₵ per litre — update regularly
   kmPerLitreDefault: 35,

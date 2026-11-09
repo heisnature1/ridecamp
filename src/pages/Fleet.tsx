@@ -178,7 +178,7 @@ export default function Fleet() {
       <PageHero
         kicker="Fleet & business"
         title="Cut your delivery costs. Grow your fleet."
-        sub="Whether you run food delivery, couriers, e-commerce logistics, field sales or a campus or estate service, electric motorcycles lower your cost per delivery and give you better control of your fleet."
+        sub="Whether you run food delivery, couriers, online retail logistics, field sales or a campus or estate service, electric motorcycles lower your cost per delivery and give you better control of your fleet."
       />
       <section className="bg-white pb-16 md:pb-24">
         <div className="mx-auto max-w-7xl px-4 md:px-8">

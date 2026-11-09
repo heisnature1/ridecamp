@@ -1,7 +1,7 @@
 /**
  * Smoke check for the admin dashboard + the public→admin lead pipeline.
  *
- * Loads the real source modules through Vite (no re-implementations) and:
+ * Loads the real source modules through Vite (no re implementations) and:
  *  1. exercises the browser lead store with a minimal window/localStorage shim,
  *  2. renders the dashboard components to markup and asserts what a user sees.
  *
@@ -66,7 +66,7 @@ try {
 
   addLead("fleet-quote", { Company: "Legacy Kind Ltd", "Number of bikes": "4" });
   leads = readLeads();
-  check("legacy kind 'fleet-quote' normalises to fleet", leads[1].kind === "fleet", leads[1].kind);
+  check("legacy kind 'fleet quote' normalises to fleet", leads[1].kind === "fleet", leads[1].kind);
 
   updateLead(leads[0].id, { status: "won" });
   check("status update persists", readLeads()[0].status === "won");
@@ -79,21 +79,21 @@ try {
   check("stats total matches", stats.total === 15, `got ${stats.total}`);
   check("fleet bikes are summed", stats.fleetBikes === 45, `got ${stats.fleetBikes}`);
   check("kinds are bucketed", stats.byKind.length === 5, `got ${stats.byKind.length}`);
-  check("home-page source keeps its path", normalizePath("/?intent=quote") === "/", normalizePath("/?intent=quote"));
+  check("home page source keeps its path", normalizePath("/?intent=quote") === "/", normalizePath("/?intent=quote"));
   check(
     "source filter picks up every lead from the fleet page (fleet quote + financing)",
     filterLeads(samples, { ...EMPTY_FILTERS, source: "/fleet" }).length === 6,
   );
   check("source filter isolates the contact form", filterLeads(samples, { ...EMPTY_FILTERS, source: "/contact" }).length === 6);
   check("home page gets a readable label", sourceLabel("/") === "Home page", sourceLabel("/"));
-  check("7-day series is produced", stats.last7.length === 7, `got ${stats.last7.length}`);
+  check("7 day series is produced", stats.last7.length === 7, `got ${stats.last7.length}`);
   check(
     "filterLeads narrows to one kind",
     filterLeads(samples, { ...EMPTY_FILTERS, kinds: ["fleet"] }).length === 3,
     `got ${filterLeads(samples, { ...EMPTY_FILTERS, kinds: ["fleet"] }).length}`,
   );
   check(
-    "filterLeads free-text search finds a company",
+    "filterLeads free text search finds a company",
     filterLeads(samples, { ...EMPTY_FILTERS, query: "harmattan" }).length === 1,
   );
   const csv = leadsToCsv(samples);
@@ -177,7 +177,7 @@ try {
     "/": "src/pages/Home.tsx",
     "/contact": "src/pages/Contact.tsx",
     // Ownership & financing moved onto the Fleet & Business page, so both the
-    // fleet-quote form and the financing form live in Fleet.tsx.
+    // fleet quote form and the financing form live in Fleet.tsx.
     "/fleet": "src/pages/Fleet.tsx",
   };
   check("every public form is registered", PUBLIC_FORMS.length === 4, `got ${PUBLIC_FORMS.length}`);

@@ -1,6 +1,6 @@
 /**
- * Stylised dot-matrix map of Ghana (lon, lat outline — hand-simplified,
- * not survey data) used for the swap-network section.
+ * Stylised dot matrix map of Ghana (lon, lat outline — hand simplified,
+ * not survey data) used for the swap network section.
  */
 export const GHANA_OUTLINE: [number, number][] = [
   [-3.25, 5.1], [-2.7, 5.1], [-2.2, 4.9], [-1.6, 4.75], [-0.8, 5.0],

@@ -45,7 +45,7 @@ export function timeAgo(iso: string): string {
   return `${months} mo ago`;
 }
 
-/** Local-day key, e.g. `2026-10-09`, used to bucket leads by day. */
+/** Local day key, e.g. `2026-10-09`, used to bucket leads by day. */
 export function dayKey(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   const m = `${d.getMonth() + 1}`.padStart(2, "0");

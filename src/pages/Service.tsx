@@ -80,7 +80,7 @@ export default function Service() {
                 Backed by a company that works at scale.
               </h3>
               <p className="mt-3 max-w-3xl text-sm leading-relaxed text-white/75">
-                Spiro is one of Africa's leading electric-mobility companies, with bikes running
+                Spiro is one of Africa's leading electric mobility companies, with bikes running
                 daily across cities in 9 countries and recognition on the TIME100 Most Influential
                 Companies list (2024).*
               </p>
