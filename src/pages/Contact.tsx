@@ -99,7 +99,7 @@ export default function Contact() {
                   <input required value={form.name} onChange={set("name")} placeholder="Name" aria-label="Name" className="rounded-xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-brand" />
                   <div className="flex overflow-hidden rounded-xl border border-line bg-white focus-within:border-brand">
                     <span className="grid place-items-center border-r border-line bg-cloud px-3 text-sm font-semibold text-slate">+233</span>
-                    <input required type="tel" value={form.phone} onChange={set("phone")} placeholder="24 000 0000" aria-label="Phone number" className="w-full px-4 py-3 text-sm outline-none" />
+                    <input required type="tel" value={form.phone} onChange={set("phone")} placeholder="055 894 1297" aria-label="Phone number" className="w-full px-4 py-3 text-sm outline-none" />
                   </div>
                   <input type="email" value={form.email} onChange={set("email")} placeholder="Email (optional)" aria-label="Email (optional)" className="rounded-xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-brand" />
                   <select value={form.city} onChange={set("city")} aria-label="City" className="rounded-xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-brand">
@@ -156,8 +156,21 @@ export default function Contact() {
                 </span>
               </a>
               <div className="rounded-3xl bg-navy p-6 text-white">
-                <p className="flex items-center gap-3 text-sm font-semibold"><MapPin className="size-4 text-brand-bright" /> {BUSINESS.address}</p>
-                <p className="mt-3 flex items-center gap-3 text-sm text-white/70"><Clock className="size-4 text-brand-bright" /> {BUSINESS.hours}</p>
+                <a
+                  href={BUSINESS.mapsUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-start gap-3 text-sm font-semibold transition-colors hover:text-brand-bright"
+                >
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-brand-bright" />
+                  <span>{BUSINESS.addressLine}</span>
+                </a>
+                <p className="mt-3 flex items-center gap-3 text-sm text-white/70">
+                  <Clock className="size-4 text-brand-bright" /> Open {BUSINESS.hours}
+                </p>
+                <p className="mt-3 text-xs text-white/50">
+                  Tap the address for directions in Google Maps.
+                </p>
               </div>
             </div>
           </Reveal>

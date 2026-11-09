@@ -38,12 +38,13 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center bg-cloud px-4 py-16">
+    <div className="flex min-h-screen items-center justify-center bg-navy px-4 py-16">
       <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-line bg-white p-8 shadow-sm">
+        <div className="rounded-3xl border border-line bg-white p-8 shadow-2xl shadow-black/25">
           <div className="flex flex-col items-center text-center">
             <Logo />
             <h1 className="mt-6 font-display text-2xl font-bold text-navy">Admin login</h1>
+            <p className="mt-1 text-xs text-slate">Internal dashboard — authorised staff only</p>
           </div>
 
           <form className="mt-8 space-y-4" onSubmit={onSubmit}>
@@ -92,6 +93,9 @@ export default function Login() {
             </Link>
           </p>
         </div>
+        <p className="mt-5 text-center text-[11px] text-white/45">
+          © 2026 Future Ride Ltd · Spiro distributor, Ghana
+        </p>
       </div>
     </div>
   );

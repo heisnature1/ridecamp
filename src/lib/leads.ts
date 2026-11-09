@@ -1,21 +1,27 @@
 /**
  * Business contact + lead-capture configuration.
- * Phone/email/address are PLACEHOLDERS — replace with confirmed details before
- * launch (see brief §8). The WhatsApp link is the live business link.
+ * Phone, address and hours are confirmed. The email is still a PLACEHOLDER —
+ * replace it with the confirmed inbox before launch (see brief §8).
  */
 export const BUSINESS = {
-  phoneDisplay: "+233 24 000 0000",
-  phoneTel: "+233240000000",
-  /** WhatsApp number in international format without "+" — kept for reference only. */
-  whatsapp: "233240000000",
+  phoneDisplay: "055 894 1297",
+  /** Same number in international format, for `tel:` links. */
+  phoneTel: "+233558941297",
+  /** WhatsApp number in international format without "+" — used for deep links. */
+  whatsapp: "233558941297",
   /**
    * Live WhatsApp short link (wa.me/message/…). Always prefer this over a
    * number-based link so visitors reach the business inbox directly.
    */
   whatsappLink: "https://wa.me/message/P3GMWJXUIXIEC1",
   email: "hello@futureride.gh",
-  address: "Spintex Road, Accra, Ghana",
-  hours: "Mon–Sat, 8:00–18:00",
+  /** Street address, used where the location is shown in running copy. */
+  address: "Adjetey, Kwabla Ave, East Legon, Accra, Ghana",
+  /** Single-line address for cards, the footer and schema.org. */
+  addressLine: "Adjetey, Kwabla Ave, East Legon, Accra",
+  /** Opens Google Maps on the office. */
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Kwabla+Ave%2C+East+Legon%2C+Accra%2C+Ghana",
+  hours: "8:00am – 5:00pm",
 };
 
 /**
