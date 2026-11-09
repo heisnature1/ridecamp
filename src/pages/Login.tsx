@@ -38,9 +38,25 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-navy px-4 py-16">
-      <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-line bg-white p-8 shadow-2xl shadow-black/25">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy px-4 py-16">
+      {/* Same Ekon 450 M1 hero photograph as the landing page, used as a backdrop. */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <img
+          src="/images/motor.jpg"
+          alt=""
+          className="size-full object-cover opacity-45 animate-kenburns"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-navy/60" />
+        <div className="absolute inset-0 hero-bg-pattern opacity-40" />
+        <div className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/20 blur-3xl animate-float" />
+        <div
+          className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/20 blur-3xl animate-float"
+          style={{ animationDelay: "-2s" }}
+        />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        <div className="rounded-3xl border border-white/10 bg-white p-8 shadow-2xl shadow-black/40">
           <div className="flex flex-col items-center text-center">
             <Logo />
             <h1 className="mt-6 font-display text-2xl font-bold text-navy">Admin login</h1>
