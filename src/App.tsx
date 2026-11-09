@@ -46,11 +46,20 @@ function AdminGuard() {
   return <Admin />;
 }
 
-export default function App() {
+/**
+ * Routes that stand on their own: the admin login is a full-screen screen with
+ * no public site chrome (nav, footer, floating call/WhatsApp buttons).
+ */
+const STANDALONE_ROUTES = ["/login"];
+
+function Shell() {
+  const { pathname } = useLocation();
+  const standalone = STANDALONE_ROUTES.includes(pathname.replace(/\/+$/, "") || "/");
+
   return (
-    <BrowserRouter>
+    <>
       <ScrollManager />
-      <Nav />
+      {!standalone && <Nav />}
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -72,8 +81,16 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <Footer />
-      <FloatingActions />
+      {!standalone && <Footer />}
+      {!standalone && <FloatingActions />}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Shell />
     </BrowserRouter>
   );
 }
