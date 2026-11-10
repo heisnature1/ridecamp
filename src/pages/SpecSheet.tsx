@@ -2,7 +2,7 @@ import { Printer } from "lucide-react";
 import { EKON_SPECS } from "../data/site";
 import Logo from "../components/Logo";
 
-/** Print-friendly spec sheet — "Download Spec Sheet" lands here; print = save as PDF. */
+/** Print friendly spec sheet — "Download Spec Sheet" lands here; print = save as PDF. */
 export default function SpecSheet() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 print:p-0">

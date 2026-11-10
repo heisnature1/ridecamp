@@ -6,8 +6,8 @@ import Logo from "./Logo";
 
 /*
  * Ownership & financing lives on the Fleet & Business page (/#financing) and
- * Why Go Electric lives on the Service page (/#why-electric), so the tab bar
- * stays short. The old /ownership and /why-electric URLs still redirect.
+ * Why Go Electric lives on the Service page (/#why electric), so the tab bar
+ * stays short. The old /ownership and /why electric URLs still redirect.
  */
 const LINKS = [
   { to: "/", label: "Home" },

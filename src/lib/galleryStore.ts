@@ -1,5 +1,5 @@
 /**
- * Browser-side gallery store.
+ * Browser side gallery store.
  *
  * Admins post pictures with a short caption from the dashboard; the public
  * Gallery page reads from the same place. Posts live in localStorage under
@@ -50,7 +50,7 @@ function write(posts: GalleryPost[]) {
   try {
     window.localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(posts));
   } catch {
-    /* ignore quota / private-mode errors */
+    /* ignore quota / private mode errors */
   }
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent(CHANGE_EVENT));

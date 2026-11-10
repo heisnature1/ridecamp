@@ -8,7 +8,7 @@ import {
 } from "./leadKinds";
 
 /**
- * Browser-side lead store.
+ * Browser side lead store.
  *
  * Everything a visitor types into a public form is written here, and the admin
  * dashboard reads from the same place, so the two can never drift apart.
@@ -91,7 +91,7 @@ function write(leads: LeadRecord[]) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
   } catch {
-    /* private mode / quota — the dashboard still shows in-memory data */
+    /* private mode / quota — the dashboard still shows in memory data */
   }
   window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { leads } }));
 }
@@ -154,7 +154,7 @@ export function removeMany(ids: string[]) {
   write(readLeads().filter((l) => !drop.has(l.id)));
 }
 
-/** Fires on same-tab writes and on writes from other tabs of the same site. */
+/** Fires on same tab writes and on writes from other tabs of the same site. */
 export function subscribe(onChange: (leads: LeadRecord[]) => void): () => void {
   if (!canUseBrowser) return () => {};
   const handler = () => onChange(readLeads());
@@ -214,7 +214,7 @@ export function leadHasNotes(lead: LeadRecord): boolean {
   return lead.adminNotes.trim().length > 0;
 }
 
-/** WhatsApp deep-link that messages the *customer*, pre-filled with context. */
+/** WhatsApp deep link that messages the *customer*, pre filled with context. */
 export function leadWhatsAppLink(lead: LeadRecord): string | null {
   const digits = leadPhone(lead).replace(/\D/g, "");
   if (!digits) return null;

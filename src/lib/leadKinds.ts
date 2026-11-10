@@ -112,7 +112,7 @@ const KIND_ALIASES: Record<string, LeadKind> = {
   "call-back": "callback",
 };
 
-/** Maps any historical/free-text kind string onto the canonical set. */
+/** Maps any historical/free text kind string onto the canonical set. */
 export function normalizeKind(raw: unknown): LeadKind {
   const key = String(raw ?? "")
     .trim()

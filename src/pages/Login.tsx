@@ -4,7 +4,7 @@ import Logo from "../components/Logo";
 
 /**
  * Internal login — sits in front of /admin. Credentials are checked against the
- * env-supplied pair; on success the session is remembered for the rest of the
+ * env supplied pair; on success the session is remembered for the rest of the
  * browser life and the original /admin URL (with any query string) is restored.
  */
 const USER = import.meta.env.VITE_ADMIN_USER ?? "admin@futureride.gh";

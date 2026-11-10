@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
  *
  * Each word rides in its own clipped box; the spaces *between* words are real
  * text nodes rendered outside those boxes (a trailing space inside an
- * `inline-block` is collapsed away by the browser, which used to run the words
+ * `inline block` is collapsed away by the browser, which used to run the words
  * together — "Thesmarter way toride").
  */
 export default function SplitHeading({
@@ -24,11 +24,11 @@ export default function SplitHeading({
       {words.map((w, i) => (
         <Fragment key={`${w}-${i}`}>
           <span
-            className="inline-block overflow-hidden pb-[0.12em] -mb-[0.12em] align-top"
+            className="inline block overflow-hidden pb-[0.12em] -mb-[0.12em] align-top"
             aria-hidden="true"
           >
             <motion.span
-              className="inline-block will-change-transform"
+              className="inline block will-change-transform"
               initial={{ y: "110%" }}
               whileInView={{ y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
