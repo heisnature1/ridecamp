@@ -73,6 +73,8 @@ export function friendlyError(error: unknown, fallback = "Something went wrong."
   if (!e) return fallback;
   if (isNotAdmin(error)) return "Sign in as an admin to do that.";
   if (e.code === "23505") return "That record already exists.";
+  // server side throttle: the form was submitted three times from one number
+  if (e.code === "23514") return e.message || "Too many submissions just now. Please try again in a few minutes.";
   if (/failed to fetch|networkerror|load failed/i.test(e.message ?? ""))
     return "Could not reach the server. Check your connection and try again.";
   return e.message || fallback;

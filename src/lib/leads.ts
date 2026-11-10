@@ -43,7 +43,7 @@ export function mailtoLink(subject: string, body: string): string {
 
 export type Lead = Record<string, string>;
 
-import { kindMeta, type LeadKind } from "./leadKinds";
+import { type LeadKind } from "./leadKinds";
 import { addLead, type LeadRecord } from "./leadsStore";
 import { botCheck, recordSubmit } from "./botGuard";
 import { sanitizeRecord, validateLead, type FieldRule } from "./validate";
@@ -59,11 +59,9 @@ function prune(lead: Lead): Lead {
  * 1. Saves the submission to the database (Supabase `leads` table) so it is
  *    kept until an admin deletes it — it survives a closed browser, another
  *    device, or cleared site data.
- * 2. Opens WhatsApp and an email draft so the team sees it straight away.
- *
- * The form is considered done as soon as the lead is saved; if the network is
- * down the lead is queued locally and retried, so a visitor never loses a
- * booking to a dropped connection.
+ * The form is done as soon as the lead is saved — the visitor stays put and
+ * sees a confirmation. If the network is down the lead is queued locally and
+ * retried, so a visitor never loses a booking to a dropped connection.
  */
 export type DispatchOptions = {
   /** field rules to enforce before saving */
@@ -95,21 +93,8 @@ export async function dispatchLead(
   const record = await addLead(kind, checked.data, source);
   recordSubmit();
 
-  const label = kindMeta(record.kind).label;
-  const lines = Object.entries(record.data)
-    .map(([k, v]) => `${k}: ${v}`)
-    .join("\n");
-  // The business WhatsApp is a `wa.me/message/…` short link, which cannot carry
-  // a pre filled message — it opens the real inbox directly. The lead detail is
-  // still captured in the dashboard and the email draft below.
-  window.open(BUSINESS.whatsappLink, "_blank", "noopener");
-  // Use a small delay before redirect to ensure open succeeds
-  setTimeout(() => {
-    window.location.href = mailtoLink(
-      `[${label}] New lead from futureride.gh`,
-      `Source: ${record.source}\n\n${lines}`,
-    );
-  }, 100);
-
+  // Saving is the whole job. The visitor stays on the page and sees the
+  // confirmation panel; the lead sits in the dashboard until an admin works it.
+  // No mail client is opened and no tab is stolen.
   return record;
 }

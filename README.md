@@ -81,7 +81,13 @@ data. Rows are only removed when an admin deletes them.
 
 Row level security does the real enforcing:
 
-- a visitor may **insert** a lead and **read** the gallery, nothing else;
+- a visitor submits through `public.ridecamp_submit_lead(kind, source, payload)`, a
+  `security definer` function that writes the row, forces `status = 'new'`, strips
+  reserved keys (`status`, `admin_notes`, `id`, `created_at`, `kind`) and hands back only
+  that new row. It cannot read the table, so a visitor never gains access to anyone
+  else's lead — a plain insert could not return its own row, which is why public
+  submissions go through the function;
+- a visitor may **read** the gallery, nothing else;
 - only an authenticated user whose email is in `ridecamp_admins` (checked by
   `public.is_ridecamp_admin()`) may read, update or delete leads, or write gallery posts,
   or upload images. Every other account in the shared project sees nothing.
@@ -116,6 +122,7 @@ layered — the database is the last word, not the UI.
 | Bot protection | Hidden honeypot field, minimum time on form, same-origin check | `src/lib/botGuard.ts` |
 | Input validation | Every form validates against a shared rule set (phone, email, name, length) and refuses markup instead of storing it | `src/lib/validate.ts` |
 | Escaping | React escapes all rendered values; the app never uses `dangerouslySetInnerHTML` or `innerHTML`, and stored text is scrubbed of `<>`, backticks and control characters | `src/lib/validate.ts` |
+| Public submit | Visitors write leads only through `ridecamp_submit_lead()`, which returns their own row id and no table access | Supabase RPC |
 | Uploads | `gallery` bucket limited to JPEG/PNG/WebP and 5 MB, write access restricted to allowlisted admins, and post rows only accept our own bucket or bundled `/images/` paths | Supabase + `ridecamp_guard_gallery_insert()` |
 | Query safety | All database access goes through the Supabase client (parameterised PostgREST / RPC). There is no string-concatenated SQL anywhere | `src/lib/*Store.ts` |
 | Data minimisation | API reads name their columns instead of `select *` | `src/lib/leadsStore.ts`, `src/lib/galleryStore.ts` |
