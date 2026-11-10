@@ -47,10 +47,10 @@ function AdminGuard() {
 }
 
 /**
- * Routes that stand on their own: the admin login is a full screen screen with
+ * Routes that stand on their own: the admin login and the admin dashboard have
  * no public site chrome (nav, footer, floating call/WhatsApp buttons).
  */
-const STANDALONE_ROUTES = ["/login"];
+const STANDALONE_ROUTES = ["/login", "/admin"];
 
 function Shell() {
   const { pathname } = useLocation();

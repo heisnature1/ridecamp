@@ -131,7 +131,7 @@ export default function Overview({
               Latest submission · {timeAgo(stats.latest.createdAt)}
             </span>
             <span className="mt-0.5 block truncate text-sm font-semibold">
-              {leadName(stats.latest)} — {leadSummary(stats.latest)}
+              {leadName(stats.latest)} · {leadSummary(stats.latest)}
             </span>
           </span>
           <span className="hidden shrink-0 items-center gap-2 sm:flex">
@@ -265,7 +265,7 @@ export default function Overview({
         <Panel delay={0.46} className="flex flex-wrap items-center justify-between gap-4">
           <p className="flex items-center gap-3 text-sm text-slate">
             <Users className="size-5 shrink-0 text-brand" />
-            The dashboard is empty. Submit any public form and it appears here instantly — or load
+            The dashboard is empty. Submit any public form and it appears here instantly, or load
             sample leads to explore the layout.
           </p>
           <button

@@ -58,7 +58,7 @@ export default function LeadDrawer({
       {lead && (
         <>
           <motion.div
-            key="drawer-backdrop"
+            key="drawerBackdrop"
             className="fixed inset-0 z-[60] bg-navy/40 backdrop-blur-[2px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -66,7 +66,7 @@ export default function LeadDrawer({
             onClick={onClose}
           />
           <motion.aside
-            key="drawer-panel"
+            key="drawerPanel"
             role="dialog"
             aria-label={`${kindMeta(lead.kind).label} lead details`}
             className="fixed right-0 top-0 z-[61] flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
@@ -170,7 +170,7 @@ export default function LeadDrawer({
                   )}
                 </div>
                 <p className="mt-1.5 text-xs text-slate">
-                  Internal only — never shown to the visitor and kept separate from what they typed.
+                  Internal only. Never shown to the visitor and kept separate from what they typed.
                 </p>
                 <textarea
                   value={draft}
@@ -179,7 +179,7 @@ export default function LeadDrawer({
                     setDirty(true);
                   }}
                   rows={4}
-                  placeholder="e.g. Called twice, no answer — try WhatsApp on Friday. Interested in the fleet option for 12 bikes."
+                  placeholder="e.g. Called twice, no answer. Try WhatsApp on Friday. Interested in the fleet option for 12 bikes."
                   className="mt-3 w-full resize-y rounded-2xl border border-line bg-cloud px-4 py-3 text-sm font-semibold text-navy outline-none transition focus:border-brand focus:bg-white"
                 />
                 <div className="mt-3 flex items-center gap-2">

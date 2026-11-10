@@ -74,14 +74,14 @@ export default function Admin() {
     if (leads.length > prevCount.current) {
       const seen = new Set(seenIds.current);
       const fresh = leads
-        .filter((l) => !seen.has(l.id) && !l.id.startsWith("sample-"))
+        .filter((l) => !seen.has(l.id) && !l.id.startsWith("sample"))
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       const newest = fresh[0];
       if (newest) {
         toast(
           fresh.length > 1
-            ? `${fresh.length} new leads — latest from ${leadName(newest)}`
-            : `New ${kindMeta(newest.kind).label.toLowerCase()} lead — ${leadName(newest)}`,
+            ? `${fresh.length} new leads, latest from ${leadName(newest)}`
+            : `New ${kindMeta(newest.kind).label.toLowerCase()} lead, ${leadName(newest)}`,
         );
       }
     }
@@ -132,10 +132,10 @@ export default function Admin() {
   );
 
   return (
-    <div className="min-h-[70vh] bg-cloud pb-20">
+    <div className="min-h-screen bg-cloud pb-20">
       {/* header */}
       <header className="border-b border-line bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 pb-6 pt-10 md:px-8 md:pt-14">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 pb-6 pt-8 md:px-8 md:pt-10">
           <Logo />
           <div className="flex flex-col items-start gap-2 sm:items-end">
             <span className="inline-flex items-center gap-2 rounded-full bg-mint px-3.5 py-1.5 text-xs font-bold text-brand-dark">
@@ -175,8 +175,8 @@ export default function Admin() {
             Admin dashboard
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate md:text-base">
-            Everything visitors type into the public site — test rides, quotes, financing
-            applications, fleet requests and call backs — lands here as it is submitted.
+            Everything visitors type into the public site: test rides, quotes, financing
+            applications, fleet requests and call backs, lands here as it is submitted.
           </p>
         </div>
       </header>
@@ -214,7 +214,7 @@ export default function Admin() {
                 )}
                 {active && (
                   <motion.span
-                    layoutId="admin-tab-underline"
+                    layoutId="adminTabUnderline"
                     className="absolute inset-x-2 -bottom-px h-[3px] rounded-full bg-brand"
                     transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
