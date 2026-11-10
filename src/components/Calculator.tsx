@@ -51,7 +51,14 @@ export default function Calculator() {
     const petrolCost = kmPerLitre > 0 ? (monthlyKm / kmPerLitre) * petrolPrice : 0;
     const evCost = monthlyKm * CALC.evCostPerKm;
     const maintenanceSaving = Math.max(0, maintenance - CALC.evMaintenancePerMonth);
+    /**
+     * The saving can genuinely be negative when a visitor rides very little: a
+     * petrol bike that barely moves costs almost nothing, so the fixed swap
+     * tariff wins. Reporting that as "GH₵ 0" hides the truth, so the signed
+     * figure is kept and the panel leads with the extra cost instead.
+     */
     const monthly = petrolCost + maintenance - (evCost + CALC.evMaintenancePerMonth);
+    const saving = monthly > 0;
     
     // Calculate range based on riding mode
     const baseRangeKm = 100; // Base range from specs
@@ -67,7 +74,11 @@ export default function Calculator() {
       petrolCost, 
       evCost, 
       maintenanceSaving, 
-      monthly, 
+      monthly,
+      saving,
+      monthlyKm,
+      evMonthly: evCost + CALC.evMaintenancePerMonth,
+      petrolMonthly: petrolCost + maintenance,
       yearly: monthly * 12,
       actualRangeKm,
       monthlyCo2SavedKg,
@@ -156,23 +167,34 @@ export default function Calculator() {
       </div>
 
         <div className="flex flex-col justify-center rounded-2xl bg-navy p-7 text-white md:p-9">
-          <p className="text-sm text-white/70">Your estimated monthly saving</p>
+          <p className="text-sm text-white/70">
+            {r.saving ? "Your estimated monthly saving" : "What you would spend extra each month"}
+          </p>
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.p
-              key={Math.round(r.monthly)}
+              key={Math.round(Math.abs(r.monthly))}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10, position: "absolute" }}
               transition={{ duration: 0.28, ease: EASE_OUT }}
-              className="mt-1 font-display text-3xl font-bold tabular-nums text-brand-bright"
+              className={`mt-1 font-display text-3xl font-bold tabular-nums ${r.saving ? "text-brand-bright" : "text-amber-400"}`}
+              data-monthly-figure
             >
-              GH₵ {fmtInt(Math.max(0, r.monthly))}
+              GH₵ {fmtInt(Math.abs(r.monthly))}
             </motion.p>
           </AnimatePresence>
-          <div className="my-5 h-px bg-white/15" />
+          <p className="mt-2 text-xs leading-relaxed text-white/60" data-monthly-caption>
+            {r.saving
+              ? `Based on ${fmtInt(r.monthlyKm)} km a month: GH₵ ${fmtInt(r.petrolMonthly)} on petrol versus GH₵ ${fmtInt(r.evMonthly)} on the Ekon.`
+              : `At ${fmtInt(r.monthlyKm)} km a month, petrol plus care costs GH₵ ${fmtInt(r.petrolMonthly)} and the Ekon costs GH₵ ${fmtInt(r.evMonthly)}. Raise your daily distance to see the saving.`}
+          </p>
+          <div className="my-5 h-px bg-white/15" />          <div className="my-5 h-px bg-white/15" />
           <p className="font-display text-2xl font-bold leading-snug md:text-3xl">
-            Over a year, you could save{" "}
-            <span className="text-brand-bright tabular-nums">GH₵ {fmtInt(Math.max(0, r.yearly))}.</span>
+            {r.saving ? "Over a year, you could save " : "Over a year, that is "}
+            <span className={`tabular-nums ${r.saving ? "text-brand-bright" : "text-amber-400"}`}>
+              GH₵ {fmtInt(Math.abs(r.yearly))}
+            </span>
+            {r.saving ? "." : " more than petrol."}
           </p>
           <div className="mt-6 space-y-2 text-xs text-white/80">
             <div className="flex items-center space-x-3">
@@ -192,6 +214,10 @@ export default function Calculator() {
           <div className="mt-5 space-y-1.5 text-xs text-white/70">
             <p>Petrol bike: GH₵ {fmtInt(r.petrolCost)} fuel + GH₵ {fmtInt(maintenance)} care / month</p>
             <p>Ekon 450 M1: GH₵ {fmtInt(r.evCost)} energy + GH₵ {fmtInt(CALC.evMaintenancePerMonth)} care / month</p>
+            <p className="pt-1 text-white/50">
+              Petrol cost per km: GH₵ {kmPerLitre > 0 ? (petrolPrice / kmPerLitre).toFixed(2) : "—"} ·
+              Electric cost per km: GH₵ {CALC.evCostPerKm.toFixed(2)}
+            </p>
           </div>
         <div className="mt-7 flex flex-wrap gap-3">
           <Link
