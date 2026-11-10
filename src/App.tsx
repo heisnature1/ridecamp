@@ -23,7 +23,8 @@ const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Privacy = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Privacy })));
 const Terms = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Terms })));
-import { RouteVeil, ScrollProgress } from "./components/motion/RouteTransition";
+import { ScrollProgress } from "./components/motion/RouteTransition";
+import PageTransition from "./components/motion/PageTransition";
 import BootSplash, { LogoLoader } from "./components/motion/LogoLoader";
 import { requestScrollRefresh } from "./lib/scrollRefresh";
 import { useAdmin } from "./lib/auth";
@@ -96,7 +97,7 @@ function Shell() {
     <>
       <ScrollManager />
       {!standalone && <ScrollProgress />}
-      <RouteVeil />
+      <PageTransition />
       {!standalone && <Nav />}
       <main>
         <Suspense fallback={<RouteFallback />}>

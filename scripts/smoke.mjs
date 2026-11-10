@@ -243,6 +243,33 @@ try {
   check("routes are code split", appSrc.includes("lazy(() => import("));
   check("a slow chunk shows a real loading state", appSrc.includes("RouteFallback"));
 
+  console.log("\n1g. Following a link shows the branded wait, not a colour wipe");
+  const fsx = await import("node:fs");
+  const read = (rel) => fsx.promises.readFile(new URL(rel, import.meta.url), "utf8");
+  const shellSrc = await read("../src/App.tsx");
+  const transSrc = await read("../src/components/motion/PageTransition.tsx");
+  const cssSrc = await read("../src/index.css");
+
+  check("the shell mounts the page transition", shellSrc.includes("<PageTransition />"));
+  check("the old colour wipe is gone from the shell", !shellSrc.includes("<RouteVeil"));
+  check("the old colour wipe is gone from the styles", !cssSrc.includes(".route-veil"));
+  check("the cover shows the logo loader", transSrc.includes("<LogoLoader"));
+  check("the cover is full screen", transSrc.includes("fixed inset-0"));
+  check("a link click is what raises it", transSrc.includes('document.addEventListener("click"'));
+  check("modified clicks are left alone", /metaKey|ctrlKey/.test(transSrc));
+  check("external and mail links are left alone", /https\?:\|tel:\|mailto:/.test(transSrc) || transSrc.includes("tel:") && transSrc.includes("mailto:"));
+  check("same page anchors show nothing", transSrc.includes("url.hash"));
+  check("it can never swallow a click", /pointer-events:\s*none|\.page-transition/.test(transSrc + cssSrc));
+  check("reduced motion skips it", transSrc.includes("if (calm) return null"));
+  check("a click that changes nothing still lifts it", transSrc.includes("SAFETY_MS"));
+
+  // nothing over the page until a link is actually followed
+  const { default: PageTransition } = await vite.ssrLoadModule("/src/components/motion/PageTransition.tsx");
+  const initial = renderToStaticMarkup(
+    React.createElement(MemoryRouter, { initialEntries: ["/"] }, React.createElement(PageTransition)),
+  );
+  check("it is invisible before any navigation", initial === "", initial.slice(0, 60));
+
   console.log("\n1f. The waiting state is the brand, and it always goes away");
   const { LogoLoader } = await vite.ssrLoadModule("/src/components/motion/LogoLoader.tsx");
   const loaderMarkup = renderToStaticMarkup(React.createElement(LogoLoader));
