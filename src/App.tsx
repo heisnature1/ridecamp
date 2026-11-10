@@ -8,25 +8,40 @@ import FloatingActions from "./components/FloatingActions";
  * visitor. The admin dashboard (and its charts, tables and drawer) never
  * reaches a public visitor, and the public pages never reach an admin.
  */
-const Home = lazy(() => import("./pages/Home"));
-const Ekon = lazy(() => import("./pages/Ekon"));
-const BatterySwap = lazy(() => import("./pages/BatterySwap"));
-const CalculatorPage = lazy(() => import("./pages/CalculatorPage"));
-const Fleet = lazy(() => import("./pages/Fleet"));
-const Service = lazy(() => import("./pages/Service"));
-const About = lazy(() => import("./pages/About"));
-const Contact = lazy(() => import("./pages/Contact"));
-const SpecSheet = lazy(() => import("./pages/SpecSheet"));
-const Gallery = lazy(() => import("./pages/Gallery"));
-const Login = lazy(() => import("./pages/Login"));
-const Admin = lazy(() => import("./pages/Admin"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Privacy = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Privacy })));
-const Terms = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Terms })));
+/**
+ * Every route chunk tells the cover when it has arrived, so the waiting
+ * transition can hold until the page a visitor asked for is genuinely here
+ * rather than for a fixed guess at how long it might take.
+ */
+function page<T extends { default: React.ComponentType }>(load: () => Promise<T>) {
+  return lazy(() =>
+    load().then((module) => {
+      markLoaded();
+      return module;
+    }),
+  );
+}
+
+const Home = page(() => import("./pages/Home"));
+const Ekon = page(() => import("./pages/Ekon"));
+const BatterySwap = page(() => import("./pages/BatterySwap"));
+const CalculatorPage = page(() => import("./pages/CalculatorPage"));
+const Fleet = page(() => import("./pages/Fleet"));
+const Service = page(() => import("./pages/Service"));
+const About = page(() => import("./pages/About"));
+const Contact = page(() => import("./pages/Contact"));
+const SpecSheet = page(() => import("./pages/SpecSheet"));
+const Gallery = page(() => import("./pages/Gallery"));
+const Login = page(() => import("./pages/Login"));
+const Admin = page(() => import("./pages/Admin"));
+const NotFound = page(() => import("./pages/NotFound"));
+const Privacy = page(() => import("./pages/Legal").then((m) => ({ default: m.Privacy })));
+const Terms = page(() => import("./pages/Legal").then((m) => ({ default: m.Terms })));
 import { ScrollProgress } from "./components/motion/RouteTransition";
 import PageTransition from "./components/motion/PageTransition";
 import BootSplash, { LogoLoader } from "./components/motion/LogoLoader";
 import { requestScrollRefresh } from "./lib/scrollRefresh";
+import { markLoaded } from "./lib/cover";
 import { useAdmin } from "./lib/auth";
 import { clearLegacySession } from "./lib/supabase";
 
@@ -47,6 +62,17 @@ function ScrollManager() {
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, [pathname, hash]);
   return null;
+}
+
+/**
+ * A redirect has no chunk to download, so it tells the cover there is nothing
+ * to wait for before it swaps the route.
+ */
+function Redirect({ to }: { to: string }) {
+  useEffect(() => {
+    markLoaded();
+  }, []);
+  return <Navigate to={to} replace />;
 }
 
 /** /admin is only reachable with a signed in admin session, otherwise bounce to /login. */
@@ -88,6 +114,7 @@ function Shell() {
   const { pathname } = useLocation();
   const standalone = STANDALONE_ROUTES.includes(pathname.replace(/\/+$/, "") || "/");
 
+
   // ScrollTrigger caches element positions; a route change replaces them all
   useEffect(() => {
     requestScrollRefresh();
@@ -108,8 +135,8 @@ function Shell() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/calculator" element={<CalculatorPage />} />
           <Route path="/fleet" element={<Fleet />} />
-          <Route path="/ownership" element={<Navigate to="/fleet#financing" replace />} />
-          <Route path="/why-electric" element={<Navigate to="/service#why-electric" replace />} />
+          <Route path="/ownership" element={<Redirect to="/fleet#financing" />} />
+          <Route path="/why-electric" element={<Redirect to="/service#why-electric" />} />
           <Route path="/service" element={<Service />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
@@ -118,7 +145,7 @@ function Shell() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminGuard />} />
-          <Route path="/faqs" element={<Navigate to="/#faqs" replace />} />
+          <Route path="/faqs" element={<Redirect to="/#faqs" />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>

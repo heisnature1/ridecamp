@@ -150,7 +150,7 @@ Two engines, split by what each is actually good at, with one shared vocabulary 
 | Pointer driven 3D tilt + travelling glare | CSS custom properties written once per frame | `components/motion/TiltCard.tsx` |
 | Scrubbed parallax and the scroll progress bar | GSAP `ScrollTrigger` | `lib/scrollFx.ts` |
 | Infinite proof ribbon | CSS animation on a duplicated track | `components/motion/Marquee.tsx` |
-| Link click cover: logo + orbiting lines on every page change | Framer Motion overlay | `components/motion/PageTransition.tsx` |
+| Link click cover: logo + orbiting lines, held until the page has loaded | Framer Motion overlay + `lib/cover.ts` store | `components/motion/PageTransition.tsx` |
 
 The tilt is real 3D, not a scale: `TiltCard` writes `--tilt-x`, `--tilt-y`, `--tilt-z` and the
 glare position to the host element on `pointermove` (coalesced with `requestAnimationFrame`), and
