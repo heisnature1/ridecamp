@@ -33,7 +33,7 @@ export default function Logo({ light = false }: { light?: boolean }) {
         <span
           className={`block text-[10px] font-semibold uppercase tracking-[0.22em] ${light ? "text-white/70" : "text-slate"}`}
         >
-          Spiro distributor · Ghana
+          Official Spiro distributor · Ghana
         </span>
       </span>
     </Link>

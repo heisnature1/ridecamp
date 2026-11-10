@@ -358,6 +358,15 @@ try {
   check("settings offers csv export", /Download CSV/.test(settings));
   check("settings offers import", /Import JSON/.test(settings));
 
+  console.log("\n2b. Brand line reads as official");
+  const { default: BrandLogo } = await vite.ssrLoadModule("/src/components/Logo.tsx");
+  const logoHtml = renderToStaticMarkup(
+    React.createElement(MemoryRouter, null, React.createElement(BrandLogo)),
+  );
+  check("the logo line says Official", logoHtml.includes("Official Spiro distributor"));
+  check("the logo line keeps Ghana", logoHtml.includes("Ghana"));
+  check("the trading name is untouched", logoHtml.includes("Future Ride Ltd"));
+
   console.log("\n3. Public forms dispatch through the same store");
   const fs = await import("node:fs");
   const path = await import("node:path");
