@@ -199,29 +199,32 @@ export async function addLead(
   const createdAt = new Date().toISOString();
   const resolvedSource = source ?? currentSource();
   const optimistic = makeRecord(kind, data, resolvedSource, createdAt);
-  setCache([optimistic, ...readLeads()]);
 
-  const { data: inserted, error } = await supabase
-    .from(TABLE)
-    .insert({ ...toRow(optimistic), created_at: createdAt })
-    .select("id,kind,status,created_at,source,data,admin_notes")
-    .single();
+  /**
+   * Visitors submit through `ridecamp_submit_lead`, a guarded function that
+   * writes the row and hands back its id. A plain insert cannot do this: the
+   * table has no anonymous read policy (by design), so asking PostgREST to
+   * return the new row would fail and roll the submission back.
+   */
+  const { data: saved, error } = await supabase.rpc("ridecamp_submit_lead", {
+    p_kind: normalizeKind(kind),
+    p_source: resolvedSource.slice(0, 500),
+    p_data: cleanData(data),
+  });
 
-  if (error || !inserted) {
-    // keep it for a retry, unless the server actively rejected the shape
-    if (!error || isNetworkError(error)) {
+  if (error) {
+    if (isNetworkError(error)) {
+      // offline: keep it on the device and retry on the next load
       writePending([...readPending(), { kind, data, source: resolvedSource, createdAt }]);
+      setCache([optimistic, ...readLeads()]);
+      return optimistic;
     }
-    setCache(readLeads().filter((l) => l.id !== optimistic.id));
-    if (error && !isNetworkError(error)) {
-      throw new Error(friendlyError(error, "Could not save your details."));
-    }
-    return optimistic;
+    throw new Error(friendlyError(error, "Could not save your details."));
   }
 
-  const saved = fromRow(inserted as Row);
-  setCache([saved, ...readLeads().filter((l) => l.id !== optimistic.id)]);
-  return saved;
+  const record = saved ? fromRow(saved as Row) : optimistic;
+  setCache([record, ...readLeads().filter((l) => l.id !== record.id)]);
+  return record;
 }
 
 /** Retry anything queued while offline. Safe to call on every dashboard load. */
@@ -231,9 +234,10 @@ export async function flushPendingLeads(): Promise<number> {
   let sent = 0;
   const keep: PendingLead[] = [];
   for (const item of pending) {
-    const { error } = await supabase.from(TABLE).insert({
-      ...toRow(makeRecord(item.kind, item.data, item.source, item.createdAt)),
-      created_at: item.createdAt,
+    const { error } = await supabase.rpc("ridecamp_submit_lead", {
+      p_kind: normalizeKind(item.kind),
+      p_source: String(item.source ?? "website").slice(0, 500),
+      p_data: cleanData(item.data),
     });
     if (error && isNetworkError(error)) keep.push(item);
     else sent += 1;

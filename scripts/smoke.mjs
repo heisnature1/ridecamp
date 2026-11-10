@@ -146,6 +146,47 @@ try {
   check("a normal submission is allowed", botCheck({ elapsedMs: 9000, source: "/contact" }).ok === true);
   check("the rate window reports a budget", typeof submitBudget().left === "number");
 
+  console.log("\n1c. A visitor can submit without ever signing in");
+  // The public forms must reach the server through the guarded RPC, never a
+  // plain insert: the leads table has no anonymous read policy, so an insert
+  // that asks for the row back (`.select().single()`) is refused and the
+  // submission is silently rolled back. This guards that regression.
+  const leadsSrc = await (await import("node:fs")).promises.readFile(
+    new URL("../src/lib/leadsStore.ts", import.meta.url),
+    "utf8",
+  );
+  check(
+    "public submissions go through the submit function",
+    /rpc\(\s*["']ridecamp_submit_lead["']/.test(leadsSrc),
+  );
+  check(
+    "offline replay also goes through the submit function",
+    (leadsSrc.match(/ridecamp_submit_lead/g) ?? []).length >= 2,
+    `found ${(leadsSrc.match(/ridecamp_submit_lead/g) ?? []).length}`,
+  );
+  const addLeadBody = leadsSrc.slice(
+    leadsSrc.indexOf("export async function addLead("),
+    leadsSrc.indexOf("/** Retry anything queued while offline."),
+  );
+  check(
+    "addLead never asks PostgREST to return the inserted row",
+    !addLeadBody.includes('.single()') && !/\.from\(TABLE\)\s*\.insert/.test(addLeadBody),
+  );
+
+  const leadsLib = await (await import("node:fs")).promises.readFile(
+    new URL("../src/lib/leads.ts", import.meta.url),
+    "utf8",
+  );
+  const dispatchBody = leadsLib.slice(leadsLib.indexOf("export async function dispatchLead"));
+  check(
+    "submitting does not hijack the browser into a mail draft",
+    !dispatchBody.includes("window.location.href") && !dispatchBody.includes("mailtoLink("),
+  );
+  check(
+    "submitting does not force a WhatsApp tab open",
+    !dispatchBody.includes("window.open("),
+  );
+
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");
   const { default: Overview } = await vite.ssrLoadModule("/src/components/admin/Overview.tsx");
