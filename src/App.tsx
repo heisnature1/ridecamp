@@ -1,22 +1,30 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import FloatingActions from "./components/FloatingActions";
-import Home from "./pages/Home";
-import Ekon from "./pages/Ekon";
-import BatterySwap from "./pages/BatterySwap";
-import CalculatorPage from "./pages/CalculatorPage";
-import Fleet from "./pages/Fleet";
-import Service from "./pages/Service";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import SpecSheet from "./pages/SpecSheet";
-import Gallery from "./pages/Gallery";
-import { Privacy, Terms } from "./pages/Legal";
-import Login from "./pages/Login";
-import Admin from "./pages/Admin";
-import NotFound from "./pages/NotFound";
+/**
+ * Routes are split so a first visit only downloads the page in front of the
+ * visitor. The admin dashboard (and its charts, tables and drawer) never
+ * reaches a public visitor, and the public pages never reach an admin.
+ */
+const Home = lazy(() => import("./pages/Home"));
+const Ekon = lazy(() => import("./pages/Ekon"));
+const BatterySwap = lazy(() => import("./pages/BatterySwap"));
+const CalculatorPage = lazy(() => import("./pages/CalculatorPage"));
+const Fleet = lazy(() => import("./pages/Fleet"));
+const Service = lazy(() => import("./pages/Service"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const SpecSheet = lazy(() => import("./pages/SpecSheet"));
+const Gallery = lazy(() => import("./pages/Gallery"));
+const Login = lazy(() => import("./pages/Login"));
+const Admin = lazy(() => import("./pages/Admin"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Privacy = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Privacy })));
+const Terms = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Terms })));
+import { RouteVeil, ScrollProgress } from "./components/motion/RouteTransition";
+import { requestScrollRefresh } from "./lib/scrollRefresh";
 import { useAdmin } from "./lib/auth";
 import { clearLegacySession } from "./lib/supabase";
 
@@ -56,6 +64,22 @@ function AdminGuard() {
 }
 
 /**
+ * Shown for the moment a route chunk downloads. Deliberately plain: a skeleton
+ * that fades in would flash on a fast connection, so this is a quiet brand mark
+ * that only appears if the page is genuinely slow.
+ */
+function RouteFallback() {
+  return (
+    <div className="grid min-h-[60vh] place-items-center" role="status" aria-live="polite">
+      <div className="flex flex-col items-center gap-3">
+        <span className="size-8 animate-spin rounded-full border-2 border-line border-t-brand" />
+        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate">Loading</span>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Routes that stand on their own: the admin login and the admin dashboard have
  * no public site chrome (nav, footer, floating call/WhatsApp buttons).
  */
@@ -65,11 +89,19 @@ function Shell() {
   const { pathname } = useLocation();
   const standalone = STANDALONE_ROUTES.includes(pathname.replace(/\/+$/, "") || "/");
 
+  // ScrollTrigger caches element positions; a route change replaces them all
+  useEffect(() => {
+    requestScrollRefresh();
+  }, [pathname]);
+
   return (
     <>
       <ScrollManager />
+      {!standalone && <ScrollProgress />}
+      <RouteVeil />
       {!standalone && <Nav />}
       <main>
+        <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/ekon" element={<Ekon />} />
@@ -90,6 +122,7 @@ function Shell() {
           <Route path="/faqs" element={<Navigate to="/#faqs" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
       </main>
       {!standalone && <Footer />}
       {!standalone && <FloatingActions />}

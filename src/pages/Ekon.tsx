@@ -1,12 +1,15 @@
 import { Zap } from "lucide-react";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
+import TiltCard from "../components/motion/TiltCard";
+import { useParallax } from "../lib/scrollFx";
 import SplitHeading from "../components/SplitHeading";
 import CtaRow from "../components/CtaRow";
 import Calculator from "../components/Calculator";
 import { EKON_FEATURES } from "../data/site";
 
 export default function Ekon() {
+  useParallax();
   return (
     <>
       <PageHero
@@ -66,12 +69,14 @@ export default function Ekon() {
               </Reveal>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {EKON_FEATURES.map((f, i) => (
-                  <Reveal key={f.title} delay={(i % 2) * 0.06}>
-                    <div className="h-full rounded-2xl border border-line bg-cloud p-5">
-                      <Zap className="size-4 text-brand" />
-                      <h3 className="mt-2 font-display text-[15px] font-bold text-navy">{f.title}</h3>
-                      <p className="mt-1 text-sm text-slate">{f.text}</p>
-                    </div>
+                  <Reveal key={f.title} delay={(i % 2) * 0.06} className="h-full">
+                    <TiltCard max={6} lift={10} className="h-full rounded-2xl" surfaceClassName="h-full">
+                      <div className="h-full rounded-2xl border border-line bg-cloud p-5">
+                        <Zap className="depth-1 size-4 text-brand" />
+                        <h3 className="mt-2 font-display text-[15px] font-bold text-navy">{f.title}</h3>
+                        <p className="mt-1 text-sm text-slate">{f.text}</p>
+                      </div>
+                    </TiltCard>
                   </Reveal>
                 ))}
               </div>

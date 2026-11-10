@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { EASE_OUT } from "../lib/motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, MessageCircle, Activity, Zap } from "lucide-react";
 import { CALC } from "../data/site";
@@ -95,6 +97,7 @@ export default function Calculator() {
             onChange={(e) => setKmPerDay(Number(e.target.value))}
             className="fr-range mt-3"
             aria-label="Daily commute distance"
+            style={{ transform: "translateZ(0)" }}
           />
         </label>
 
@@ -154,9 +157,18 @@ export default function Calculator() {
 
         <div className="flex flex-col justify-center rounded-2xl bg-navy p-7 text-white md:p-9">
           <p className="text-sm text-white/70">Your estimated monthly saving</p>
-          <p className="mt-1 font-display text-3xl font-bold tabular-nums text-brand-bright">
-            GH₵ {fmtInt(Math.max(0, r.monthly))}
-          </p>
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.p
+              key={Math.round(r.monthly)}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10, position: "absolute" }}
+              transition={{ duration: 0.28, ease: EASE_OUT }}
+              className="mt-1 font-display text-3xl font-bold tabular-nums text-brand-bright"
+            >
+              GH₵ {fmtInt(Math.max(0, r.monthly))}
+            </motion.p>
+          </AnimatePresence>
           <div className="my-5 h-px bg-white/15" />
           <p className="font-display text-2xl font-bold leading-snug md:text-3xl">
             Over a year, you could save{" "}

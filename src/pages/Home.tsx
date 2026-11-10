@@ -1,14 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ArrowRight, BatteryCharging, Bike, MapPinned, Route, ShieldCheck, Wrench, Sparkles } from "lucide-react";
 import SplitHeading from "../components/SplitHeading";
 import Reveal from "../components/Reveal";
+import TiltCard from "../components/motion/TiltCard";
 import CountUp from "../components/CountUp";
 import CtaRow from "../components/CtaRow";
 import Calculator from "../components/Calculator";
 import { GLANCE, HOW_IT_WORKS, TESTIMONIALS, TRUST_STRIP, WHY_GHANA, WAYS_TO_OWN, FAQS } from "../data/site";
+import { EASE_OUT, useSceneParallax } from "../lib/motion";
+import { useParallax, useScrollRevealGroup } from "../lib/scrollFx";
+import Marquee from "../components/motion/Marquee";
 import { dispatchLead } from "../lib/leads";
 import { RULES } from "../lib/validate";
 import { formatGhanaPhone } from "../lib/leadKinds";
@@ -16,93 +20,111 @@ import { formatGhanaPhone } from "../lib/leadKinds";
 const TRUST_ICONS = [Route, BatteryCharging, ShieldCheck, MapPinned];
 
 function Hero() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!heroRef.current) return;
-      const rect = heroRef.current.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-      const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-      setMousePosition({ x, y });
-    };
-
-    heroRef.current?.addEventListener("mousemove", handleMouseMove);
-    return () => heroRef.current?.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  const sceneRef = useSceneParallax<HTMLElement>();
 
   return (
-    <section className="relative overflow-hidden bg-navy text-white" ref={heroRef}>
-      {/* Animated background layers */}
-      <div className="absolute inset-0" aria-hidden="true">
-        <div className="absolute inset-0 hero-bg-pattern" />
-        <img
-          src="/images/motor.jpg"
-          alt="Spiro Ekon electric motorcycle on a Ghanaian road"
-          className="size-full object-cover opacity-40"
+    <section className="hero-scene relative overflow-hidden bg-navy text-white" ref={sceneRef}>
+      {/* ---------------- background scene, in real depth layers ---------------- */}
+      <div className="absolute inset-0 hero-bg-pattern" aria-hidden="true" />
+
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+        {/* far layer: the photograph drifts least */}
+        <div
+          className="hero-sheen absolute inset-[-6%]"
+          style={{ transform: "translate3d(calc(var(--px) * 10px), calc(var(--py) * 8px), 0) scale(1.06)" }}
+        >
+          <img
+            src="/images/motor.jpg"
+            alt=""
+            className="size-full object-cover opacity-45"
+            loading="eager"
+          />
+        </div>
+
+        {/* vignette keeps the type legible over any part of the photo */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/92 to-navy/35" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-navy/40" />
+
+        {/* mid layer: light blooms that respond more strongly */}
+        <div
+          className="absolute -left-16 top-1/4 size-[26rem] rounded-full bg-brand/25 blur-[90px] animate-float"
+          style={{ transform: "translate3d(calc(var(--px) * 34px), calc(var(--py) * 26px), 0)" }}
+        />
+        <div
+          className="absolute -right-10 bottom-1/4 size-80 rounded-full bg-cyan-500/20 blur-[80px] animate-float"
           style={{
-            transform: `translate3d(${mousePosition.x * 30}px, ${mousePosition.y * 20}px, 0) scale(1.05)`
+            animationDelay: "-2s",
+            transform: "translate3d(calc(var(--px) * -46px), calc(var(--py) * 30px), 0)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-navy/40" />
-        {/* Floating orbs */}
-        <div className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/20 blur-3xl animate-float" style={{ animationDelay: "0s" }} />
-        <div className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/20 blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
-        <div className="absolute top-1/2 left-1/2 size-64 rounded-full bg-brand-bright/15 blur-3xl animate-float" style={{ animationDelay: "-4s" }} />
+
+        {/* near layer: a faint grid that moves the most, giving the scene a floor */}
+        <div
+          className="hero-grid absolute inset-x-0 bottom-0 h-1/2 opacity-40"
+          style={{ transform: "translate3d(calc(var(--px) * 18px), calc(var(--py) * 12px), 0)" }}
+        />
       </div>
-      
+
       <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 md:px-8 md:pb-28 md:pt-28">
         <motion.div
-          initial={{ opacity: 0, y: 40, rotateX: -10 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
-          style={{
-            transform: `perspective(1000px) rotateY(${mousePosition.x * 3}deg) rotateX(${-mousePosition.y * 2}deg)`
-          }}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: EASE_OUT }}
+          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-bright backdrop-blur-md"
+        >
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-bright opacity-70" />
+            <span className="relative inline-flex size-2 rounded-full bg-brand-bright" />
+          </span>
+          Now delivering in Accra
+        </motion.div>
+
+        {/* the headline is split into two depth planes: words sit above the rule */}
+        <div
+          className="mt-6"
+          style={{ transform: "translate3d(calc(var(--px) * -8px), calc(var(--py) * -5px), 0)" }}
         >
           <SplitHeading
             as="h1"
             text="The smarter way to ride and earn."
             className="max-w-3xl font-display text-4xl font-bold leading-[1.05] sm:text-5xl md:text-7xl"
           />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
+        </div>
+
+        <motion.p
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
-          style={{
-            transform: `perspective(1000px) rotateY(${mousePosition.x * 2}deg) rotateX(${-mousePosition.y * 1.5}deg)`
-          }}
+          transition={{ duration: 0.8, delay: 0.35, ease: EASE_OUT }}
+          className="mt-6 max-w-xl text-base leading-relaxed text-white/85 md:text-lg"
+          style={{ transform: "translate3d(calc(var(--px) * 5px), calc(var(--py) * 4px), 0)" }}
         >
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/85 md:text-lg">
-            Future Ride Ltd brings Spiro's Africa built electric motorcycle to Ghana. No petrol. No oil
-            changes. Far fewer repairs. More money in your pocket every single day.
-          </p>
-        </motion.div>
+          Future Ride Ltd brings Spiro's Africa built electric motorcycle to Ghana. No petrol. No oil
+          changes. Far fewer repairs. More money in your pocket every single day.
+        </motion.p>
+
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.35, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ duration: 0.8, delay: 0.5, ease: EASE_OUT }}
+          className="mt-8 flex flex-wrap items-center gap-4"
         >
-          <div className="mt-8 flex flex-wrap gap-4">
-            <CtaRow />
-            <Link
-              to="/gallery"
-              className="inline-flex items-center gap-2 rounded-full bg-white/10 px-6 py-3 text-sm font-bold text-white border border-white/20 transition-all duration-300 hover:bg-white/20 hover:border-white/30 hover:scale-105"
-            >
-              <Sparkles className="size-4" /> View Gallery
-            </Link>
-          </div>
+          <CtaRow />
+          <Link
+            to="/gallery"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-md transition-all duration-300 hover:border-white/35 hover:bg-white/20"
+          >
+            <Sparkles className="size-4 transition-transform duration-500 group-hover:rotate-[18deg]" />
+            View Gallery
+          </Link>
         </motion.div>
       </div>
 
-      {/* trust strip */}
+      {/* trust strip: the cards lift and glow individually */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.5, ease: [0.23, 1, 0.32, 1] }}
-        className="relative border-t border-white/10 bg-navy-deep/50 backdrop-blur-xl glass-dark"
+        transition={{ duration: 0.8, delay: 0.65, ease: EASE_OUT }}
+        className="relative border-t border-white/10 bg-navy-deep/50 backdrop-blur-xl"
       >
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 md:grid-cols-4 md:px-8">
           {TRUST_STRIP.map((t, i) => {
@@ -110,12 +132,13 @@ function Hero() {
             return (
               <motion.div
                 key={t}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
-                className="group relative p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all duration-300"
+                transition={{ duration: 0.5, delay: 0.75 + i * 0.09, ease: EASE_OUT }}
+                whileHover={{ y: -4 }}
+                className="group relative rounded-2xl border border-white/5 bg-white/5 p-4 transition-colors duration-300 hover:border-brand-bright/30 hover:bg-white/10"
               >
-                <span className="relative flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand/20 to-brand-bright/20 group-hover:from-brand/40 group-hover:to-brand-bright/40 transition-colors">
+                <span className="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand/25 to-brand-bright/25 transition-all duration-500 group-hover:rotate-6 group-hover:from-brand/40 group-hover:to-brand-bright/40">
                   <Icon className="size-6 text-brand-bright" />
                 </span>
                 <p className="mt-3 text-[13px] font-semibold text-white/90">{t}</p>
@@ -123,6 +146,16 @@ function Hero() {
             );
           })}
         </div>
+      </motion.div>
+
+      {/* scroll cue */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-24 left-1/2 hidden -translate-x-1/2 md:block"
+        animate={{ y: [0, 10, 0], opacity: [0.35, 0.9, 0.35] }}
+        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <ChevronDown className="size-6 text-white/70" />
       </motion.div>
     </section>
   );
@@ -142,12 +175,14 @@ function WhyGhana() {
         </Reveal>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {WHY_GHANA.map((w, i) => (
-            <Reveal key={w.title} delay={(i % 4) * 0.08}>
-              <div className="h-full rounded-2xl border border-line bg-cloud p-6 transition hover:border-brand/50 hover:bg-mint">
-                <span className="font-display text-2xl font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="mt-3 font-display text-lg font-bold text-navy">{w.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate">{w.text}</p>
-              </div>
+            <Reveal key={w.title} delay={(i % 4) * 0.08} className="h-full">
+              <TiltCard max={7} lift={12} className="h-full rounded-2xl" surfaceClassName="h-full">
+                <div className="depth-1 h-full rounded-2xl border border-line bg-cloud p-6 transition-colors duration-300 hover:border-brand/50 hover:bg-mint">
+                  <span className="font-display text-2xl font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
+                  <h3 className="mt-3 font-display text-lg font-bold text-navy">{w.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate">{w.text}</p>
+                </div>
+              </TiltCard>
             </Reveal>
           ))}
         </div>
@@ -160,8 +195,8 @@ function Glance() {
   return (
     <section className="relative bg-navy py-16 text-white md:py-24 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-0 right-1/4 size-96 rounded-full bg-brand/10 blur-3xl animate-float" />
-        <div className="absolute bottom-0 left-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
+        <div data-parallax="60" className="absolute top-0 right-1/4 size-96 rounded-full bg-brand/10 blur-3xl" />
+        <div data-parallax="-60" className="absolute bottom-0 left-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl" />
       </div>
       <div className="relative mx-auto max-w-7xl px-4 md:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -172,19 +207,16 @@ function Glance() {
             transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
             className="perspective-1000"
           >
-            <div className="relative transform-style-3d card-3d">
+            <TiltCard max={10} lift={20} className="rounded-2xl" surfaceClassName="rounded-2xl">
               <img
                 src="/images/motor.jpg"
                 alt="Spiro Ekon 450 M1 electric motorcycle"
                 className="w-full rounded-2xl object-cover"
-                style={{ transform: "translateZ(20px)" }}
               />
-              <span className="absolute left-4 top-4 rounded-full bg-gradient-to-r from-brand to-brand-bright px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-brand/30"
-                style={{ transform: "translateZ(40px)" }}
-              >
+              <span className="depth-3 absolute left-4 top-4 rounded-full bg-gradient-to-r from-brand to-brand-bright px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-brand/30">
                 Ekon 450 M1
               </span>
-              <div className="absolute bottom-4 right-4 flex gap-2" style={{ transform: "translateZ(30px)" }}>
+              <div className="depth-2 absolute bottom-4 right-4 flex gap-2">
                 <motion.div
                   animate={{ y: [0, -5, 0] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 0 }}
@@ -201,7 +233,7 @@ function Glance() {
                   className="size-3 rounded-full bg-cyan-500/50"
                 />
               </div>
-            </div>
+            </TiltCard>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, x: 40, rotateY: -15 }}
@@ -290,8 +322,8 @@ function HowItWorks() {
   return (
     <section className="relative bg-cloud py-16 md:py-24 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/10 blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
+        <div data-parallax="70" className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/10 blur-3xl" />
+        <div data-parallax="-90" className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl" />
       </div>
       <div className="relative mx-auto max-w-7xl px-4 md:px-8">
         <motion.div
@@ -325,9 +357,9 @@ function HowItWorks() {
                 transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
                 className="perspective-1000"
               >
-                <div className="card-3d group relative h-full">
-                  <div className="card-3d-inner p-8 relative">
-                    <div className="flex items-center justify-between mb-6" style={{ transform: "translateZ(20px)" }}>
+                <TiltCard max={6} lift={10} className="h-full rounded-3xl" surfaceClassName="h-full">
+                  <div className="group relative h-full rounded-3xl bg-white p-8">
+                    <div className="depth-1 flex items-center justify-between mb-6">
                       <span className="font-display text-5xl font-bold text-line/30">0{i + 1}</span>
                       <motion.div
                         className="relative flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand/10 to-brand-bright/10 group-hover:from-brand/20 group-hover:to-brand-bright/20 transition-colors"
@@ -348,7 +380,7 @@ function HowItWorks() {
                       style={{ transform: "translateZ(5px)" }}
                     />
                   </div>
-                </div>
+                </TiltCard>
               </motion.div>
             );
           })}
@@ -362,8 +394,8 @@ function WaysToOwn() {
   return (
     <section className="relative bg-white py-16 md:py-24 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/10 blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
+        <div data-parallax="70" className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/10 blur-3xl" />
+        <div data-parallax="-90" className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl" />
       </div>
       <div className="relative mx-auto max-w-7xl px-4 md:px-8">
         <motion.div
@@ -395,9 +427,9 @@ function WaysToOwn() {
               transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
               className="perspective-1000"
             >
-              <div className="card-3d group relative h-full flex flex-col">
-                <div className="card-3d-inner p-8 flex flex-col h-full relative">
-                  <div className="mb-6" style={{ transform: "translateZ(20px)" }}>
+              <TiltCard max={6} lift={10} className="h-full rounded-3xl" surfaceClassName="h-full">
+                <div className="group flex h-full flex-col rounded-3xl bg-white p-8">
+                  <div className="depth-1 mb-6">
                     <span className="inline-flex items-center justify-center size-14 rounded-2xl bg-gradient-to-br from-brand/10 to-brand-bright/10">
                       <span className="font-display text-2xl font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
                     </span>
@@ -409,7 +441,7 @@ function WaysToOwn() {
                     style={{ transform: "translateZ(5px)" }}
                   />
                 </div>
-              </div>
+              </TiltCard>
             </motion.div>
           ))}
         </motion.div>
@@ -441,8 +473,8 @@ function Testimonials() {
   return (
     <section className="relative bg-mint py-16 md:py-24 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/15 blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/15 blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
+        <div data-parallax="80" className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/15 blur-3xl" />
+        <div data-parallax="-70" className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/15 blur-3xl" />
       </div>
       <div className="relative mx-auto max-w-7xl px-4 md:px-8">
         <motion.div
@@ -475,9 +507,9 @@ function Testimonials() {
               transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
               className="perspective-1000"
             >
-              <div className="card-3d group relative h-full">
-                <div className="card-3d-inner p-7 relative">
-                  <div className="flex items-center gap-3 mb-4" style={{ transform: "translateZ(20px)" }}>
+              <TiltCard max={6} lift={10} className="h-full rounded-3xl" surfaceClassName="h-full">
+                <div className="group relative h-full rounded-3xl bg-white p-7">
+                  <div className="depth-1 flex items-center gap-3 mb-4">
                     <motion.div
                       className="grid size-12 place-items-center rounded-xl bg-gradient-to-br from-brand/10 to-brand-bright/10 group-hover:from-brand/20 group-hover:to-brand-bright/20 transition-colors"
                       whileHover={{ scale: 1.1, rotate: 3 }}
@@ -499,7 +531,7 @@ function Testimonials() {
                     style={{ transform: "translateZ(5px)" }}
                   />
                 </div>
-              </div>
+              </TiltCard>
             </motion.div>
           ))}
         </motion.div>
@@ -514,8 +546,8 @@ function Faqs() {
   return (
     <section id="faqs" className="relative bg-white py-16 md:py-24 overflow-hidden scroll-mt-24">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/10 blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
+        <div data-parallax="70" className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/10 blur-3xl" />
+        <div data-parallax="-90" className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl" />
       </div>
       <div className="relative mx-auto max-w-3xl px-4 md:px-8">
         <motion.div
@@ -626,11 +658,12 @@ function FinalCta() {
   const mountedAt = useRef(Date.now());
 
   return (
-    <section className="relative bg-navy py-16 text-white md:py-24 overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/20 blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/20 blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
-        <div className="absolute top-1/2 left-1/2 size-64 rounded-full bg-brand-bright/15 blur-3xl animate-float" style={{ animationDelay: "-4s" }} />
+    <section className="relative overflow-hidden bg-navy py-16 text-white md:py-24">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div data-parallax="80" className="absolute left-1/4 top-1/4 size-96 rounded-full bg-brand/20 blur-3xl" />
+        <div data-parallax="-110" className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/20 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 size-64 rounded-full bg-brand-bright/15 blur-3xl animate-float" style={{ animationDelay: "-4s" }} />
+        <div className="hero-grid absolute inset-x-0 bottom-0 h-2/3 opacity-30" />
       </div>
       <div className="relative mx-auto max-w-3xl px-4 text-center md:px-8">
         <motion.div
@@ -770,12 +803,42 @@ function FinalCta() {
   );
 }
 
+/** A ribbon of proof points that drifts past, between the two heavy sections. */
+function ProofRibbon() {
+  const items = [
+    "No petrol, ever",
+    "Battery swap in under a minute",
+    "Serviced by our own technicians",
+    "Financing from 30 percent down",
+    "Built for Ghana's roads",
+    "Delivered anywhere in Accra",
+  ];
+  return (
+    <section className="relative border-y border-line bg-cloud py-5">
+      <Marquee speed={42}>
+        {items.map((item) => (
+          <span key={item} className="flex items-center gap-6 px-6">
+            <span className="font-display text-sm font-bold uppercase tracking-[0.14em] text-navy/80">
+              {item}
+            </span>
+            <Sparkles className="size-3.5 shrink-0 text-brand" />
+          </span>
+        ))}
+      </Marquee>
+    </section>
+  );
+}
+
 export default function Home() {
+  useParallax();
+  useScrollRevealGroup("[data-reveal-group]");
+
   return (
     <>
       <Hero />
       <WhyGhana />
       <Glance />
+      <ProofRibbon />
       <HowItWorks />
       <section className="bg-cloud py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 md:px-8">

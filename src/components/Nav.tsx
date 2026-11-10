@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
+import { pointerPosition, useMotionAllowed } from "../lib/motion";
 
 /*
  * Ownership & financing lives on the Fleet & Business page (/#financing) and
@@ -18,6 +19,42 @@ const LINKS = [
   { to: "/service", label: "Service" },
   { to: "/about", label: "About" },
 ];
+
+/**
+ * MagneticButton — the call to action leans toward the pointer as it nears.
+ *
+ * Small displacements (max 6px) only; the point is that the button feels alive
+ * under the cursor, not that it runs away from it. Skipped on touch and under
+ * reduced motion.
+ */
+function MagneticCta({ className, children }: { className: string; children: React.ReactNode }) {
+  const allowed = useMotionAllowed();
+  const ref = useRef<HTMLAnchorElement | null>(null);
+
+  const onMove = (event: React.PointerEvent<HTMLAnchorElement>) => {
+    if (!allowed) return;
+    const element = ref.current;
+    if (!element) return;
+    const { x, y } = pointerPosition(event, element);
+    element.style.transform = `translate3d(${(x * 6).toFixed(1)}px, ${(y * 5).toFixed(1)}px, 0)`;
+  };
+
+  const reset = () => {
+    if (ref.current) ref.current.style.transform = "translate3d(0,0,0)";
+  };
+
+  return (
+    <Link
+      to="/contact"
+      ref={ref}
+      className={className}
+      onPointerMove={onMove}
+      onPointerLeave={reset}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -77,15 +114,10 @@ export default function Nav() {
           })}
         </nav>
         <div className="flex items-center gap-3">
-          <Link
-            to="/contact"
-            className="hidden relative overflow-hidden rounded-full bg-gradient-to-r from-brand via-brand-bright to-cyan-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-brand/30 transition-all duration-300 hover:shadow-xl hover:shadow-brand/40 hover:scale-[1.02] active:scale-[0.98] sm:inline-flex group btn-3d"
-          >
+          <MagneticCta className="group relative hidden overflow-hidden rounded-full bg-gradient-to-r from-brand via-brand-bright to-cyan-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-brand/30 transition-[box-shadow,transform] duration-300 hover:shadow-xl hover:shadow-brand/40 sm:inline-flex">
             <span className="relative z-10">Book Test Ride</span>
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-brand-bright to-brand opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            />
-          </Link>
+            <motion.div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-brand-bright to-brand opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          </MagneticCta>
           <button
             className="rounded-xl border border-line p-2.5 text-navy xl:hidden transition-all duration-300 hover:bg-cloud hover:scale-105 active:scale-95"
             onClick={() => setOpen((v) => !v)}
