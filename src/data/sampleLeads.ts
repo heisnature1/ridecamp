@@ -242,7 +242,7 @@ export function buildSampleLeads(): LeadRecord[] {
     at.setDate(at.getDate() - seed.daysAgo);
     at.setHours(seed.hour, (i * 7) % 60, 0, 0);
     return {
-      id: `sample-${i + 1}`,
+      id: `sample${i + 1}`,
       kind: seed.kind,
       status: seed.status,
       createdAt: at.toISOString(),
@@ -253,4 +253,4 @@ export function buildSampleLeads(): LeadRecord[] {
   });
 }
 
-export const SAMPLE_LEAD_IDS_PREFIX = "sample-";
+export const SAMPLE_LEAD_IDS_PREFIX = "sample";

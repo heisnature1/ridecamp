@@ -8,7 +8,7 @@ import type { LeadRecord } from "../../lib/leadsStore";
 import { EASE, KindChip, Panel } from "./ui";
 
 /**
- * Answers the question “what exactly will I see from the public site?” —
+ * Answers the question “what exactly will I see from the public site?”:
  * every public form, every field it captures, and how many leads it has sent.
  */
 export default function Sources({
@@ -26,7 +26,7 @@ export default function Sources({
           <div className="text-sm leading-relaxed text-slate">
             <p className="font-semibold text-navy">Every public form writes to this dashboard.</p>
             <p className="mt-1">
-              The cards below list each form and the exact fields it captures — those labels are the
+              The cards below list each form and the exact fields it captures; those labels are the
               rows you will see under “What they entered” on a lead. Nothing a visitor types is
               dropped; blank optional fields are simply left out. Chats that happen directly on
               WhatsApp or over the phone are not captured here.

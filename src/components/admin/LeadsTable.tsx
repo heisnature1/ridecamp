@@ -56,7 +56,7 @@ export default function LeadsTable({
 
   return (
     <Panel>
-      {/* type filters — one merged table, filtered rather than split into per type tables */}
+      {/* type filters: one merged table, filtered rather than split into per type tables */}
       <div className="flex flex-wrap items-center gap-2">
         <Chip
           active={filters.kinds.length === 0 && filters.query === "" && filters.source === ""}
@@ -230,7 +230,7 @@ export default function LeadsTable({
                         <span className="truncate font-bold text-navy">{leadName(lead)}</span>
                       </span>
                       <span className="block truncate text-xs text-slate">
-                        {[leadOrg(lead), leadPhone(lead)].filter(Boolean).join(" · ") || "—"}
+                        {[leadOrg(lead), leadPhone(lead)].filter(Boolean).join(" · ") || "Not given"}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -273,7 +273,7 @@ export default function LeadsTable({
                       <div className="min-w-0">
                         <p className="truncate font-bold text-navy">{leadName(lead)}</p>
                         <p className="truncate text-xs text-slate">
-                          {[leadOrg(lead), leadPhone(lead)].filter(Boolean).join(" · ") || "—"}
+                          {[leadOrg(lead), leadPhone(lead)].filter(Boolean).join(" · ") || "Not given"}
                         </p>
                       </div>
                       <KindChip chipClass={kindMeta(lead.kind).chip}>{kindMeta(lead.kind).label}</KindChip>

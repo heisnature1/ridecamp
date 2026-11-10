@@ -67,7 +67,7 @@ export default function Settings({
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [confirmClear, setConfirmClear] = useState(false);
-  const hasSamples = leads.some((l) => l.id.startsWith("sample-"));
+  const hasSamples = leads.some((l) => l.id.startsWith("sample"));
 
   const exportCsv = () => {
     downloadFile(exportFileName("csv"), leadsToCsv(leads), "text/csv;charset=utf-8");
@@ -162,7 +162,7 @@ export default function Settings({
           <Database className="mt-0.5 size-5 shrink-0 text-brand" />
           <p>
             Leads are stored in this browser's local storage, so the dashboard reflects everything
-            submitted <span className="font-semibold text-navy">on this device and browser</span> —
+            submitted <span className="font-semibold text-navy">on this device and browser</span>, 
             including submissions made in another tab, which appear live. To collect leads from every
             visitor on every device, point{" "}
             <code className="rounded bg-white px-1.5 py-0.5 font-mono text-[11px] text-navy">
