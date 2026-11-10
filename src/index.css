@@ -376,6 +376,15 @@ body {
   }
 }
 
+/* the per page cover: the same field as the boot splash, never blocks the page */
+.page-transition {
+  background: rgba(10, 31, 68, 0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: none;
+  will-change: opacity;
+}
+
 /* the cover never traps the page: it fades out, it is not a modal */
 .boot-splash {
   will-change: opacity;
@@ -462,15 +471,6 @@ body {
   transform-origin: 0 50%;
   background: linear-gradient(90deg, var(--color-brand), var(--color-brand-bright), #06b6d4);
   pointer-events: none;
-}
-
-/* page transition veil — the panel that wipes across on route change */
-.route-veil {
-  position: fixed;
-  inset: 0;
-  z-index: 55;
-  pointer-events: none;
-  background: linear-gradient(115deg, var(--color-navy), var(--color-brand-dark));
 }
 
 /* section that reveals its children as it scrolls into view */
