@@ -191,12 +191,25 @@ export const FAQS: [string, string][] = [
   ["Can I try before I buy?", "Yes. Book a test ride and see for yourself."],
 ];
 
-/** Savings calculator defaults (GH₵). Confirm constants with Spiro before launch (brief §5). */
+/**
+ * Savings calculator constants (GH₵).
+ *
+ * `evCostPerKm` is the one number to confirm with Spiro before launch: it is the
+ * battery swap tariff expressed per kilometre. Everything else is a default the
+ * visitor can change on the calculator itself.
+ *
+ * SANITY CHECK: this figure must stay *below* the petrol cost per kilometre,
+ * which is `petrolPriceDefault / kmPerLitreDefault` (currently 12 / 35 = GH₵ 0.34).
+ * At the GH₵ 0.45 placeholder it used to hold, the electric bike cost 31% MORE
+ * per kilometre than petrol, so the calculator could only ever show GH₵ 0 — at
+ * 100 km a day the visitor was quietly told they would save nothing.
+ */
 export const CALC = {
-  petrolPriceDefault: 12.0, // GH₵ per litre — update regularly
+  petrolPriceDefault: 12.0, // GH₵ per litre, update regularly
   kmPerLitreDefault: 35,
   daysPerMonthDefault: 26,
   maintenanceDefault: 100, // current monthly maintenance spend, GH₵
-  evCostPerKm: 0.45, // PLACEHOLDER swap energy cost per km, GH₵
+  /** PLACEHOLDER: swap tariff per km. Must be under petrol cost per km. */
+  evCostPerKm: 0.22,
   evMaintenancePerMonth: 40, // PLACEHOLDER, GH₵
 };

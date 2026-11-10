@@ -329,6 +329,38 @@ try {
   check("the bike photo renders in the glance section", countOf(/images\/motor\.jpg/g) >= 2);
   check("no stray debug text leaks into the page", !has(/undefined|NaN/));
 
+  console.log("\n1i. The savings calculator tells the truth");
+  const { CALC } = await vite.ssrLoadModule("/src/data/site.ts");
+  const petrolPerKm = CALC.petrolPriceDefault / CALC.kmPerLitreDefault;
+  check(
+    "electric is cheaper per km than petrol (or the calculator can only ever show zero)",
+    CALC.evCostPerKm < petrolPerKm,
+    `electric GH₵ ${CALC.evCostPerKm} vs petrol GH₵ ${petrolPerKm.toFixed(3)}`,
+  );
+
+  // the same arithmetic the component runs, at the slider's default of 100 km
+  const monthlyKm = 100 * CALC.daysPerMonthDefault;
+  const petrolCost = (monthlyKm / CALC.kmPerLitreDefault) * CALC.petrolPriceDefault;
+  const evCost = monthlyKm * CALC.evCostPerKm;
+  const saving = petrolCost + CALC.maintenanceDefault - (evCost + CALC.evMaintenancePerMonth);
+  check(
+    "the default visit shows a real saving, not zero",
+    saving > 100,
+    `computed GH₵ ${saving.toFixed(0)}`,
+  );
+
+  const { default: Calculator } = await vite.ssrLoadModule("/src/components/Calculator.tsx");
+  const calcHtml = renderToStaticMarkup(
+    React.createElement(MemoryRouter, null, React.createElement(Calculator)),
+  );
+  const calcText = calcHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  // the monthly figure lives in the element the panel marks, so read that only
+  const monthlyFigure = (calcHtml.match(/data-monthly-figure[^>]*>([^<]*)/) ?? [])[1] ?? "";
+  check("the panel shows a non zero monthly figure", /GH₵ [1-9]/.test(monthlyFigure.trim()), monthlyFigure.trim());
+  check("it says what the saving is based on", /km a month/.test(calcText));
+  check("the cost per km is stated for both bikes", /Petrol cost per km/.test(calcText) && /Electric cost per km/.test(calcText));
+  check("a loss would not be labelled as a saving", calcText.includes("Your estimated monthly saving") === saving > 0);
+
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");
   const { default: Overview } = await vite.ssrLoadModule("/src/components/admin/Overview.tsx");
