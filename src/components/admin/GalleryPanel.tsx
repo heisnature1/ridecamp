@@ -2,7 +2,13 @@ import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Image, Edit, Trash2, Upload, X as XIcon } from "lucide-react";
 import { Panel, PanelTitle, EmptyState } from "./ui";
-import { addPost, updatePost, deletePost, type GalleryPost } from "../../lib/galleryStore";
+import {
+  addPost,
+  updatePost,
+  deletePost,
+  uploadGalleryImage,
+  type GalleryPost,
+} from "../../lib/galleryStore";
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -17,6 +23,7 @@ function ImageUploadZone({
   value,
   onChange,
   onRemove,
+  onPickFile,
   label = "Image",
   required = true,
   className = "",
@@ -24,6 +31,8 @@ function ImageUploadZone({
   value: string;
   onChange: (url: string) => void;
   onRemove?: () => void;
+  /** Hand the chosen file to the parent so it can upload it on save. */
+  onPickFile?: (file: File) => void;
   label?: string;
   required?: boolean;
   className?: string;
@@ -58,10 +67,11 @@ function ImageUploadZone({
       const dataUrl = await fileToDataUrl(file);
       setPreview(dataUrl);
       onChange(dataUrl);
+      onPickFile?.(file);
     } catch {
       alert("Failed to read file");
     }
-  }, [onChange]);
+  }, [onChange, onPickFile]);
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,10 +85,11 @@ function ImageUploadZone({
       const dataUrl = await fileToDataUrl(file);
       setPreview(dataUrl);
       onChange(dataUrl);
+      onPickFile?.(file);
     } catch {
       alert("Failed to read file");
     }
-  }, [onChange]);
+  }, [onChange, onPickFile]);
 
   const handleRemove = useCallback(() => {
     setPreview(null);
@@ -139,7 +150,7 @@ function ImageUploadZone({
             <div className="aspect-[4/3] flex flex-col items-center justify-center p-6 text-center">
               <Upload className="size-10 text-slate/40" />
               <p className="mt-2 text-sm text-slate">Drag & drop or click to upload</p>
-              <p className="text-[11px] text-slate/50">PNG, JPG, WebP up to 5MB</p>
+              <p className="text-[11px] text-slate/50">PNG, JPG or WebP, up to 5MB</p>
             </div>
           )}
         </div>
@@ -175,39 +186,71 @@ export default function GalleryPanel({
   const [newTitle, setNewTitle] = useState("");
   const [newCaption, setNewCaption] = useState("");
   const [newImage, setNewImage] = useState("");
+  const [newFile, setNewFile] = useState<File | null>(null);
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!newTitle.trim() || !newImage.trim()) {
-      onToast("Title and image URL are required", "warn");
+      onToast("Title and image are required", "warn");
       return;
     }
-    const post = addPost({ title: newTitle.trim(), caption: newCaption.trim(), image: newImage.trim() });
-    onAdd(post);
-    onToast("Gallery post added");
-    setIsAdding(false);
-    setNewTitle("");
-    setNewCaption("");
-    setNewImage("");
+    setSaving(true);
+    try {
+      const image = newFile ? await uploadGalleryImage(newFile) : newImage.trim();
+      const post = await addPost({
+        title: newTitle.trim(),
+        caption: newCaption.trim(),
+        image,
+      });
+      onAdd(post);
+      onToast("Gallery post saved");
+      setIsAdding(false);
+      setNewTitle("");
+      setNewCaption("");
+      setNewImage("");
+      setNewFile(null);
+    } catch (err) {
+      onToast(err instanceof Error ? err.message : "Could not save that post", "warn");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleUpdate = (id: string) => {
-    const post = posts.find(p => p.id === id);
+  const handleUpdate = async (id: string) => {
+    const post = posts.find((p) => p.id === id);
     if (!post) return;
     if (!editTitle.trim() || !editImage.trim()) {
-      onToast("Title and image URL are required", "warn");
+      onToast("Title and image are required", "warn");
       return;
     }
-    updatePost(id, { title: editTitle.trim(), caption: editCaption.trim(), image: editImage.trim() });
-    onUpdate(id, { title: editTitle.trim(), caption: editCaption.trim(), image: editImage.trim() });
-    onToast("Gallery post updated");
-    setEditingId(null);
+    setSaving(true);
+    try {
+      const image = editFile ? await uploadGalleryImage(editFile) : editImage.trim();
+      await updatePost(id, {
+        title: editTitle.trim(),
+        caption: editCaption.trim(),
+        image,
+      });
+      onUpdate(id, { title: editTitle.trim(), caption: editCaption.trim(), image });
+      onToast("Gallery post updated");
+      setEditingId(null);
+      setEditFile(null);
+    } catch (err) {
+      onToast(err instanceof Error ? err.message : "Could not update that post", "warn");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm("Delete this gallery post?")) {
-      deletePost(id);
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Delete this gallery post? This cannot be undone.")) return;
+    try {
+      await deletePost(id);
       onDelete(id);
       onToast("Gallery post deleted", "warn");
+    } catch (err) {
+      onToast(err instanceof Error ? err.message : "Could not delete that post", "warn");
     }
   };
 
@@ -216,6 +259,7 @@ export default function GalleryPanel({
     setEditTitle(post.title);
     setEditCaption(post.caption);
     setEditImage(post.image);
+    setEditFile(null);
   };
 
   const startAdd = () => {
@@ -224,6 +268,7 @@ export default function GalleryPanel({
 
   const cancelEdit = () => {
     setEditingId(null);
+    setEditFile(null);
   };
 
   const cancelAdd = () => {
@@ -231,6 +276,7 @@ export default function GalleryPanel({
     setNewTitle("");
     setNewCaption("");
     setNewImage("");
+    setNewFile(null);
   };
 
   return (
@@ -279,6 +325,7 @@ export default function GalleryPanel({
               <ImageUploadZone
                 value={newImage}
                 onChange={setNewImage}
+                onPickFile={setNewFile}
                 label="Image"
                 required
               />
@@ -287,8 +334,13 @@ export default function GalleryPanel({
               <button type="button" onClick={cancelAdd} className="rounded-full bg-white px-4 py-2 text-xs font-bold text-navy ring-1 ring-line transition hover:ring-navy active:scale-95">
                 Cancel
               </button>
-              <button type="button" onClick={handleAdd} className="rounded-full bg-brand px-4 py-2 text-xs font-bold text-white transition hover:bg-brand-dark active:scale-95">
-                Add post
+              <button
+                type="button"
+                onClick={handleAdd}
+                disabled={saving}
+                className="rounded-full bg-brand px-4 py-2 text-xs font-bold text-white transition hover:bg-brand-dark active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {saving ? "Saving…" : "Add post"}
               </button>
             </div>
           </motion.div>
@@ -349,6 +401,7 @@ export default function GalleryPanel({
                         <ImageUploadZone
                           value={editImage}
                           onChange={setEditImage}
+                          onPickFile={setEditFile}
                           label="Image"
                           required
                         />
@@ -357,8 +410,13 @@ export default function GalleryPanel({
                         <button type="button" onClick={cancelEdit} className="rounded-full bg-white px-4 py-2 text-xs font-bold text-navy ring-1 ring-line transition hover:ring-navy active:scale-95">
                           Cancel
                         </button>
-                        <button type="button" onClick={() => handleUpdate(post.id)} className="rounded-full bg-brand px-4 py-2 text-xs font-bold text-white transition hover:bg-brand-dark active:scale-95">
-                          Save
+                        <button
+                          type="button"
+                          onClick={() => handleUpdate(post.id)}
+                          disabled={saving}
+                          className="rounded-full bg-brand px-4 py-2 text-xs font-bold text-white transition hover:bg-brand-dark active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {saving ? "Saving…" : "Save"}
                         </button>
                       </div>
                     </div>

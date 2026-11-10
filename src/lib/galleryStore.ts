@@ -1,13 +1,18 @@
+import { supabase, friendlyError, GALLERY_BUCKET } from "./supabase";
+
 /**
- * Browser side gallery store.
+ * Gallery store — backed by Supabase.
  *
- * Admins post pictures with a short caption from the dashboard; the public
- * Gallery page reads from the same place. Posts live in localStorage under
- * `ridecamp_gallery` and notify subscribers in this tab (custom event) and
- * any other open tab (`storage` event), just like the lead store.
+ * Posts live in the `gallery_posts` table and the pictures themselves live in
+ * the public `gallery` storage bucket, so a post is visible to every visitor on
+ * every device and stays there until an admin deletes it.
+ *
+ * The public Gallery page reads with the anon key; only a signed in admin can
+ * add, edit or delete (enforced by row level security and storage policies).
  */
 
-export const GALLERY_STORAGE_KEY = "ridecamp_gallery";
+export const GALLERY_STORAGE_KEY = "ridecamp_gallery_cache";
+const TABLE = "gallery_posts";
 const CHANGE_EVENT = "ridecamp:gallery-change";
 
 export type GalleryPost = {
@@ -16,7 +21,7 @@ export type GalleryPost = {
   title: string;
   /** short caption shown under the image */
   caption: string;
-  /** URL the image is served from — `/images/…` for bundled assets or any http(s) link */
+  /** public URL the image is served from */
   image: string;
   /** ISO timestamp of when it was posted */
   createdAt: string;
@@ -24,43 +29,33 @@ export type GalleryPost = {
 
 const canUseBrowser = typeof window !== "undefined";
 
-function newId(): string {
-  const c = globalThis.crypto;
-  if (c && typeof c.randomUUID === "function") return c.randomUUID();
-  return `post-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+type Row = {
+  id: string;
+  title: string;
+  caption: string | null;
+  image_url: string;
+  created_at: string;
+};
+
+function fromRow(row: Row): GalleryPost {
+  return {
+    id: row.id,
+    title: row.title ?? "",
+    caption: row.caption ?? "",
+    image: row.image_url ?? "",
+    createdAt: row.created_at,
+  };
 }
 
-function readRaw(): GalleryPost[] {
-  if (!canUseBrowser) return [];
-  try {
-    const raw = window.localStorage.getItem(GALLERY_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .map((p: any) => normalizePost(p))
-      .filter((p: GalleryPost) => p.id && p.title);
-  } catch {
-    return [];
-  }
-}
-
-function write(posts: GalleryPost[]) {
+function emit(posts: GalleryPost[]) {
   if (!canUseBrowser) return;
-  try {
-    window.localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(posts));
-  } catch {
-    /* ignore quota / private mode errors */
-  }
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
-  }
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { posts } }));
 }
 
 export function normalizePost(raw: unknown): GalleryPost {
   const r = (raw ?? {}) as Record<string, unknown>;
   return {
-    id: typeof r.id === "string" && r.id ? r.id : newId(),
+    id: typeof r.id === "string" && r.id ? r.id : "",
     title: typeof r.title === "string" ? r.title.trim() : "",
     caption: typeof r.caption === "string" ? r.caption.trim() : "",
     image: typeof r.image === "string" ? r.image.trim() : "",
@@ -71,22 +66,130 @@ export function normalizePost(raw: unknown): GalleryPost {
   };
 }
 
+/* ------------------------------------------------------------------ */
+/* cache                                                               */
+/* ------------------------------------------------------------------ */
+
+/** Last snapshot fetched from the server (first paint / offline). */
 export function getGallery(): GalleryPost[] {
-  return readRaw().sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
+  if (!canUseBrowser) return [];
+  try {
+    const raw = window.localStorage.getItem(GALLERY_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map(normalizePost)
+      .filter((p) => p.id && p.title)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } catch {
+    return [];
+  }
 }
 
-export function addPost(post: Omit<GalleryPost, "id" | "createdAt">): GalleryPost {
-  const next = normalizePost({ ...post, createdAt: new Date().toISOString() });
-  const existing = readRaw();
-  write([next, ...existing]);
-  return next;
+function setCache(posts: GalleryPost[]) {
+  if (canUseBrowser) {
+    try {
+      window.localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(posts));
+    } catch {
+      /* ignore quota errors — the list still renders from memory */
+    }
+  }
+  emit(posts);
 }
 
-export function updatePost(id: string, patch: Partial<Omit<GalleryPost, "id">>): void {
-  write(
-    readRaw().map((p) =>
+/** Fresh list from the database. Public — no sign in needed. */
+export async function fetchGallery(): Promise<GalleryPost[]> {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(friendlyError(error, "Could not load the gallery."));
+  const posts = (data as Row[]).map(fromRow);
+  setCache(posts);
+  return posts;
+}
+
+/* ------------------------------------------------------------------ */
+/* image upload                                                        */
+/* ------------------------------------------------------------------ */
+
+function extensionFor(file: File): string {
+  const fromName = file.name.split(".").pop()?.toLowerCase();
+  if (fromName && /^(png|jpe?g|webp|gif|avif)$/.test(fromName)) return fromName;
+  const byType: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/webp": "webp",
+    "image/gif": "gif",
+    "image/avif": "avif",
+  };
+  return byType[file.type] ?? "jpg";
+}
+
+/** Upload a picture to the gallery bucket and return its public URL. */
+export async function uploadGalleryImage(file: File): Promise<string> {
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extensionFor(file)}`;
+  const { error } = await supabase.storage.from(GALLERY_BUCKET).upload(path, file, {
+    cacheControl: "31536000",
+    upsert: false,
+    contentType: file.type || "image/jpeg",
+  });
+  if (error) throw new Error(friendlyError(error, "Could not upload that image."));
+  const { data } = supabase.storage.from(GALLERY_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+/** Best effort removal of the file behind a post (ignored if it is not ours). */
+async function removeImage(imageUrl: string) {
+  const marker = `/storage/v1/object/public/${GALLERY_BUCKET}/`;
+  const at = imageUrl.indexOf(marker);
+  if (at === -1) return;
+  const path = imageUrl.slice(at + marker.length);
+  if (!path) return;
+  await supabase.storage.from(GALLERY_BUCKET).remove([path]);
+}
+
+/* ------------------------------------------------------------------ */
+/* writes (admin only, enforced by RLS)                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Create a post. `image` may be a freshly uploaded URL or a bundled path such
+ * as `/images/motor.jpg`.
+ */
+export async function addPost(
+  post: Omit<GalleryPost, "id" | "createdAt">,
+): Promise<GalleryPost> {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .insert({ title: post.title, caption: post.caption, image_url: post.image })
+    .select("*")
+    .single();
+  if (error || !data) throw new Error(friendlyError(error, "Could not add that post."));
+  const saved = fromRow(data as Row);
+  setCache([saved, ...getGallery().filter((p) => p.id !== saved.id)]);
+  return saved;
+}
+
+export async function updatePost(
+  id: string,
+  patch: Partial<Pick<GalleryPost, "title" | "caption" | "image">>,
+): Promise<void> {
+  const payload: Record<string, unknown> = {};
+  if (patch.title !== undefined) payload.title = patch.title;
+  if (patch.caption !== undefined) payload.caption = patch.caption;
+  if (patch.image !== undefined) payload.image_url = patch.image;
+
+  const previous = getGallery().find((p) => p.id === id);
+  const { error } = await supabase.from(TABLE).update(payload).eq("id", id);
+  if (error) throw new Error(friendlyError(error, "Could not update that post."));
+
+  if (previous && patch.image !== undefined && previous.image !== patch.image) {
+    await removeImage(previous.image);
+  }
+  setCache(
+    getGallery().map((p) =>
       p.id === id
         ? {
             ...p,
@@ -99,10 +202,15 @@ export function updatePost(id: string, patch: Partial<Omit<GalleryPost, "id">>):
   );
 }
 
-export function deletePost(id: string): void {
-  write(readRaw().filter((p) => p.id !== id));
+export async function deletePost(id: string): Promise<void> {
+  const previous = getGallery().find((p) => p.id === id);
+  const { error } = await supabase.from(TABLE).delete().eq("id", id);
+  if (error) throw new Error(friendlyError(error, "Could not delete that post."));
+  if (previous) await removeImage(previous.image);
+  setCache(getGallery().filter((p) => p.id !== id));
 }
 
+/** Fires when the cached list changes in this tab or another one. */
 export function subscribe(cb: () => void): () => void {
   if (!canUseBrowser) return () => {};
   const handler = () => cb();
@@ -117,13 +225,16 @@ export function subscribe(cb: () => void): () => void {
   };
 }
 
-/** Seed posts so the public gallery is never empty on first load. */
-export function seedGallery(): GalleryPost[] {
-  const existing = readRaw();
+/**
+ * Make sure the public gallery is not empty on a brand new project.
+ * Only an admin can insert, so this quietly does nothing otherwise.
+ */
+export async function seedGallery(): Promise<GalleryPost[]> {
+  const existing = await fetchGallery();
   if (existing.length) return [];
-  const seeds: Omit<GalleryPost, "id" | "createdAt">[] = [
+  const seeds = [
     {
-      title: "Ekon 450 M1 — road tested in Accra",
+      title: "Ekon 450 M1, road tested in Accra",
       image: "/images/motor.jpg",
       caption:
         "The Spiro Ekon 450 M1 on Ghanaian roads. Reinforced frame, tuned suspension, 300 kg load capacity.",
@@ -138,13 +249,12 @@ export function seedGallery(): GalleryPost[] {
       title: "Fleet delivery",
       image: "/images/fleet-delivery.jpg",
       caption:
-        "Delivery fleets switching from petrol to electric — lower running cost, more trips per day.",
+        "Delivery fleets switching from petrol to electric, with a lower running cost and more trips per day.",
     },
   ];
-  const now = Date.now();
-  const created = seeds.map((s, i) =>
-    normalizePost({ ...s, id: `seed-${i + 1}`, createdAt: new Date(now - (seeds.length - i) * 86400000).toISOString() }),
+  const { error } = await supabase.from(TABLE).insert(
+    seeds.map((s) => ({ title: s.title, caption: s.caption, image_url: s.image })),
   );
-  write([...created, ...existing]);
-  return created;
+  if (error) return [];
+  return fetchGallery();
 }

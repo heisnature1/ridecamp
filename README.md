@@ -41,8 +41,8 @@ npm run smoke      # lead pipeline + dashboard smoke check (no browser needed)
 
 ## Lead capture & admin dashboard
 
-Every public form writes to a single lead store (`src/lib/leadsStore.ts`, key
-`ridecamp_leads`) *before* it dispatches, so nothing a visitor types is lost:
+Every public form writes to a single lead store (`src/lib/leadsStore.ts`) that is
+backed by Supabase, so nothing a visitor types is lost:
 
 | Form | Page | Lead types | Fields captured |
 | ---- | ---- | ---------- | --------------- |
@@ -67,10 +67,35 @@ under labels such as `fleet quote` still file correctly.
 - **Public forms** — which forms feed the dashboard and exactly what each captures.
 - **Data & export** — CSV/JSON export, JSON import, sample data, clear.
 
-Leads are stored in the browser's local storage, so the dashboard reflects
-submissions made on that device (including other tabs, which update live). Point
-`dispatchLead` in `src/lib/leads.ts` at a backend/CRM webhook to collect leads
-from every visitor; the dashboard needs no other change.
+### Where the data lives
+
+Leads and gallery posts live in **Supabase** (project `qtoeqbmlcanczlybimoj`), not in the
+visitor's browser, so a booking survives a closed tab, a different device, or cleared site
+data. Rows are only removed when an admin deletes them.
+
+| Thing | Where |
+| ----- | ----- |
+| Leads / bookings | `public.leads` (one row per submission, `data` holds the form fields as JSON) |
+| Gallery posts | `public.gallery_posts` + images in the public `gallery` storage bucket |
+| Admin accounts | Supabase Auth users **and** an allowlisted row in `public.ridecamp_admins` |
+
+Row level security does the real enforcing:
+
+- a visitor may **insert** a lead and **read** the gallery, nothing else;
+- only an authenticated user whose email is in `ridecamp_admins` (checked by
+  `public.is_ridecamp_admin()`) may read, update or delete leads, or write gallery posts,
+  or upload images. Every other account in the shared project sees nothing.
+
+A small localStorage cache mirrors the last fetch so the dashboard paints instantly and a
+submission made while offline is queued and retried on the next load rather than lost.
+
+### Admin login
+
+`/login` signs in with Supabase Auth (email + password); the default account is
+`admin@futureride.gh` / `future-ride`. **Change that password** from the Supabase dashboard
+(Authentication → Users) before going live, and add each colleague as a user *and* a row in
+`ridecamp_admins`. Config lives in `src/lib/supabase.ts`; override it with
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` if the project ever moves.
 
 ## Brand & photography
 

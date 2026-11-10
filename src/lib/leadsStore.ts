@@ -1,3 +1,4 @@
+import { supabase, friendlyError } from "./supabase";
 import {
   kindMeta,
   normalizeKind,
@@ -8,16 +9,17 @@ import {
 } from "./leadKinds";
 
 /**
- * Browser side lead store.
+ * Lead store — backed by Supabase (Postgres).
  *
- * Everything a visitor types into a public form is written here, and the admin
- * dashboard reads from the same place, so the two can never drift apart.
- * Writes notify subscribers in the current tab (custom event) *and* in any
- * other open tab (`storage` event), which is how the dashboard updates live.
+ * Every booking, quote, financing application, fleet enquiry and call back is
+ * written to the `leads` table, so it survives the visitor closing the browser,
+ * switching device, or clearing site data. Rows are only removed when an admin
+ * deletes them (or clears everything from the dashboard).
+ *
+ * A read through cache is mirrored to localStorage: it keeps the dashboard
+ * instant on reloads and means a submission is never lost if the network blips
+ * — unsent leads are retried and removed from the cache only once they land.
  */
-
-export const STORAGE_KEY = "ridecamp_leads";
-const CHANGE_EVENT = "ridecamp:leads-change";
 
 export type LeadData = Record<string, string>;
 
@@ -35,13 +37,55 @@ export type LeadRecord = {
   adminNotes: string;
 };
 
+const TABLE = "leads";
+const CACHE_KEY = "ridecamp_leads_cache";
+const PENDING_KEY = "ridecamp_leads_pending";
+const CHANGE_EVENT = "ridecamp:leads-change";
+
 const canUseBrowser = typeof window !== "undefined";
 
-function newId(): string {
-  const c = globalThis.crypto;
-  if (c && typeof c.randomUUID === "function") return c.randomUUID();
-  return `lead-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+/* ------------------------------------------------------------------ */
+/* cache + pending queue (localStorage)                                */
+/* ------------------------------------------------------------------ */
+
+function readJson<T>(key: string, fallback: T): T {
+  if (!canUseBrowser) return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
 }
+
+function writeJson(key: string, value: unknown) {
+  if (!canUseBrowser) return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* private mode / quota — the dashboard still works from memory */
+  }
+}
+
+function emit(leads: LeadRecord[]) {
+  if (!canUseBrowser) return;
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { leads } }));
+}
+
+/* ------------------------------------------------------------------ */
+/* shape conversion                                                    */
+/* ------------------------------------------------------------------ */
+
+type Row = {
+  id: string;
+  kind: string;
+  status: string;
+  created_at: string;
+  source: string;
+  data: unknown;
+  admin_notes: string;
+};
 
 function cleanData(raw: unknown): LeadData {
   if (!raw || typeof raw !== "object") return {};
@@ -54,46 +98,221 @@ function cleanData(raw: unknown): LeadData {
   return out;
 }
 
-function isoDate(raw: unknown): string {
-  if (typeof raw === "string" && !Number.isNaN(Date.parse(raw))) return raw;
-  return new Date(0).toISOString();
-}
-
-/** Accepts the current shape *and* the older `{ kind, timestamp, data }` shape. */
-export function normalizeRecord(raw: unknown): LeadRecord {
-  const r = (raw ?? {}) as Record<string, unknown>;
+function fromRow(row: Row): LeadRecord {
   return {
-    id: typeof r.id === "string" && r.id ? r.id : newId(),
-    kind: normalizeKind(r.kind),
-    status: normalizeStatus(r.status),
-    createdAt: isoDate(r.createdAt ?? r.timestamp),
-    source: typeof r.source === "string" && r.source ? r.source : "unknown",
-    data: cleanData(r.data),
-    adminNotes: typeof r.adminNotes === "string" ? r.adminNotes : "",
+    id: row.id,
+    kind: normalizeKind(row.kind),
+    status: normalizeStatus(row.status),
+    createdAt: row.created_at,
+    source: row.source || "unknown",
+    data: cleanData(row.data),
+    adminNotes: row.admin_notes ?? "",
   };
 }
 
-export function readLeads(): LeadRecord[] {
-  if (!canUseBrowser) return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map(normalizeRecord);
-  } catch {
-    return [];
-  }
+function toRow(lead: LeadRecord) {
+  return {
+    kind: lead.kind,
+    status: lead.status,
+    created_at: lead.createdAt,
+    source: lead.source,
+    data: lead.data,
+    admin_notes: lead.adminNotes,
+  };
 }
 
-function write(leads: LeadRecord[]) {
-  if (!canUseBrowser) return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
-  } catch {
-    /* private mode / quota — the dashboard still shows in memory data */
+/* ------------------------------------------------------------------ */
+/* reads                                                               */
+/* ------------------------------------------------------------------ */
+
+/** Cached snapshot — used for the first paint and the smoke tests. */
+export function readLeads(): LeadRecord[] {
+  const cached = readJson<LeadRecord[]>(CACHE_KEY, []);
+  if (!Array.isArray(cached)) return [];
+  return cached.map((l) => ({
+    id: String(l.id ?? ""),
+    kind: normalizeKind(l.kind),
+    status: normalizeStatus(l.status),
+    createdAt: typeof l.createdAt === "string" ? l.createdAt : new Date(0).toISOString(),
+    source: typeof l.source === "string" ? l.source : "unknown",
+    data: cleanData(l.data),
+    adminNotes: typeof l.adminNotes === "string" ? l.adminNotes : "",
+  }));
+}
+
+function setCache(leads: LeadRecord[]) {
+  writeJson(CACHE_KEY, leads);
+  emit(leads);
+}
+
+/** Fresh list from the server. Requires an admin session. */
+export async function fetchLeads(): Promise<LeadRecord[]> {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(friendlyError(error, "Could not load leads."));
+  const leads = (data as Row[]).map(fromRow);
+  setCache(leads);
+  return leads;
+}
+
+/* ------------------------------------------------------------------ */
+/* writes                                                              */
+/* ------------------------------------------------------------------ */
+
+type PendingLead = { kind: string; data: LeadData; source: string; createdAt: string };
+
+function readPending(): PendingLead[] {
+  const list = readJson<PendingLead[]>(PENDING_KEY, []);
+  return Array.isArray(list) ? list : [];
+}
+
+function writePending(list: PendingLead[]) {
+  writeJson(PENDING_KEY, list);
+}
+
+function makeRecord(kind: string, data: LeadData, source: string, createdAt: string): LeadRecord {
+  return {
+    id: `local-${createdAt}-${Math.random().toString(36).slice(2, 8)}`,
+    kind: normalizeKind(kind),
+    status: "new",
+    createdAt,
+    source,
+    data: cleanData(data),
+    adminNotes: "",
+  };
+}
+
+/**
+ * Save a public form submission.
+ *
+ * Resolves as soon as the row is in Postgres. If the network is down the lead
+ * is queued locally (and shown in the dashboard from the cache) and retried on
+ * the next page load — it is never silently dropped.
+ */
+export async function addLead(
+  kind: string,
+  data: LeadData,
+  source?: string,
+): Promise<LeadRecord> {
+  const createdAt = new Date().toISOString();
+  const resolvedSource = source ?? currentSource();
+  const optimistic = makeRecord(kind, data, resolvedSource, createdAt);
+  setCache([optimistic, ...readLeads()]);
+
+  const { data: inserted, error } = await supabase
+    .from(TABLE)
+    .insert({ ...toRow(optimistic), created_at: createdAt })
+    .select("*")
+    .single();
+
+  if (error || !inserted) {
+    // keep it for a retry, unless the server actively rejected the shape
+    if (!error || isNetworkError(error)) {
+      writePending([...readPending(), { kind, data, source: resolvedSource, createdAt }]);
+    }
+    setCache(readLeads().filter((l) => l.id !== optimistic.id));
+    if (error && !isNetworkError(error)) {
+      throw new Error(friendlyError(error, "Could not save your details."));
+    }
+    return optimistic;
   }
-  window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { leads } }));
+
+  const saved = fromRow(inserted as Row);
+  setCache([saved, ...readLeads().filter((l) => l.id !== optimistic.id)]);
+  return saved;
+}
+
+/** Retry anything queued while offline. Safe to call on every dashboard load. */
+export async function flushPendingLeads(): Promise<number> {
+  const pending = readPending();
+  if (!pending.length) return 0;
+  let sent = 0;
+  const keep: PendingLead[] = [];
+  for (const item of pending) {
+    const { error } = await supabase.from(TABLE).insert({
+      ...toRow(makeRecord(item.kind, item.data, item.source, item.createdAt)),
+      created_at: item.createdAt,
+    });
+    if (error && isNetworkError(error)) keep.push(item);
+    else sent += 1;
+  }
+  writePending(keep);
+  if (sent) emit(readLeads());
+  return sent;
+}
+
+export async function updateLead(
+  id: string,
+  patch: Partial<Pick<LeadRecord, "status" | "data" | "adminNotes">>,
+): Promise<void> {
+  const payload: Record<string, unknown> = {};
+  if (patch.status !== undefined) payload.status = normalizeStatus(patch.status);
+  if (patch.data !== undefined) payload.data = cleanData(patch.data);
+  if (patch.adminNotes !== undefined) payload.admin_notes = patch.adminNotes;
+
+  const { error } = await supabase.from(TABLE).update(payload).eq("id", id);
+  if (error) throw new Error(friendlyError(error, "Could not update that lead."));
+
+  setCache(
+    readLeads().map((l) =>
+      l.id === id
+        ? {
+            ...l,
+            status: payload.status ? (payload.status as LeadStatus) : l.status,
+            data: patch.data !== undefined ? cleanData(patch.data) : l.data,
+            adminNotes:
+              patch.adminNotes !== undefined ? patch.adminNotes : l.adminNotes,
+          }
+        : l,
+    ),
+  );
+}
+
+export async function deleteLead(id: string): Promise<void> {
+  const { error } = await supabase.from(TABLE).delete().eq("id", id);
+  if (error) throw new Error(friendlyError(error, "Could not delete that lead."));
+  setCache(readLeads().filter((l) => l.id !== id));
+}
+
+/** Admin "delete everything" — the only other way rows disappear. */
+export async function clearLeads(): Promise<void> {
+  const { error } = await supabase
+    .from(TABLE)
+    .delete()
+    .neq("id", "00000000-0000-0000-0000-000000000000");
+  if (error) throw new Error(friendlyError(error, "Could not clear the leads."));
+  writePending([]);
+  setCache([]);
+}
+
+/** Bulk insert — used by the dashboard's "load sample data" button. */
+export async function addMany(records: LeadRecord[]): Promise<number> {
+  if (!records.length) return 0;
+  const { error } = await supabase
+    .from(TABLE)
+    .insert(records.map((r) => ({ ...toRow(r), id: isUuid(r.id) ? r.id : undefined })));
+  if (error) throw new Error(friendlyError(error, "Could not load the sample data."));
+  await fetchLeads();
+  return records.length;
+}
+
+/** Bulk removal — used to strip the sample data set back out. */
+export async function removeMany(ids: string[]): Promise<void> {
+  const uuids = ids.filter(isUuid);
+  if (!uuids.length) return;
+  const { error } = await supabase.from(TABLE).delete().in("id", uuids);
+  if (error) throw new Error(friendlyError(error, "Could not remove those leads."));
+  setCache(readLeads().filter((l) => !uuids.includes(l.id)));
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
+function isNetworkError(error: { message?: string } | null): boolean {
+  return /failed to fetch|networkerror|load failed|timeout/i.test(error?.message ?? "");
 }
 
 export function currentSource(): string {
@@ -102,64 +321,15 @@ export function currentSource(): string {
   return `${pathname}${search}`;
 }
 
-export function addLead(kind: string, data: LeadData, source?: string): LeadRecord {
-  const record = normalizeRecord({
-    id: newId(),
-    kind: normalizeKind(kind),
-    status: "new",
-    createdAt: new Date().toISOString(),
-    source: source ?? currentSource(),
-    data,
-  });
-  write([...readLeads(), record]);
-  return record;
-}
-
-export function updateLead(id: string, patch: Partial<Pick<LeadRecord, "status" | "data" | "adminNotes">>) {
-  write(
-    readLeads().map((l) =>
-      l.id === id
-        ? {
-            ...l,
-            status: patch.status ? normalizeStatus(patch.status) : l.status,
-            data: patch.data ? cleanData(patch.data) : l.data,
-            adminNotes: patch.adminNotes !== undefined ? patch.adminNotes : l.adminNotes,
-          }
-        : l,
-    ),
-  );
-}
-
-export function deleteLead(id: string) {
-  write(readLeads().filter((l) => l.id !== id));
-}
-
-export function clearLeads() {
-  if (!canUseBrowser) return;
-  try {
-    window.localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    /* ignore */
-  }
-  window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { leads: [] } }));
-}
-
-export function addMany(records: LeadRecord[]) {
-  write([...readLeads(), ...records.map(normalizeRecord)]);
-}
-
-/** Bulk removal — used to strip the sample data set back out. */
-export function removeMany(ids: string[]) {
-  const drop = new Set(ids);
-  write(readLeads().filter((l) => !drop.has(l.id)));
-}
-
-/** Fires on same tab writes and on writes from other tabs of the same site. */
+/**
+ * Notifies on local cache changes (same tab) and on writes from other tabs.
+ * The dashboard also re-fetches from Supabase on mount.
+ */
 export function subscribe(onChange: (leads: LeadRecord[]) => void): () => void {
   if (!canUseBrowser) return () => {};
   const handler = () => onChange(readLeads());
   const onStorage = (e: StorageEvent) => {
-    if (e.key === STORAGE_KEY || e.key === null) onChange(readLeads());
+    if (e.key === CACHE_KEY || e.key === null) onChange(readLeads());
   };
   window.addEventListener(CHANGE_EVENT, handler);
   window.addEventListener("storage", onStorage);
@@ -201,11 +371,11 @@ export function leadOrg(lead: LeadRecord): string {
 }
 
 export function leadCity(lead: LeadRecord): string {
-  return firstValue(lead.data, CITY_KEYS) || "—";
+  return firstValue(lead.data, CITY_KEYS);
 }
 
 export function leadSummary(lead: LeadRecord): string {
-  const parts = [leadPhone(lead), leadEmail(lead), leadCity(lead)].filter((p) => p && p !== "—");
+  const parts = [leadPhone(lead), leadEmail(lead), leadCity(lead)].filter(Boolean);
   return parts.join(" · ") || "No contact details captured";
 }
 
@@ -232,7 +402,7 @@ export function leadEmailLink(lead: LeadRecord): string | null {
     .map(([k, v]) => `${k}: ${v}`)
     .join("\n");
   return `mailto:${to}?subject=${encodeURIComponent(
-    `Following up on your ${kindMeta(lead.kind).label.toLowerCase()} request — Future Ride Ltd`,
+    `Following up on your ${kindMeta(lead.kind).label.toLowerCase()} request, Future Ride Ltd`,
   )}&body=${encodeURIComponent(`Hi ${leadName(lead).split(" ")[0]},\n\nThank you for your interest.\n\nYour details:\n${body}`)}`;
 }
 
@@ -279,7 +449,28 @@ export function downloadFile(fileName: string, content: string, mime: string) {
   window.setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-export function importLeadsJson(json: string): { added: number; skipped: number } {
+function isoStamp(raw: unknown): string {
+  return typeof raw === "string" && !Number.isNaN(Date.parse(raw))
+    ? raw
+    : new Date().toISOString();
+}
+
+/** Accepts the current shape and the older `{ kind, timestamp, data }` shape. */
+export function normalizeRecord(raw: unknown): LeadRecord {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  return {
+    id: typeof r.id === "string" && r.id ? r.id : `import-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    kind: normalizeKind(r.kind),
+    status: normalizeStatus(r.status),
+    createdAt: isoStamp(r.createdAt ?? r.timestamp),
+    source: typeof r.source === "string" && r.source ? r.source : "unknown",
+    data: cleanData(r.data),
+    adminNotes: typeof r.adminNotes === "string" ? r.adminNotes : "",
+  };
+}
+
+/** Restore an exported JSON backup into the database. */
+export async function importLeadsJson(json: string): Promise<{ added: number; skipped: number }> {
   const parsed: unknown = JSON.parse(json);
   const list = Array.isArray(parsed)
     ? parsed
@@ -287,10 +478,19 @@ export function importLeadsJson(json: string): { added: number; skipped: number 
       ? ((parsed as { leads: unknown[] }).leads)
       : null;
   if (!list) throw new Error("That file does not look like a Future Ride Ltd lead export.");
-  const existing = readLeads();
+
+  const existing = await fetchLeads();
   const known = new Set(existing.map((l) => l.id));
   const incoming = list.map(normalizeRecord);
   const fresh = incoming.filter((l) => !known.has(l.id));
-  if (fresh.length) write([...existing, ...fresh]);
+  if (!fresh.length) return { added: 0, skipped: incoming.length };
+
+  const rows = fresh.map((l) => ({
+    ...(isUuid(l.id) ? { id: l.id } : {}),
+    ...toRow(l),
+  }));
+  const { error } = await supabase.from(TABLE).insert(rows);
+  if (error) throw new Error(friendlyError(error, "Could not import that backup."));
+  await fetchLeads();
   return { added: fresh.length, skipped: incoming.length - fresh.length };
 }

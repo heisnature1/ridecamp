@@ -18,6 +18,7 @@ import Sources from "../components/admin/Sources";
 import GalleryPanel from "../components/admin/GalleryPanel";
 import { Toasts, type ToastMessage } from "../components/admin/ui";
 import useLeads from "../lib/useLeads";
+import { signOut, useAdmin } from "../lib/auth";
 import { EMPTY_FILTERS, type LeadFilters } from "../lib/leadStats";
 import { kindMeta, normalizeKind, type LeadStatus } from "../lib/leadKinds";
 import {
@@ -25,12 +26,19 @@ import {
   deleteLead,
   downloadFile,
   exportFileName,
+  flushPendingLeads,
   leadsToCsv,
   leadName,
   updateLead,
 } from "../lib/leadsStore";
 import { buildSampleLeads } from "../data/sampleLeads";
-import { getGallery, subscribe, seedGallery, type GalleryPost } from "../lib/galleryStore";
+import {
+  fetchGallery,
+  getGallery,
+  subscribe,
+  seedGallery,
+  type GalleryPost,
+} from "../lib/galleryStore";
 
 type TabId = "overview" | "leads" | "sources" | "gallery";
 
@@ -43,6 +51,8 @@ const TABS: { id: TabId; label: string; icon: typeof Inbox }[] = [
 
 export default function Admin() {
   const leads = useLeads();
+  const { admin } = useAdmin();
+  const refreshLeads = leads.refresh;
   const [gallery, setGallery] = useState<GalleryPost[]>([]);
   const [tab, setTab] = useState<TabId>("overview");
   const [filters, setFilters] = useState<LeadFilters>(EMPTY_FILTERS);
@@ -51,12 +61,23 @@ export default function Admin() {
   const prevCount = useRef(leads.length);
   const seenIds = useRef<string[]>(leads.map((l) => l.id));
 
+  /* Load everything from the database on mount, retry anything queued offline,
+     and seed the gallery if the project is brand new. */
   useEffect(() => {
     setGallery(getGallery());
     const off = subscribe(() => setGallery(getGallery()));
-    seedGallery();
+    (async () => {
+      try {
+        await flushPendingLeads();
+        await refreshLeads();
+        await seedGallery();
+        setGallery(await fetchGallery());
+      } catch {
+        /* offline — the cached lists are already showing */
+      }
+    })();
     return off;
-  }, []);
+  }, [refreshLeads]);
 
   const toast = useCallback((text: string, tone: "ok" | "warn" = "ok") => {
     const id = Date.now() + Math.random();
@@ -64,8 +85,8 @@ export default function Admin() {
     window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4200);
   }, []);
 
-  const logout = () => {
-    window.localStorage.removeItem("fr_admin_session");
+  const logout = async () => {
+    await signOut();
     window.location.assign("/login");
   };
 
@@ -111,11 +132,15 @@ export default function Admin() {
     );
   }, []);
 
-  const loadSample = useCallback(() => {
+  const loadSample = useCallback(async () => {
     const existing = new Set(leads.map((l) => l.id));
     const fresh = buildSampleLeads().filter((l) => !existing.has(l.id));
-    addMany(fresh);
-    toast(`Added ${fresh.length} sample leads`);
+    try {
+      await addMany(fresh);
+      toast(`Added ${fresh.length} sample leads`);
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Could not load sample data", "warn");
+    }
   }, [leads, toast]);
 
   const exportCsv = useCallback(() => {
@@ -143,7 +168,7 @@ export default function Admin() {
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-brand" />
               </span>
-              Live · this browser
+              {admin ? `Signed in · ${admin.email}` : "Live"}
             </span>
             <div className="flex flex-wrap gap-2">
               <Link
@@ -285,18 +310,30 @@ export default function Admin() {
       <LeadDrawer
         lead={activeLead}
         onClose={() => setActiveId(null)}
-        onStatus={(id, status: LeadStatus) => {
-          updateLead(id, { status });
-          toast(`Marked as ${status}`);
+        onStatus={async (id, status: LeadStatus) => {
+          try {
+            await updateLead(id, { status });
+            toast(`Marked as ${status}`);
+          } catch (err) {
+            toast(err instanceof Error ? err.message : "Could not update that lead", "warn");
+          }
         }}
-        onDelete={(id) => {
-          deleteLead(id);
-          setActiveId(null);
-          toast("Lead deleted", "warn");
+        onDelete={async (id) => {
+          try {
+            await deleteLead(id);
+            setActiveId(null);
+            toast("Lead deleted", "warn");
+          } catch (err) {
+            toast(err instanceof Error ? err.message : "Could not delete that lead", "warn");
+          }
         }}
-        onNote={(id, note) => {
-          updateLead(id, { adminNotes: note });
-          toast(note.trim() ? "Notes saved" : "Notes cleared");
+        onNote={async (id, note) => {
+          try {
+            await updateLead(id, { adminNotes: note });
+            toast(note.trim() ? "Notes saved" : "Notes cleared");
+          } catch (err) {
+            toast(err instanceof Error ? err.message : "Could not save that note", "warn");
+          }
         }}
       />
 
@@ -304,8 +341,8 @@ export default function Admin() {
 
       <p className="mx-auto mt-10 flex max-w-7xl items-center gap-2 px-4 text-[11px] text-slate md:px-8">
         <SlidersHorizontal className="size-3.5" />
-        Storage key <code className="rounded bg-white px-1.5 py-0.5 font-mono">ridecamp_leads</code> ·
-        {leads.length} records on this device.
+        Database <code className="rounded bg-white px-1.5 py-0.5 font-mono">leads</code> ·
+        {leads.length} records saved. They stay until deleted here.
       </p>
     </div>
   );

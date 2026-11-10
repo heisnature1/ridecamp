@@ -52,26 +52,38 @@ const vite = await createServer({
 
 try {
   console.log("\n1. Lead store — what the public forms write, the dashboard reads");
-  const { addLead, readLeads, updateLead, deleteLead, leadsToCsv, leadName } =
-    await vite.ssrLoadModule("/src/lib/leadsStore.ts");
+  const {
+    readLeads,
+    leadsToCsv,
+    leadName,
+    leadSummary,
+    normalizeRecord,
+    leadWhatsAppLink,
+  } = await vite.ssrLoadModule("/src/lib/leadsStore.ts");
   const { computeStats, filterLeads, EMPTY_FILTERS } = await vite.ssrLoadModule("/src/lib/leadStats.ts");
   const { normalizePath, sourceLabel } = await vite.ssrLoadModule("/src/lib/format.ts");
   const { buildSampleLeads } = await vite.ssrLoadModule("/src/data/sampleLeads.ts");
 
-  addLead("test-ride", { Name: "Smoke Test Rider", Phone: "+233 24 111 2222", City: "Accra" });
-  let leads = readLeads();
-  check("addLead persists a submission", leads.length === 1, `got ${leads.length}`);
-  check("source page is captured", leads[0].source === "/contact?intent=quote", leads[0].source);
-  check("status starts as new", leads[0].status === "new", leads[0].status);
-
-  addLead("fleet-quote", { Company: "Legacy Kind Ltd", "Number of bikes": "4" });
-  leads = readLeads();
-  check("legacy kind 'fleet quote' normalises to fleet", leads[1].kind === "fleet", leads[1].kind);
-
-  updateLead(leads[0].id, { status: "won" });
-  check("status update persists", readLeads()[0].status === "won");
-  deleteLead(leads[0].id);
-  check("delete removes the record", readLeads().length === 1);
+  // records are normalised the same way whether they come from Postgres or the cache
+  const ride = normalizeRecord({
+    id: "00000000-0000-0000-0000-000000000001",
+    kind: "test-ride",
+    status: "new",
+    createdAt: "2026-11-09T10:00:00.000Z",
+    source: "/contact?intent=quote",
+    data: { Name: "Smoke Test Rider", Phone: "+233 24 111 2222", City: "Accra" },
+  });
+  check("a lead keeps its name", leadName(ride) === "Smoke Test Rider", leadName(ride));
+  check("summary joins the contact fields", leadSummary(ride).includes("Accra"), leadSummary(ride));
+  check(
+    "WhatsApp follow up link targets the rider",
+    (leadWhatsAppLink(ride) ?? "").startsWith("https://wa.me/233241112222"),
+    leadWhatsAppLink(ride) ?? "none",
+  );
+  const legacy = normalizeRecord({ kind: "fleet-quote", timestamp: "2026-10-01T09:00:00.000Z", data: {} });
+  check("legacy kind 'fleet quote' normalises to fleet", legacy.kind === "fleet", legacy.kind);
+  check("legacy timestamp is read", legacy.createdAt.startsWith("2026-10-01"), legacy.createdAt);
+  check("readLeads() never throws without a cache", Array.isArray(readLeads()));
 
   const samples = buildSampleLeads();
   const stats = computeStats(samples);

@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
-import { getGallery, subscribe, type GalleryPost } from "../lib/galleryStore";
+import { fetchGallery, getGallery, subscribe, type GalleryPost } from "../lib/galleryStore";
 
 export default function Gallery() {
   const [posts, setPosts] = useState<GalleryPost[]>([]);
 
   useEffect(() => {
     setPosts(getGallery());
+    fetchGallery()
+      .then(setPosts)
+      .catch(() => {
+        /* offline — the cached list is already showing */
+      });
     return subscribe(() => setPosts(getGallery()));
   }, []);
 

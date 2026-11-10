@@ -59,15 +59,21 @@ function prune(lead: Lead): Lead {
 /**
  * Front end lead dispatch.
  *
- * 1. Saves the submission to the local lead store — this is exactly what the
- *    admin dashboard at `/admin` reads, and it happens *before* anything can
- *    navigate the browser away.
- * 2. Opens WhatsApp with the lead pre filled and an email draft.
+ * 1. Saves the submission to the database (Supabase `leads` table) so it is
+ *    kept until an admin deletes it — it survives a closed browser, another
+ *    device, or cleared site data.
+ * 2. Opens WhatsApp and an email draft so the team sees it straight away.
  *
- * A backend/CRM webhook can replace step 2 later without touching the forms.
+ * The form is considered done as soon as the lead is saved; if the network is
+ * down the lead is queued locally and retried, so a visitor never loses a
+ * booking to a dropped connection.
  */
-export function dispatchLead(kind: LeadKind, lead: Lead, source?: string): LeadRecord {
-  const record = addLead(kind, prune(lead), source);
+export async function dispatchLead(
+  kind: LeadKind,
+  lead: Lead,
+  source?: string,
+): Promise<LeadRecord> {
+  const record = await addLead(kind, prune(lead), source);
 
   const label = kindMeta(record.kind).label;
   const lines = Object.entries(record.data)
@@ -75,7 +81,7 @@ export function dispatchLead(kind: LeadKind, lead: Lead, source?: string): LeadR
     .join("\n");
   // The business WhatsApp is a `wa.me/message/…` short link, which cannot carry
   // a pre filled message — it opens the real inbox directly. The lead detail is
-  // still captured in the admin store and the email draft below.
+  // still captured in the dashboard and the email draft below.
   window.open(BUSINESS.whatsappLink, "_blank", "noopener");
   // Use a small delay before redirect to ensure open succeeds
   setTimeout(() => {

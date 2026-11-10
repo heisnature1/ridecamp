@@ -15,7 +15,6 @@ import {
   exportFileName,
   importLeadsJson,
   leadsToCsv,
-  readLeads,
   type LeadRecord,
 } from "../../lib/leadsStore";
 import { EASE, Panel, PanelTitle } from "./ui";
@@ -85,10 +84,12 @@ export default function Settings({
 
   const onPickFile = (file: File) => {
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
-        const result = importLeadsJson(String(reader.result));
-        onToast(`Imported ${result.added} leads${result.skipped ? ` · ${result.skipped} duplicates skipped` : ""}`);
+        const result = await importLeadsJson(String(reader.result));
+        onToast(
+          `Imported ${result.added} leads${result.skipped ? ` · ${result.skipped} duplicates skipped` : ""}`,
+        );
       } catch (err) {
         onToast(err instanceof Error ? err.message : "Could not read that file", "warn");
       }
@@ -96,11 +97,15 @@ export default function Settings({
     reader.readAsText(file);
   };
 
-  const doClear = () => {
-    const count = readLeads().length;
-    clearLeads();
+  const doClear = async () => {
+    const count = leads.length;
+    try {
+      await clearLeads();
+      onToast(`Deleted ${count} leads from the database`, "warn");
+    } catch (err) {
+      onToast(err instanceof Error ? err.message : "Could not clear the leads", "warn");
+    }
     setConfirmClear(false);
-    onToast(`Deleted ${count} leads`, "warn");
   };
 
   return (
