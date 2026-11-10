@@ -243,6 +243,35 @@ try {
   check("routes are code split", appSrc.includes("lazy(() => import("));
   check("a slow chunk shows a real loading state", appSrc.includes("RouteFallback"));
 
+  console.log("\n1f. The waiting state is the brand, and it always goes away");
+  const { LogoLoader } = await vite.ssrLoadModule("/src/components/motion/LogoLoader.tsx");
+  const loaderMarkup = renderToStaticMarkup(React.createElement(LogoLoader));
+  check("the loader shows the Future Ride mark", loaderMarkup.includes("/brand/mark-512.png"));
+  check("the loader spins more than one line", (loaderMarkup.match(/class="orbit orbit-/g) ?? []).length === 3,
+    `found ${(loaderMarkup.match(/class="orbit orbit-/g) ?? []).length}`);
+  check("each line has its own tempo", /orbit-a/.test(loaderMarkup) && /orbit-b/.test(loaderMarkup) && /orbit-c/.test(loaderMarkup));
+  check("the loader announces itself to screen readers", loaderMarkup.includes('role="status"') && loaderMarkup.includes("sr-only"));
+  check("the decorative rings are hidden from screen readers", loaderMarkup.includes('aria-hidden="true"'));
+
+  globalThis.__reducedMotion = true;
+  const calmLoader = renderToStaticMarkup(React.createElement(LogoLoader));
+  globalThis.__reducedMotion = false;
+  check("reduced motion freezes the rings", !calmLoader.includes("orbit orbit-"));
+  check("reduced motion still shows the mark", calmLoader.includes("/brand/mark-512.png"));
+
+  const html = await (await import("node:fs")).promises.readFile(
+    new URL("../index.html", import.meta.url),
+    "utf8",
+  );
+  check("a first paint cover exists before any script runs", html.includes('id="boot-splash"'));
+  check("the first paint cover uses the mark", html.includes("/brand/mark-512.png"));
+  check("the first paint cover spins its own lines", (html.match(/boot-spin boot-spin-/g) ?? []).length === 3);
+  check(
+    "the first paint cover cannot outlive a broken bundle",
+    html.includes("@keyframes boot-lift") && /animation:\s*boot-lift[^;]*6s/.test(html),
+  );
+  check("no inline script that a strict CSP would block", !/<script>(?![\s\S]*?application\/ld\+json)/.test(html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, "")));
+
   console.log("\n1e. The home page actually renders the scene");
   const { default: Home } = await vite.ssrLoadModule("/src/pages/Home.tsx");
   const homeHtml = renderToStaticMarkup(

@@ -24,6 +24,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Privacy = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Privacy })));
 const Terms = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Terms })));
 import { RouteVeil, ScrollProgress } from "./components/motion/RouteTransition";
+import BootSplash, { LogoLoader } from "./components/motion/LogoLoader";
 import { requestScrollRefresh } from "./lib/scrollRefresh";
 import { useAdmin } from "./lib/auth";
 import { clearLegacySession } from "./lib/supabase";
@@ -70,11 +71,8 @@ function AdminGuard() {
  */
 function RouteFallback() {
   return (
-    <div className="grid min-h-[60vh] place-items-center" role="status" aria-live="polite">
-      <div className="flex flex-col items-center gap-3">
-        <span className="size-8 animate-spin rounded-full border-2 border-line border-t-brand" />
-        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate">Loading</span>
-      </div>
+    <div className="grid min-h-[70vh] place-items-center bg-navy text-white" role="status" aria-live="polite">
+      <LogoLoader size={150} />
     </div>
   );
 }
@@ -137,6 +135,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <BootSplash />
       <Shell />
     </BrowserRouter>
   );
