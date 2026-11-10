@@ -9,6 +9,7 @@ Ghana, built from the company's content brief. Every page drives toward four act
 - [Vite](https://vitejs.dev) + React 19 + TypeScript
 - [Tailwind CSS v4](https://tailwindcss.com) (brand: deep navy `#0a1f44` + fresh green `#16a34a`)
 - [Framer Motion](https://www.framer.com/motion/) for reveals and micro interactions
+- [GSAP](https://gsap.com) + ScrollTrigger for scrubbed scroll effects (see [Motion & 3D](#motion--3d))
 - [React Router v7](https://reactrouter.com)
 
 ## Getting started
@@ -137,6 +138,41 @@ npm run verify   # typecheck + dependency audit + build + smoke/security tests
 Notes worth acting on before launch: change the seeded admin password, add each real admin to
 both Supabase Auth **and** `ridecamp_admins`, and keep the published key limited to the
 `anon`/publishable role (never ship the service role key).
+
+## Motion & 3D
+
+Two engines, split by what each is actually good at, with one shared vocabulary in
+`src/lib/motion.ts` (easings, durations, variants, and the accessibility guards):
+
+| Job | Tool | Where |
+| --- | --- | --- |
+| Entrances, hovers, press states, list staggers | Framer Motion | `Reveal.tsx`, `SplitHeading.tsx`, page components |
+| Pointer driven 3D tilt + travelling glare | CSS custom properties written once per frame | `components/motion/TiltCard.tsx` |
+| Scrubbed parallax and the scroll progress bar | GSAP `ScrollTrigger` | `lib/scrollFx.ts` |
+| Infinite proof ribbon | CSS animation on a duplicated track | `components/motion/Marquee.tsx` |
+| Route change wipe | Framer Motion overlay | `components/motion/RouteTransition.tsx` |
+
+The tilt is real 3D, not a scale: `TiltCard` writes `--tilt-x`, `--tilt-y`, `--tilt-z` and the
+glare position to the host element on `pointermove` (coalesced with `requestAnimationFrame`), and
+the surface transforms with `rotateX/rotateY/translateZ`. Children opt into depth with
+`.depth-1/2/3`. The hero scene works the same way: one listener writes `--px`/`--py` and every
+layer reads them at its own strength, so the photograph, the light blooms and the grid floor move
+past each other.
+
+Accessibility is not an afterthought:
+
+- `prefers-reduced-motion` disables every decorative effect. `useCalmMotion()` short circuits the
+  hooks, `TiltCard` renders a plain static card with no listeners attached, and the CSS blanket
+  rule in `index.css` is the backstop.
+- Tilt and pointer parallax require `(hover: hover) and (pointer: fine)`; touch devices never
+  attach the listeners.
+- The ribbon pauses on hover so it can be read, and its duplicate copy is `aria-hidden`.
+- Nothing below the fold starts invisible without a guaranteed reveal, and the route veil never
+  blocks pointer events.
+
+Performance: routes and third party code are split in `vite.config.ts` (`vendor`, `motion`,
+`icons`, `data` chunks), so a first visit to `/` does not download the admin dashboard, and the
+dashboard does not download GSAP. GSAP is loaded dynamically by `lib/scrollRefresh.ts`.
 
 ## Brand & photography
 

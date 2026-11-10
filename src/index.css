@@ -253,11 +253,195 @@ body {
   box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3), 0 0 0 2px rgba(34, 197, 94, 0.1);
 }
 
+/* ------------------------------------------------------------------ */
+/* motion primitives                                                   */
+/* ------------------------------------------------------------------ */
+
+/* Scenes read --px / --py (pointer position, -1 to 1). They are declared with
+   a default of 0 so a touch device, or a pointer that never moved, still gets a
+   valid transform instead of an invalid one that the browser would drop. */
+.hero-scene,
+.scene-3d {
+  --px: 0;
+  --py: 0;
+}
+
+/* 3D tilt card — rotation is driven by JS written custom properties, so
+   pointer movement is one style write per frame instead of a React render. */
+.tilt-host {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --tilt-z: 0;
+  --glare-x: 50%;
+  --glare-y: 50%;
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+.tilt-surface {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(var(--tilt-z));
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+  will-change: transform;
+}
+
+.tilt-host:hover .tilt-surface {
+  box-shadow:
+    0 32px 64px -28px rgba(10, 31, 68, 0.35),
+    0 8px 24px -12px rgba(10, 31, 68, 0.18);
+}
+
+/* the highlight that travels with the pointer, sells the surface as solid */
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    circle at var(--glare-x) var(--glare-y),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.08) 32%,
+    transparent 62%
+  );
+  mix-blend-mode: soft-light;
+}
+
+.tilt-host:hover .tilt-glare {
+  opacity: 1;
+}
+
+/* children that should float above the card surface */
+.depth-1 {
+  transform: translateZ(18px);
+}
+.depth-2 {
+  transform: translateZ(34px);
+}
+.depth-3 {
+  transform: translateZ(52px);
+}
+
+/* the faint perspective grid on the hero floor */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to top, black, transparent 85%);
+  -webkit-mask-image: linear-gradient(to top, black, transparent 85%);
+  transform-origin: bottom center;
+}
+
+/* marquee that pauses for anyone who wants to read it */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover,
+.marquee-host:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* slow sheen across the hero motorcycle photo */
+.hero-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.16) 48%,
+    transparent 62%
+  );
+  background-size: 260% 100%;
+  animation: sheen 9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sheen {
+  0%,
+  100% {
+    background-position: 160% 0;
+  }
+  50% {
+    background-position: -60% 0;
+  }
+}
+
+/* underline that grows from the pointer side */
+.link-sweep {
+  position: relative;
+}
+.link-sweep::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-sweep:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* the scroll progress bar pinned under the nav */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-brand-bright), #06b6d4);
+  pointer-events: none;
+}
+
+/* page transition veil — the panel that wipes across on route change */
+.route-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  background: linear-gradient(115deg, var(--color-navy), var(--color-brand-dark));
+}
+
+/* section that reveals its children as it scrolls into view */
+.scroll-reveal-group > * {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* decorative layers that only exist to move get out of the way entirely */
+  .tilt-glare,
+  .hero-sheen::after {
+    display: none !important;
+  }
+  .tilt-surface {
+    transform: none !important;
+  }
+  .scroll-reveal-group > * {
+    opacity: 1;
+    transform: none;
   }
 }
 

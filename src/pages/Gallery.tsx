@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
+import TiltCard from "../components/motion/TiltCard";
 import { fetchGallery, getGallery, subscribe, type GalleryPost } from "../lib/galleryStore";
 
 export default function Gallery() {
@@ -39,15 +40,17 @@ export default function Gallery() {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post, i) => (
-                <Reveal key={post.id} delay={Math.min(i, 5) * 0.05}>
-                  <article className="overflow-hidden rounded-3xl border border-line bg-white shadow-sm">
+                <Reveal key={post.id} delay={Math.min(i, 5) * 0.05} className="h-full">
+                  <TiltCard as="article" max={7} lift={12} className="h-full rounded-3xl" surfaceClassName="h-full">
+                  <article className="group h-full overflow-hidden rounded-3xl border border-line bg-white shadow-sm">
                     <div className="relative aspect-[4/3] overflow-hidden bg-navy">
                       <img
                         src={post.image}
                         alt={post.title}
-                        className="size-full object-cover transition duration-500 hover:scale-105"
+                        className="size-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.06]"
                         loading="lazy"
                       />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                     </div>
                     <div className="p-5">
                       <h3 className="font-display text-base font-bold text-navy">{post.title}</h3>
@@ -63,6 +66,7 @@ export default function Gallery() {
                       </p>
                     </div>
                   </article>
+                  </TiltCard>
                 </Reveal>
               ))}
             </div>

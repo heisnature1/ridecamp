@@ -5,6 +5,7 @@ import Reveal from "../components/Reveal";
 import SplitHeading from "../components/SplitHeading";
 import { SERVICE_ITEMS, SPIRO_SCALE, WHY_ELECTRIC } from "../data/site";
 import CtaRow from "../components/CtaRow";
+import TiltCard from "../components/motion/TiltCard";
 
 export default function Service() {
   return (
@@ -18,12 +19,14 @@ export default function Service() {
         <div className="mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {SERVICE_ITEMS.map((s, i) => (
-              <Reveal key={s.title} delay={(i % 3) * 0.08}>
-                <div className="h-full rounded-3xl border border-line bg-cloud p-7">
-                  <Wrench className="size-5 text-brand" />
-                  <h2 className="mt-3 font-display text-lg font-bold text-navy">{s.title}</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-slate">{s.text}</p>
-                </div>
+              <Reveal key={s.title} delay={(i % 3) * 0.08} className="h-full">
+                <TiltCard max={6} lift={10} className="h-full rounded-3xl" surfaceClassName="h-full">
+                  <div className="h-full rounded-3xl border border-line bg-cloud p-7">
+                    <Wrench className="depth-1 size-5 text-brand" />
+                    <h2 className="mt-3 font-display text-lg font-bold text-navy">{s.title}</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-slate">{s.text}</p>
+                  </div>
+                </TiltCard>
               </Reveal>
             ))}
           </div>

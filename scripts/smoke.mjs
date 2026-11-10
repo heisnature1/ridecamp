@@ -34,6 +34,15 @@ globalThis.window = {
   removeEventListener: () => {},
   dispatchEvent: () => true,
   location: { pathname: "/contact", search: "?intent=quote" },
+  // pretend to be a desktop with a real pointer, unless a test says otherwise
+  matchMedia: (query) => ({
+    matches: query.includes("prefers-reduced-motion")
+      ? Boolean(globalThis.__reducedMotion)
+      : true,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }),
   setTimeout: () => 0,
 };
 globalThis.localStorage = globalThis.window.localStorage;
@@ -186,6 +195,70 @@ try {
     "submitting does not force a WhatsApp tab open",
     !dispatchBody.includes("window.open("),
   );
+
+  console.log("\n1d. Motion layer behaves honestly");
+  const { default: TiltCard } = await vite.ssrLoadModule("/src/components/motion/TiltCard.tsx");
+  const { default: Marquee } = await vite.ssrLoadModule("/src/components/motion/Marquee.tsx");
+  const { clamp, pointerPosition } = await vite.ssrLoadModule("/src/lib/motion.ts");
+
+  const tiltMarkup = renderToStaticMarkup(
+    React.createElement(TiltCard, null, React.createElement("p", null, "Depth card")),
+  );
+  check("the tilt card renders its content", tiltMarkup.includes("Depth card"));
+  check("the tilt card mounts the 3D surface", tiltMarkup.includes("tilt-surface"));
+  check("the tilt card ships a moving highlight", tiltMarkup.includes("tilt-glare"));
+
+  // a visitor who asks for less motion gets a plain, static card
+  globalThis.__reducedMotion = true;
+  const calmMarkup = renderToStaticMarkup(
+    React.createElement(TiltCard, null, React.createElement("p", null, "Depth card")),
+  );
+  globalThis.__reducedMotion = false;
+  check("reduced motion removes the 3D surface entirely", !calmMarkup.includes("tilt-surface"));
+  check("reduced motion still shows the content", calmMarkup.includes("Depth card"));
+
+  const marqueeMarkup = renderToStaticMarkup(
+    React.createElement(Marquee, null, React.createElement("span", null, "No petrol, ever")),
+  );
+  check("the ribbon renders its text", marqueeMarkup.includes("No petrol, ever"));
+  check(
+    "the ribbon copies itself once for a seamless loop",
+    (marqueeMarkup.match(/No petrol, ever/g) ?? []).length === 2,
+    `found ${(marqueeMarkup.match(/No petrol, ever/g) ?? []).length}`,
+  );
+  check("the duplicate copy is hidden from screen readers", marqueeMarkup.includes('aria-hidden="true"'));
+
+  check("pointer maths clamps to the element edge", clamp(9, -1, 1) === 1 && clamp(-9, -1, 1) === -1);
+  const centre = pointerPosition(
+    { clientX: 50, clientY: 50 },
+    { getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }) },
+  );
+  check("the pointer is centred at the middle of a card", centre.x === 0 && centre.y === 0);
+
+  // the animation engines must not be required to paint the first screen
+  const appSrc = await (await import("node:fs")).promises.readFile(
+    new URL("../src/App.tsx", import.meta.url),
+    "utf8",
+  );
+  check("routes are code split", appSrc.includes("lazy(() => import("));
+  check("a slow chunk shows a real loading state", appSrc.includes("RouteFallback"));
+
+  console.log("\n1e. The home page actually renders the scene");
+  const { default: Home } = await vite.ssrLoadModule("/src/pages/Home.tsx");
+  const homeHtml = renderToStaticMarkup(
+    React.createElement(MemoryRouter, null, React.createElement(Home)),
+  );
+  const has = (re) => re.test(homeHtml);
+  const countOf = (re) => (homeHtml.match(re) ?? []).length;
+  check("the hero renders its headline", has(/smarter way to ride/));
+  check("depth cards mount their 3D surfaces", countOf(/tilt-surface/g) >= 6, `found ${countOf(/tilt-surface/g)}`);
+  check("each surface carries a moving highlight", countOf(/tilt-glare/g) === countOf(/tilt-surface/g));
+  check("the hero reads pointer depth variables", countOf(/var\(--px\)/g) >= 3, `found ${countOf(/var\(--px\)/g)}`);
+  check("sections register for scroll parallax", countOf(/data-parallax/g) >= 4, `found ${countOf(/data-parallax/g)}`);
+  check("the proof ribbon renders", has(/Battery swap in under a minute/));
+  check("the ribbon loops seamlessly", countOf(/marquee-track/g) === 1 && countOf(/Battery swap in under a minute/g) === 2);
+  check("the bike photo renders in the glance section", countOf(/images\/motor\.jpg/g) >= 2);
+  check("no stray debug text leaks into the page", !has(/undefined|NaN/));
 
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");

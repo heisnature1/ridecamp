@@ -4,6 +4,7 @@ import Reveal from "../components/Reveal";
 import SplitHeading from "../components/SplitHeading";
 import GhanaMap from "../components/GhanaMap";
 import { SWAP_STEPS, SWAP_WHY } from "../data/site";
+import TiltCard from "../components/motion/TiltCard";
 
 export default function BatterySwap() {
   return (
@@ -18,25 +19,27 @@ export default function BatterySwap() {
         <div className="mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-5 md:grid-cols-3">
             {SWAP_STEPS.map((s, i) => (
-              <Reveal key={s.title} delay={i * 0.1}>
-                <div className="relative h-full rounded-3xl border border-line bg-cloud p-8">
-                  <span className="absolute right-6 top-6 font-display text-5xl font-bold text-line">0{i + 1}</span>
-                  <h2 className="font-display text-xl font-bold text-navy">{s.title}</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-slate">{s.text}</p>
-                </div>
+              <Reveal key={s.title} delay={i * 0.1} className="h-full">
+                <TiltCard max={7} lift={12} className="h-full rounded-3xl" surfaceClassName="h-full">
+                  <div className="relative h-full rounded-3xl border border-line bg-cloud p-8">
+                    <span className="depth-1 absolute right-6 top-6 font-display text-5xl font-bold text-line">0{i + 1}</span>
+                    <h2 className="font-display text-xl font-bold text-navy">{s.title}</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-slate">{s.text}</p>
+                  </div>
+                </TiltCard>
               </Reveal>
             ))}
           </div>
 
           <div className="mt-12 grid items-center gap-10 lg:grid-cols-2">
             <Reveal>
-              <div className="overflow-hidden rounded-3xl">
+              <TiltCard max={8} lift={16} className="rounded-3xl" surfaceClassName="overflow-hidden rounded-3xl">
                 <img
                   src="/images/swap-station.jpg"
                   alt="Battery swap station at night"
                   className="h-[380px] w-full object-cover"
                 />
-              </div>
+              </TiltCard>
             </Reveal>
             <Reveal delay={0.1}>
               <SplitHeading

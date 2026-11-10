@@ -3,6 +3,7 @@ import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import SplitHeading from "../components/SplitHeading";
 import { ABOUT_PROMISE } from "../data/site";
+import TiltCard from "../components/motion/TiltCard";
 
 export default function About() {
   return (
@@ -16,6 +17,7 @@ export default function About() {
         <div className="mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <Reveal>
+              <TiltCard max={5} lift={10} className="rounded-3xl" surfaceClassName="rounded-3xl">
               <div className="rounded-3xl bg-navy p-8 text-white md:p-10">
                 <SplitHeading
                   as="h2"
@@ -30,6 +32,7 @@ export default function About() {
                   and earn more.
                 </p>
               </div>
+              </TiltCard>
               <SplitHeading
                 as="h2"
                 text="Our promise"
