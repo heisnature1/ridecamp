@@ -326,6 +326,61 @@ body {
   transform: translateZ(52px);
 }
 
+/* ------------------------------------------------------------------ */
+/* branded waiting state                                               */
+/* ------------------------------------------------------------------ */
+
+/* three arcs around the mark: different radii, tempos and directions, so the
+   whole thing reads as machinery rather than one spinning ring */
+.orbit {
+  transform-origin: 100px 100px;
+  transform-box: view-box;
+}
+.orbit-a {
+  animation: orbit-spin 4.2s linear infinite;
+}
+.orbit-b {
+  animation: orbit-spin 2.9s linear infinite reverse;
+}
+.orbit-c {
+  animation: orbit-spin 1.7s linear infinite;
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* the green bloom that seats the mark inside the rings */
+.logo-halo {
+  position: absolute;
+  inset: -30%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0) 70%);
+  pointer-events: none;
+}
+
+/* the mark settles into place; it is visible with or without the animation */
+.mark-arrive {
+  animation: mark-arrive 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes mark-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* the cover never traps the page: it fades out, it is not a modal */
+.boot-splash {
+  will-change: opacity;
+}
+
 /* the faint perspective grid on the hero floor */
 .hero-grid {
   background-image:
@@ -442,6 +497,10 @@ body {
   .scroll-reveal-group > * {
     opacity: 1;
     transform: none;
+  }
+  .orbit,
+  .loader-dots::after {
+    animation: none !important;
   }
 }
 

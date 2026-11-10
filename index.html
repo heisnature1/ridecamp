@@ -76,9 +76,112 @@
         ]
       }
     </script>
+    <style>
+      /* ---- first paint cover: no flash of white before the app boots ---- */
+      html { background: #0a1f44; }
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        display: grid;
+        place-items: center;
+        background: #0a1f44;
+        /* Fail safe with no script at all: if the app never boots (blocked
+           script, dead network) the cover still lifts itself. Purely
+           declarative, so it cannot be broken by a CSP or a JS error. */
+        animation: boot-lift 0.7s ease 6s forwards;
+      }
+      #boot-splash.is-gone { display: none; }
+      @keyframes boot-lift {
+        to {
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+        }
+      }
+      .boot-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
+      .boot-mark-wrap { position: relative; width: 200px; height: 200px; display: grid; place-items: center; }
+      .boot-halo {
+        position: absolute;
+        inset: -60px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0) 70%);
+      }
+      .boot-orbits { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+      .boot-mark { position: relative; z-index: 1; user-select: none; animation: boot-mark-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .boot-spin { transform-origin: 100px 100px; transform-box: view-box; }
+      .boot-spin-a { animation: boot-spin 4.2s linear infinite; }
+      .boot-spin-b { animation: boot-spin 2.9s linear infinite reverse; }
+      .boot-spin-c { animation: boot-spin 1.7s linear infinite; }
+      .boot-name { margin: 26px 0 0; color: #fff; font: 700 14px/1.2 "Space Grotesk", system-ui, sans-serif; }
+      .boot-label {
+        margin: 6px 0 0;
+        color: rgba(255, 255, 255, 0.5);
+        font: 600 10px/1.2 "Inter", system-ui, sans-serif;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+      }
+      .boot-dots::after { content: ""; animation: boot-dots 1.4s steps(4, end) infinite; }
+      @keyframes boot-spin { to { transform: rotate(360deg); } }
+      @keyframes boot-mark-in { from { opacity: 0; transform: scale(0.86); } to { opacity: 1; transform: scale(1); } }
+      @keyframes boot-dots {
+        0% { content: ""; }
+        25% { content: "."; }
+        50% { content: ".."; }
+        75% { content: "..."; }
+        100% { content: ""; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-spin, .boot-dots::after, .boot-mark { animation: none; }
+      }
+    </style>
   </head>
   <body>
+    <!--
+      First paint cover. This is plain HTML + CSS with no script, so it is visible
+      the moment the document paints — before the bundle downloads. The React
+      BootSplash takes over from it and is what actually dismisses it; if the
+      bundle fails entirely, the timer below still lifts it so the page is never
+      held hostage by its own loading screen.
+    -->
+    <div id="boot-splash" aria-label="Loading Future Ride Ltd">
+      <div class="boot-inner">
+        <div class="boot-mark-wrap">
+          <div class="boot-halo" aria-hidden="true"></div>
+          <svg class="boot-orbits" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="boot-a" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#16a34a" stop-opacity="0" />
+                <stop offset="45%" stop-color="#4ade80" stop-opacity="0.95" />
+                <stop offset="100%" stop-color="#06b6d4" stop-opacity="0" />
+              </linearGradient>
+              <linearGradient id="boot-b" x1="1" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0" />
+                <stop offset="50%" stop-color="#22c55e" stop-opacity="1" />
+                <stop offset="100%" stop-color="#16a34a" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <!-- static guide: barely there, gives the arcs a track to run on -->
+            <circle cx="100" cy="100" r="94" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1.5" stroke-dasharray="1 7" />
+            <!-- outer sweep, 4.2s -->
+            <g class="boot-spin boot-spin-a">
+              <circle cx="100" cy="100" r="94" stroke="url(#boot-a)" stroke-width="3" stroke-linecap="round" stroke-dasharray="170 420" />
+            </g>
+            <!-- middle sweep, opposite direction, 2.9s -->
+            <g class="boot-spin boot-spin-b">
+              <circle cx="100" cy="100" r="82" stroke="url(#boot-b)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="86 400" />
+            </g>
+            <!-- inner comet, 1.7s -->
+            <g class="boot-spin boot-spin-c">
+              <circle cx="100" cy="100" r="70" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-dasharray="34 370" opacity="0.9" />
+            </g>
+          </svg>
+          <img src="/brand/mark-512.png" alt="" width="104" height="104" class="boot-mark" />
+        </div>
+        <p class="boot-name">Future Ride Ltd</p>
+        <p class="boot-label">Loading<span class="boot-dots"></span></p>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
 </html>
