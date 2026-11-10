@@ -240,7 +240,7 @@ try {
     new URL("../src/App.tsx", import.meta.url),
     "utf8",
   );
-  check("routes are code split", appSrc.includes("lazy(() => import("));
+  check("routes are code split", /lazy\(\(\) =>\s*\n?\s*load\(\)/.test(appSrc) || appSrc.includes("lazy(() => import("));
   check("a slow chunk shows a real loading state", appSrc.includes("RouteFallback"));
 
   console.log("\n1g. Following a link shows the branded wait, not a colour wipe");
@@ -261,7 +261,7 @@ try {
   check("same page anchors show nothing", transSrc.includes("url.hash"));
   check("it can never swallow a click", /pointer-events:\s*none|\.page-transition/.test(transSrc + cssSrc));
   check("reduced motion skips it", transSrc.includes("if (calm) return null"));
-  check("a click that changes nothing still lifts it", transSrc.includes("SAFETY_MS"));
+  check("a click that changes nothing still lifts it", transSrc.includes("CEILING_MS + 500"));
 
   // nothing over the page until a link is actually followed
   const { default: PageTransition } = await vite.ssrLoadModule("/src/components/motion/PageTransition.tsx");
@@ -269,6 +269,19 @@ try {
     React.createElement(MemoryRouter, { initialEntries: ["/"] }, React.createElement(PageTransition)),
   );
   check("it is invisible before any navigation", initial === "", initial.slice(0, 60));
+
+  console.log("\n1h. The cover waits for the page, not for a clock");
+  const coverSrc = await read("../src/lib/cover.ts");
+  const ptSrc = await read("../src/components/motion/PageTransition.tsx");
+  check("the cover tracks a real load signal", coverSrc.includes("markLoaded"));
+  check("the cover is raised on a click", coverSrc.includes("raiseCover"));
+  check("the cover has a ceiling so it cannot trap a visitor", coverSrc.includes("CEILING_MS"));
+  check("a lazy route reports when its chunk arrives", shellSrc.includes("markLoaded();"));
+  check("redirect routes report too, so they never wait", shellSrc.includes("<Redirect"));
+  check("the cover lifts only after the route commits", ptSrc.includes("pathname === raisedOn.current"));
+  check("it waits two frames so the new page has painted", (ptSrc.match(/requestAnimationFrame/g) ?? []).length >= 2);
+  check("it holds while the chunk is still arriving", ptSrc.includes("if (!cover.loaded)"));
+  check("a click that changes nothing is released by the ceiling", ptSrc.includes("CEILING_MS + 500"));
 
   console.log("\n1f. The waiting state is the brand, and it always goes away");
   const { LogoLoader } = await vite.ssrLoadModule("/src/components/motion/LogoLoader.tsx");
