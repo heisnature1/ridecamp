@@ -52,26 +52,38 @@ const vite = await createServer({
 
 try {
   console.log("\n1. Lead store — what the public forms write, the dashboard reads");
-  const { addLead, readLeads, updateLead, deleteLead, leadsToCsv, leadName } =
-    await vite.ssrLoadModule("/src/lib/leadsStore.ts");
+  const {
+    readLeads,
+    leadsToCsv,
+    leadName,
+    leadSummary,
+    normalizeRecord,
+    leadWhatsAppLink,
+  } = await vite.ssrLoadModule("/src/lib/leadsStore.ts");
   const { computeStats, filterLeads, EMPTY_FILTERS } = await vite.ssrLoadModule("/src/lib/leadStats.ts");
   const { normalizePath, sourceLabel } = await vite.ssrLoadModule("/src/lib/format.ts");
   const { buildSampleLeads } = await vite.ssrLoadModule("/src/data/sampleLeads.ts");
 
-  addLead("test-ride", { Name: "Smoke Test Rider", Phone: "+233 24 111 2222", City: "Accra" });
-  let leads = readLeads();
-  check("addLead persists a submission", leads.length === 1, `got ${leads.length}`);
-  check("source page is captured", leads[0].source === "/contact?intent=quote", leads[0].source);
-  check("status starts as new", leads[0].status === "new", leads[0].status);
-
-  addLead("fleet-quote", { Company: "Legacy Kind Ltd", "Number of bikes": "4" });
-  leads = readLeads();
-  check("legacy kind 'fleet quote' normalises to fleet", leads[1].kind === "fleet", leads[1].kind);
-
-  updateLead(leads[0].id, { status: "won" });
-  check("status update persists", readLeads()[0].status === "won");
-  deleteLead(leads[0].id);
-  check("delete removes the record", readLeads().length === 1);
+  // records are normalised the same way whether they come from Postgres or the cache
+  const ride = normalizeRecord({
+    id: "00000000-0000-0000-0000-000000000001",
+    kind: "test-ride",
+    status: "new",
+    createdAt: "2026-11-09T10:00:00.000Z",
+    source: "/contact?intent=quote",
+    data: { Name: "Smoke Test Rider", Phone: "+233 24 111 2222", City: "Accra" },
+  });
+  check("a lead keeps its name", leadName(ride) === "Smoke Test Rider", leadName(ride));
+  check("summary joins the contact fields", leadSummary(ride).includes("Accra"), leadSummary(ride));
+  check(
+    "WhatsApp follow up link targets the rider",
+    (leadWhatsAppLink(ride) ?? "").startsWith("https://wa.me/233241112222"),
+    leadWhatsAppLink(ride) ?? "none",
+  );
+  const legacy = normalizeRecord({ kind: "fleet-quote", timestamp: "2026-10-01T09:00:00.000Z", data: {} });
+  check("legacy kind 'fleet quote' normalises to fleet", legacy.kind === "fleet", legacy.kind);
+  check("legacy timestamp is read", legacy.createdAt.startsWith("2026-10-01"), legacy.createdAt);
+  check("readLeads() never throws without a cache", Array.isArray(readLeads()));
 
   const samples = buildSampleLeads();
   const stats = computeStats(samples);
@@ -99,6 +111,40 @@ try {
   const csv = leadsToCsv(samples);
   check("csv has a header + one row per lead", csv.split("\r\n").length === 16, `got ${csv.split("\r\n").length}`);
   check("csv quotes values containing commas", csv.includes('"GH\u20b5 2,000 to 5,000"'), "income band not quoted");
+
+  console.log("\n1b. Input hardening — validation, escaping and bot guards");
+  const { sanitize, sanitizeRecord, validate, validateLead, RULES, normalizePhone, safeUrl } =
+    await vite.ssrLoadModule("/src/lib/validate.ts");
+  const { botCheck, submitBudget } = await vite.ssrLoadModule("/src/lib/botGuard.ts");
+
+  check("markup is stripped from stored text", sanitize("<script>alert(1)</script>Kofi") === "scriptalert(1)/scriptKofi", sanitize("<script>alert(1)</script>Kofi"));
+  check("control characters are removed", !/[\u0000-\u001f]/.test(sanitize("A\u0000B\u0007C")));
+  check("length is capped", sanitize("x".repeat(900), 40).length === 40);
+  check("backticks cannot start a template", !sanitize("a`b").includes("`"));
+  const nested = sanitizeRecord({ Name: "Kofi", Evil: { $ne: 1 }, Note: "<b>hi</b>" });
+  check("nested objects are dropped", !("Evil" in nested));
+  check("nested markup is stripped", nested.Note === "bhi/b", nested.Note);
+
+  check("a valid Ghanaian number passes", validate("055 894 1297", RULES.phone).ok);
+  check("a short phone number fails", !validate("12345", RULES.phone).ok);
+  check("a bad email fails", !validate("not-an-email", { ...RULES.email, required: true }).ok);
+  check("a good email passes", validate("a@b.co", { ...RULES.email, required: true }).ok);
+  check("markup in a name is refused", !validate("<script>alert(1)</script>", RULES.name).ok);
+  check("phone is normalised to local format", normalizePhone("+233558941297") === "0558941297", normalizePhone("+233558941297"));
+  check("javascript: urls are rejected", safeUrl("javascript:alert(1)") === null);
+  check("https urls are allowed", safeUrl("https://example.com/a.jpg")?.startsWith("https://") === true);
+  check("numeric bikes only", validate("3; drop table", { ...RULES.bikes, required: true }).ok === false);
+
+  const leadCheck = validateLead({ Name: "Kofi Mensah", Phone: "055 894 1297", Notes: "Please call after 3pm" }, { Name: RULES.name, Phone: RULES.phone, Notes: RULES.notes });
+  check("a whole lead is validated", leadCheck.ok === true, leadCheck.ok ? "" : leadCheck.error);
+  check("lead values come back clean", leadCheck.ok && !leadCheck.data.Name.includes("<"));
+  const filthy = validateLead({ Name: "<img src=x onerror=alert(1)>", Phone: "0558941297" }, { Name: RULES.name, Phone: RULES.phone });
+  check("a lead with markup is refused", filthy.ok === false);
+
+  check("honeypot filled in is blocked", botCheck({ honeypot: "http://spam.example", elapsedMs: 9000, source: "/contact" }).ok === false);
+  check("instant submission is blocked", botCheck({ elapsedMs: 10, source: "/contact" }).ok === false);
+  check("a normal submission is allowed", botCheck({ elapsedMs: 9000, source: "/contact" }).ok === true);
+  check("the rate window reports a budget", typeof submitBudget().left === "number");
 
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");

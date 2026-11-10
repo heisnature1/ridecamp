@@ -16,6 +16,9 @@ import Gallery from "./pages/Gallery";
 import { Privacy, Terms } from "./pages/Legal";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import NotFound from "./pages/NotFound";
+import { useAdmin } from "./lib/auth";
+import { clearLegacySession } from "./lib/supabase";
 
 /**
  * Route changes go to the top of the page, unless the URL points at a section
@@ -36,11 +39,17 @@ function ScrollManager() {
   return null;
 }
 
-/** /admin is only reachable after a successful login - otherwise bounce to /login. */
+/** /admin is only reachable with a signed in admin session, otherwise bounce to /login. */
 function AdminGuard() {
-  const logged_in =
-    typeof window !== "undefined" && window.localStorage.getItem("fr_admin_session") === "1";
-  if (!logged_in) {
+  const { admin } = useAdmin();
+  if (admin === undefined) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-cloud text-sm text-slate">
+        Checking your session…
+      </div>
+    );
+  }
+  if (!admin) {
     return <Navigate to="/login" state={{ from: { pathname: "/admin" } }} replace />;
   }
   return <Admin />;
@@ -78,7 +87,8 @@ function Shell() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminGuard />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/faqs" element={<Navigate to="/#faqs" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       {!standalone && <Footer />}
@@ -88,6 +98,10 @@ function Shell() {
 }
 
 export default function App() {
+  // a deployment from before Supabase Auth trusted a localStorage flag; make
+  // sure no browser can still present it
+  clearLegacySession();
+
   return (
     <BrowserRouter>
       <Shell />

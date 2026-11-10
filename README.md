@@ -41,8 +41,8 @@ npm run smoke      # lead pipeline + dashboard smoke check (no browser needed)
 
 ## Lead capture & admin dashboard
 
-Every public form writes to a single lead store (`src/lib/leadsStore.ts`, key
-`ridecamp_leads`) *before* it dispatches, so nothing a visitor types is lost:
+Every public form writes to a single lead store (`src/lib/leadsStore.ts`) that is
+backed by Supabase, so nothing a visitor types is lost:
 
 | Form | Page | Lead types | Fields captured |
 | ---- | ---- | ---------- | --------------- |
@@ -67,10 +67,69 @@ under labels such as `fleet quote` still file correctly.
 - **Public forms** — which forms feed the dashboard and exactly what each captures.
 - **Data & export** — CSV/JSON export, JSON import, sample data, clear.
 
-Leads are stored in the browser's local storage, so the dashboard reflects
-submissions made on that device (including other tabs, which update live). Point
-`dispatchLead` in `src/lib/leads.ts` at a backend/CRM webhook to collect leads
-from every visitor; the dashboard needs no other change.
+### Where the data lives
+
+Leads and gallery posts live in **Supabase** (project `qtoeqbmlcanczlybimoj`), not in the
+visitor's browser, so a booking survives a closed tab, a different device, or cleared site
+data. Rows are only removed when an admin deletes them.
+
+| Thing | Where |
+| ----- | ----- |
+| Leads / bookings | `public.leads` (one row per submission, `data` holds the form fields as JSON) |
+| Gallery posts | `public.gallery_posts` + images in the public `gallery` storage bucket |
+| Admin accounts | Supabase Auth users **and** an allowlisted row in `public.ridecamp_admins` |
+
+Row level security does the real enforcing:
+
+- a visitor may **insert** a lead and **read** the gallery, nothing else;
+- only an authenticated user whose email is in `ridecamp_admins` (checked by
+  `public.is_ridecamp_admin()`) may read, update or delete leads, or write gallery posts,
+  or upload images. Every other account in the shared project sees nothing.
+
+A small localStorage cache mirrors the last fetch so the dashboard paints instantly and a
+submission made while offline is queued and retried on the next load rather than lost.
+
+### Admin login
+
+`/login` signs in with Supabase Auth (email + password); the default account is
+`admin@futureride.gh` / `future-ride`. **Change that password** from the Supabase dashboard
+(Authentication → Users) before going live, and add each colleague as a user *and* a row in
+`ridecamp_admins`. Config lives in `src/lib/supabase.ts`; override it with
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` if the project ever moves.
+
+## Security
+
+The site holds personal data (names, phone numbers, emails, income bands), so the checks are
+layered — the database is the last word, not the UI.
+
+| Area | What is in place | Where |
+| ---- | ---------------- | ----- |
+| Transport | HSTS with `includeSubDomains` + preload, HTTP to HTTPS redirect, `upgrade-insecure-requests` | `vercel.json` |
+| Headers | CSP (no inline scripts, `frame-ancestors 'none'`), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP | `vercel.json` |
+| Auth | Supabase Auth email + password; session restored from a rotating refresh token; the old trust-a-localStorage-flag login is deleted on boot | `src/lib/auth.ts`, `src/lib/supabase.ts` |
+| Passwords | Never stored by this app — hashed with bcrypt by Supabase Auth (`auth.users.encrypted_password`) | Supabase |
+| Login throttling | 5 attempts per 10 minutes per address, counted in Postgres | `public.ridecamp_login_guard()` |
+| Session storage | Access token (1 h) + rotating refresh token in `localStorage` under `fr_admin_auth`; no cookies are set, so there is no CSRF surface. Signing out also clears the cached records | `src/lib/auth.ts` |
+| Record access | RLS on `leads` and `gallery_posts`; only an email on the `ridecamp_admins` allowlist can read or delete | Supabase |
+| Field tampering | A public insert can never choose `status`, `admin_notes` or `created_at`, only known `kind` values survive, payloads are capped at 8 kB and only flat strings are accepted | `ridecamp_guard_lead_insert()` |
+| Rate limiting | Server side: max 3 submissions per phone number per 10 minutes. Browser side: 3 per 10 minutes per device | trigger + `src/lib/botGuard.ts` |
+| Bot protection | Hidden honeypot field, minimum time on form, same-origin check | `src/lib/botGuard.ts` |
+| Input validation | Every form validates against a shared rule set (phone, email, name, length) and refuses markup instead of storing it | `src/lib/validate.ts` |
+| Escaping | React escapes all rendered values; the app never uses `dangerouslySetInnerHTML` or `innerHTML`, and stored text is scrubbed of `<>`, backticks and control characters | `src/lib/validate.ts` |
+| Uploads | `gallery` bucket limited to JPEG/PNG/WebP and 5 MB, write access restricted to allowlisted admins, and post rows only accept our own bucket or bundled `/images/` paths | Supabase + `ridecamp_guard_gallery_insert()` |
+| Query safety | All database access goes through the Supabase client (parameterised PostgREST / RPC). There is no string-concatenated SQL anywhere | `src/lib/*Store.ts` |
+| Data minimisation | API reads name their columns instead of `select *` | `src/lib/leadsStore.ts`, `src/lib/galleryStore.ts` |
+| Dependencies | `npm run audit` (0 known vulnerabilities) wired into `npm run verify` | `package.json` |
+
+Run everything before shipping:
+
+```bash
+npm run verify   # typecheck + dependency audit + build + smoke/security tests
+```
+
+Notes worth acting on before launch: change the seeded admin password, add each real admin to
+both Supabase Auth **and** `ridecamp_admins`, and keep the published key limited to the
+`anon`/publishable role (never ship the service role key).
 
 ## Brand & photography
 

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Building2, CheckCircle2, FileCheck2, Handshake, MessageCircle } from "lucide-react";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import SplitHeading from "../components/SplitHeading";
 import { FLEET_AUDIENCE, FLEET_BENEFITS, OWNERSHIP_DOCS, WAYS_TO_OWN } from "../data/site";
 import { dispatchLead, WA_DEFAULT } from "../lib/leads";
+import { RULES } from "../lib/validate";
 import { formatGhanaPhone } from "../lib/leadKinds";
 
 /** Where the financing application lives now that /ownership has folded into /fleet. */
@@ -20,8 +21,13 @@ function FleetForm() {
     city: "",
     useCase: "Food / parcel delivery",
     notes: "",
+    website: "",
   });
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
+  const mountedAt = useRef(Date.now());
+
 
   const set =
     (k: keyof typeof form) =>
@@ -44,26 +50,59 @@ function FleetForm() {
   return (
     <form
       id="fleet-quote"
-      className="rounded-3xl border border-line bg-white p-8 md:p-10"
-      onSubmit={(e) => {
+      className="relative rounded-3xl border border-line bg-white p-8 md:p-10"
+      onSubmit={async (e) => {
         e.preventDefault();
-        setSent(true);
-        dispatchLead(
-          "fleet",
-          {
-            Company: form.company,
-            "Contact person": form.person,
-            Phone: formatGhanaPhone(form.phone),
-            Email: form.email,
-            "Number of bikes": form.bikes,
-            City: form.city,
-            "Use case": form.useCase,
-            Notes: form.notes,
-          },
-          "/fleet#fleet-quote",
-        );
+        setSending(true);
+        setError("");
+        try {
+          await dispatchLead(
+            "fleet",
+            {
+              Company: form.company,
+              "Contact person": form.person,
+              Phone: formatGhanaPhone(form.phone),
+              Email: form.email,
+              "Number of bikes": form.bikes,
+              City: form.city,
+              "Use case": form.useCase,
+              Notes: form.notes,
+            },
+            "/fleet#fleet-quote",
+            {
+              honeypot: form.website,
+              elapsedMs: Date.now() - mountedAt.current,
+              rules: {
+                Company: RULES.company,
+                "Contact person": RULES.name,
+                Phone: { ...RULES.phone, label: "Phone number" },
+                Email: { ...RULES.email, required: true },
+                "Number of bikes": RULES.bikes,
+                City: RULES.city,
+                "Use case": RULES.useCase,
+                Notes: RULES.notes,
+              },
+            },
+          );
+          setSent(true);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Could not send that. Please try again.");
+        } finally {
+          setSending(false);
+        }
       }}
     >
+      <input
+        type="text"
+        name="company_website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={form.website}
+        onChange={(e) => setForm({ ...form, website: e.target.value })}
+        className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
+
       <h3 className="font-display text-2xl font-bold text-navy">Request a fleet quote</h3>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <input required value={form.company} onChange={set("company")} placeholder="Company" aria-label="Company" className="rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand" />
@@ -86,7 +125,15 @@ function FleetForm() {
         aria-label="Tell us about your operation (optional)"
         className="mt-4 w-full rounded-xl border border-line bg-cloud px-4 py-3 text-sm outline-none focus:border-brand"
       />
-      <button className="mt-6 w-full rounded-full bg-brand py-4 text-sm font-bold text-white hover:bg-brand-dark sm:w-auto sm:px-10">
+      {error && (
+        <p role="alert" className="mt-4 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 ring-1 ring-red-200">
+          {error}
+        </p>
+      )}
+      <button
+        disabled={sending}
+        className="mt-6 w-full rounded-full bg-brand py-4 text-sm font-bold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:px-10"
+      >
         Request a Fleet Quote
       </button>
     </form>
@@ -102,8 +149,13 @@ function FinancingForm() {
     occupation: "",
     income: "",
     option: "Lease to own",
+    website: "",
   });
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
+  const mountedAt = useRef(Date.now());
+
 
   const set =
     (k: keyof typeof form) =>
@@ -126,11 +178,13 @@ function FinancingForm() {
   return (
     <form
       id="apply-financing"
-      className="rounded-3xl border border-line bg-white p-8 md:p-10"
-      onSubmit={(e) => {
+      className="relative rounded-3xl border border-line bg-white p-8 md:p-10"
+      onSubmit={async (e) => {
         e.preventDefault();
-        setSent(true);
-        dispatchLead(
+        setSending(true);
+        setError("");
+        try {
+          await dispatchLead(
           "financing",
           {
             Name: form.name,
@@ -142,9 +196,38 @@ function FinancingForm() {
             "Preferred option": form.option,
           },
           FINANCING_SOURCE,
-        );
+          {
+            honeypot: form.website,
+            elapsedMs: Date.now() - mountedAt.current,
+            rules: {
+              Name: RULES.name,
+              Phone: { ...RULES.phone, label: "Phone number" },
+              Email: RULES.email,
+              City: RULES.city,
+              Occupation: RULES.occupation,
+              "Income range": RULES.income,
+              "Preferred option": RULES.option,
+            },
+          },
+          );
+          setSent(true);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Could not send that. Please try again.");
+        } finally {
+          setSending(false);
+        }
       }}
     >
+      <input
+        type="text"
+        name="company_website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={form.website}
+        onChange={(e) => setForm({ ...form, website: e.target.value })}
+        className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
       <h3 className="font-display text-2xl font-bold text-navy">Apply for financing</h3>
       <p className="mt-2 text-sm text-slate">Two minutes now saves you a week of wondering.</p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -165,7 +248,15 @@ function FinancingForm() {
           ))}
         </select>
       </div>
-      <button className="mt-6 w-full rounded-full bg-brand py-4 text-sm font-bold text-white hover:bg-brand-dark sm:w-auto sm:px-10">
+      {error && (
+        <p role="alert" className="mt-4 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 ring-1 ring-red-200">
+          {error}
+        </p>
+      )}
+      <button
+        disabled={sending}
+        className="mt-6 w-full rounded-full bg-brand py-4 text-sm font-bold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:px-10"
+      >
         Apply for Financing
       </button>
     </form>

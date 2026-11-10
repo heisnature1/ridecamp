@@ -37,9 +37,9 @@ export default function LeadDrawer({
 }: {
   lead: LeadRecord | null;
   onClose: () => void;
-  onStatus: (id: string, status: LeadStatus) => void;
-  onDelete: (id: string) => void;
-  onNote: (id: string, note: string) => void;
+  onStatus: (id: string, status: LeadStatus) => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
+  onNote: (id: string, note: string) => void | Promise<void>;
 }) {
   const wa = lead ? leadWhatsAppLink(lead) : null;
   const mail = lead ? leadEmailLink(lead) : null;
@@ -188,7 +188,7 @@ export default function LeadDrawer({
                     whileTap={{ scale: 0.96 }}
                     disabled={!dirty}
                     onClick={() => {
-                      onNote(lead.id, draft);
+                      void onNote(lead.id, draft);
                       setDirty(false);
                     }}
                     className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition ${
@@ -224,7 +224,7 @@ export default function LeadDrawer({
                         key={s.id}
                         type="button"
                         whileTap={{ scale: 0.94 }}
-                        onClick={() => onStatus(lead.id, s.id)}
+                        onClick={() => void onStatus(lead.id, s.id)}
                         className={`flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-bold transition ${
                           active ? s.chip : "bg-white text-navy ring-1 ring-line hover:ring-navy/40"
                         }`}
@@ -264,7 +264,7 @@ export default function LeadDrawer({
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.97 }}
-                onClick={() => onDelete(lead.id)}
+                onClick={() => void onDelete(lead.id)}
                 className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold text-red-600 ring-1 ring-red-200 transition hover:bg-red-50"
               >
                 <Trash2 className="size-4" /> Delete this lead

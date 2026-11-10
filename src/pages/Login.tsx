@@ -1,40 +1,49 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import Logo from "../components/Logo";
+import { loginThrottle, signIn, useAdmin } from "../lib/auth";
 
 /**
- * Internal login — sits in front of /admin. Credentials are checked against the
- * env supplied pair; on success the session is remembered for the rest of the
- * browser life and the original /admin URL (with any query string) is restored.
+ * Internal login, sitting in front of /admin.
+ *
+ * Signs in with Supabase Auth (email + password), so the session is a real,
+ * verifiable one and the database only hands over leads to a signed in admin.
+ * After signing in the original /admin URL is restored.
  */
-const USER = import.meta.env.VITE_ADMIN_USER ?? "admin@futureride.gh";
-const PASS = import.meta.env.VITE_ADMIN_PASS ?? "future-ride";
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const from = useLocation();
+  const { admin } = useAdmin();
 
-  if (typeof window !== "undefined" && window.localStorage.getItem("fr_admin_session") === "1") {
+  if (admin) {
     return <Navigate to={from.state?.from?.pathname ?? "/admin"} replace />;
   }
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    // tiny delay so the button feels responsive
-    window.setTimeout(() => {
-      if (email === USER && password === PASS) {
-        window.localStorage.setItem("fr_admin_session", "1");
-        window.location.assign(from.state?.from?.pathname ?? "/admin");
-      } else {
-        setError("That email or password isn't recognised.");
+    try {
+      // server side counter: 5 attempts per 10 minutes per address
+      const retryAfter = await loginThrottle(email);
+      if (retryAfter > 0) {
+        setError(
+          `Too many sign in attempts. Try again in ${Math.ceil(retryAfter / 60)} minute${
+            retryAfter <= 60 ? "" : "s"
+          }.`,
+        );
         setLoading(false);
+        return;
       }
-    }, 220);
+      await signIn(email, password);
+      window.location.assign(from.state?.from?.pathname ?? "/admin");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "That email or password isn't recognised.");
+      setLoading(false);
+    }
   };
 
   return (
