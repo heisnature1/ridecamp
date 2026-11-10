@@ -149,7 +149,7 @@ function setCache(leads: LeadRecord[]) {
 export async function fetchLeads(): Promise<LeadRecord[]> {
   const { data, error } = await supabase
     .from(TABLE)
-    .select("*")
+    .select("id,kind,status,created_at,source,data,admin_notes")
     .order("created_at", { ascending: false });
   if (error) throw new Error(friendlyError(error, "Could not load leads."));
   const leads = (data as Row[]).map(fromRow);
@@ -204,7 +204,7 @@ export async function addLead(
   const { data: inserted, error } = await supabase
     .from(TABLE)
     .insert({ ...toRow(optimistic), created_at: createdAt })
-    .select("*")
+    .select("id,kind,status,created_at,source,data,admin_notes")
     .single();
 
   if (error || !inserted) {

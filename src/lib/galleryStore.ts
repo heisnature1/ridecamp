@@ -1,4 +1,5 @@
 import { supabase, friendlyError, GALLERY_BUCKET } from "./supabase";
+import { safeUrl, sanitize } from "./validate";
 
 /**
  * Gallery store — backed by Supabase.
@@ -102,7 +103,7 @@ function setCache(posts: GalleryPost[]) {
 export async function fetchGallery(): Promise<GalleryPost[]> {
   const { data, error } = await supabase
     .from(TABLE)
-    .select("*")
+    .select("id,title,caption,image_url,created_at")
     .order("created_at", { ascending: false });
   if (error) throw new Error(friendlyError(error, "Could not load the gallery."));
   const posts = (data as Row[]).map(fromRow);
@@ -161,10 +162,16 @@ async function removeImage(imageUrl: string) {
 export async function addPost(
   post: Omit<GalleryPost, "id" | "createdAt">,
 ): Promise<GalleryPost> {
+  const image = safeUrl(post.image);
+  if (!image) throw new Error("That image location is not allowed.");
   const { data, error } = await supabase
     .from(TABLE)
-    .insert({ title: post.title, caption: post.caption, image_url: post.image })
-    .select("*")
+    .insert({
+      title: sanitize(post.title, 120),
+      caption: sanitize(post.caption, 500),
+      image_url: image,
+    })
+    .select("id,title,caption,image_url,created_at")
     .single();
   if (error || !data) throw new Error(friendlyError(error, "Could not add that post."));
   const saved = fromRow(data as Row);
@@ -177,9 +184,13 @@ export async function updatePost(
   patch: Partial<Pick<GalleryPost, "title" | "caption" | "image">>,
 ): Promise<void> {
   const payload: Record<string, unknown> = {};
-  if (patch.title !== undefined) payload.title = patch.title;
-  if (patch.caption !== undefined) payload.caption = patch.caption;
-  if (patch.image !== undefined) payload.image_url = patch.image;
+  if (patch.title !== undefined) payload.title = sanitize(patch.title, 120);
+  if (patch.caption !== undefined) payload.caption = sanitize(patch.caption, 500);
+  if (patch.image !== undefined) {
+    const image = safeUrl(patch.image);
+    if (!image) throw new Error("That image location is not allowed.");
+    payload.image_url = image;
+  }
 
   const previous = getGallery().find((p) => p.id === id);
   const { error } = await supabase.from(TABLE).update(payload).eq("id", id);

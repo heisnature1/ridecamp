@@ -10,6 +10,7 @@ import CtaRow from "../components/CtaRow";
 import Calculator from "../components/Calculator";
 import { GLANCE, HOW_IT_WORKS, TESTIMONIALS, TRUST_STRIP, WHY_GHANA, WAYS_TO_OWN, FAQS } from "../data/site";
 import { dispatchLead } from "../lib/leads";
+import { RULES } from "../lib/validate";
 import { formatGhanaPhone } from "../lib/leadKinds";
 
 const TRUST_ICONS = [Route, BatteryCharging, ShieldCheck, MapPinned];
@@ -511,7 +512,7 @@ function Faqs() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="relative bg-white py-16 md:py-24 overflow-hidden">
+    <section id="faqs" className="relative bg-white py-16 md:py-24 overflow-hidden scroll-mt-24">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="absolute top-1/4 left-1/4 size-96 rounded-full bg-brand/10 blur-3xl animate-float" />
         <div className="absolute bottom-1/4 right-1/4 size-72 rounded-full bg-cyan-500/10 blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
@@ -618,8 +619,11 @@ function Faqs() {
 }
 
 function FinalCta() {
-  const [form, setForm] = useState({ name: "", phone: "", city: "" });
+  const [form, setForm] = useState({ name: "", phone: "", city: "", website: "" });
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
+  const mountedAt = useRef(Date.now());
 
   return (
     <section className="relative bg-navy py-16 text-white md:py-24 overflow-hidden">
@@ -663,18 +667,50 @@ function FinalCta() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
-            className="mx-auto mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row"
+            className="relative mx-auto mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row"
             onSubmit={(e) => {
               e.preventDefault();
-              setSent(true);
-              dispatchLead("callback", {
-                Name: form.name,
-                Phone: formatGhanaPhone(form.phone),
-                City: form.city,
-                Interest: "Call me back",
-              });
+              (async () => {
+                setSending(true);
+                try {
+                  await dispatchLead(
+                    "callback",
+                    {
+                      Name: form.name,
+                      Phone: formatGhanaPhone(form.phone),
+                      City: form.city,
+                      Interest: "Call me back",
+                    },
+                    undefined,
+                    {
+                      honeypot: form.website,
+                      elapsedMs: Date.now() - mountedAt.current,
+                      rules: {
+                        Name: RULES.name,
+                        Phone: { ...RULES.phone, label: "Phone number" },
+                        City: RULES.city,
+                      },
+                    },
+                  );
+                  setSent(true);
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "Could not send that. Please try again.");
+                } finally {
+                  setSending(false);
+                }
+              })();
             }}
           >
+            <input
+              type="text"
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={form.website}
+              onChange={(e) => setForm({ ...form, website: e.target.value })}
+              className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
             <div className="flex-1 relative" style={{ transform: "translateZ(20px)" }}>
               <input
                 required
@@ -707,10 +743,18 @@ function FinalCta() {
               />
             </div>
             <div className="relative" style={{ transform: "translateZ(30px)" }}>
-              <button className="btn-3d w-full sm:w-auto rounded-full px-8 py-3.5 text-sm font-bold text-white">
-                I'm Interested
+              <button
+                disabled={sending}
+                className="btn-3d w-full rounded-full px-8 py-3.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              >
+                {sending ? "Sending…" : "I'm Interested"}
               </button>
             </div>
+            {error && (
+              <p role="alert" className="w-full rounded-xl bg-red-500/15 px-4 py-2 text-sm font-semibold text-red-200">
+                {error}
+              </p>
+            )}
           </motion.form>
         )}
         <motion.p

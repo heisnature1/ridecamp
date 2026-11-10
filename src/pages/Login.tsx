@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import Logo from "../components/Logo";
-import { signIn, useAdmin } from "../lib/auth";
+import { loginThrottle, signIn, useAdmin } from "../lib/auth";
 
 /**
  * Internal login, sitting in front of /admin.
@@ -27,6 +27,17 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
+      // server side counter: 5 attempts per 10 minutes per address
+      const retryAfter = await loginThrottle(email);
+      if (retryAfter > 0) {
+        setError(
+          `Too many sign in attempts. Try again in ${Math.ceil(retryAfter / 60)} minute${
+            retryAfter <= 60 ? "" : "s"
+          }.`,
+        );
+        setLoading(false);
+        return;
+      }
       await signIn(email, password);
       window.location.assign(from.state?.from?.pathname ?? "/admin");
     } catch (err) {

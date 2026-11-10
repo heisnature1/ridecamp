@@ -22,11 +22,30 @@ export const supabase = createClient(url, key, {
     persistSession: true,
     autoRefreshToken: true,
     // The admin signs in with a password on our own /login screen, so there is
-    // no auth redirect to parse.
+    // no auth redirect to parse (which also removes an injection vector).
     detectSessionInUrl: false,
+    // Session is kept in localStorage under our own key; the access token is
+    // short lived (1 hour) and refresh tokens rotate on every use. Cookies are
+    // not used at all, so there is no CSRF surface and no cookie to steal via a
+    // cross site request — see `clearLegacySession` below for old sessions.
     storageKey: "fr_admin_auth",
+    flowType: "pkce",
   },
 });
+
+/**
+ * Remove the pre Supabase session flag. The old build trusted a plain
+ * `fr_admin_session = "1"` value in localStorage, which anyone could set, so it
+ * is deleted on load to make sure it can never be honoured.
+ */
+export function clearLegacySession() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem("fr_admin_session");
+  } catch {
+    /* ignore */
+  }
+}
 
 /** The gallery images bucket (public read, admin only writes). */
 export const GALLERY_BUCKET = "gallery";

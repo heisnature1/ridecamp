@@ -45,15 +45,12 @@ export type Lead = Record<string, string>;
 
 import { kindMeta, type LeadKind } from "./leadKinds";
 import { addLead, type LeadRecord } from "./leadsStore";
+import { botCheck, recordSubmit } from "./botGuard";
+import { sanitizeRecord, validateLead, type FieldRule } from "./validate";
 
 /** Drop empty inputs so the admin never sees a row of blank fields. */
 function prune(lead: Lead): Lead {
-  const out: Lead = {};
-  for (const [key, value] of Object.entries(lead)) {
-    const v = String(value ?? "").trim();
-    if (v) out[key] = v;
-  }
-  return out;
+  return sanitizeRecord(lead, 2000);
 }
 
 /**
@@ -68,12 +65,35 @@ function prune(lead: Lead): Lead {
  * down the lead is queued locally and retried, so a visitor never loses a
  * booking to a dropped connection.
  */
+export type DispatchOptions = {
+  /** field rules to enforce before saving */
+  rules?: Record<string, FieldRule>;
+  /** value of the hidden honeypot input */
+  honeypot?: string;
+  /** ms since the form first rendered */
+  elapsedMs?: number;
+};
+
 export async function dispatchLead(
   kind: LeadKind,
   lead: Lead,
   source?: string,
+  options: DispatchOptions = {},
 ): Promise<LeadRecord> {
-  const record = await addLead(kind, prune(lead), source);
+  // 1. bot / abuse checks
+  const bot = botCheck({
+    honeypot: options.honeypot,
+    elapsedMs: options.elapsedMs ?? Number.POSITIVE_INFINITY,
+    source: source ?? (typeof window !== "undefined" ? window.location.pathname : "/"),
+  });
+  if (!bot.ok) throw new Error(bot.error);
+
+  // 2. shape and content validation, then scrub every value
+  const checked = validateLead(prune(lead), options.rules ?? {});
+  if (!checked.ok) throw new Error(checked.error);
+
+  const record = await addLead(kind, checked.data, source);
+  recordSubmit();
 
   const label = kindMeta(record.kind).label;
   const lines = Object.entries(record.data)

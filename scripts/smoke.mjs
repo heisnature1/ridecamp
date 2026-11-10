@@ -112,6 +112,40 @@ try {
   check("csv has a header + one row per lead", csv.split("\r\n").length === 16, `got ${csv.split("\r\n").length}`);
   check("csv quotes values containing commas", csv.includes('"GH\u20b5 2,000 to 5,000"'), "income band not quoted");
 
+  console.log("\n1b. Input hardening — validation, escaping and bot guards");
+  const { sanitize, sanitizeRecord, validate, validateLead, RULES, normalizePhone, safeUrl } =
+    await vite.ssrLoadModule("/src/lib/validate.ts");
+  const { botCheck, submitBudget } = await vite.ssrLoadModule("/src/lib/botGuard.ts");
+
+  check("markup is stripped from stored text", sanitize("<script>alert(1)</script>Kofi") === "scriptalert(1)/scriptKofi", sanitize("<script>alert(1)</script>Kofi"));
+  check("control characters are removed", !/[\u0000-\u001f]/.test(sanitize("A\u0000B\u0007C")));
+  check("length is capped", sanitize("x".repeat(900), 40).length === 40);
+  check("backticks cannot start a template", !sanitize("a`b").includes("`"));
+  const nested = sanitizeRecord({ Name: "Kofi", Evil: { $ne: 1 }, Note: "<b>hi</b>" });
+  check("nested objects are dropped", !("Evil" in nested));
+  check("nested markup is stripped", nested.Note === "bhi/b", nested.Note);
+
+  check("a valid Ghanaian number passes", validate("055 894 1297", RULES.phone).ok);
+  check("a short phone number fails", !validate("12345", RULES.phone).ok);
+  check("a bad email fails", !validate("not-an-email", { ...RULES.email, required: true }).ok);
+  check("a good email passes", validate("a@b.co", { ...RULES.email, required: true }).ok);
+  check("markup in a name is refused", !validate("<script>alert(1)</script>", RULES.name).ok);
+  check("phone is normalised to local format", normalizePhone("+233558941297") === "0558941297", normalizePhone("+233558941297"));
+  check("javascript: urls are rejected", safeUrl("javascript:alert(1)") === null);
+  check("https urls are allowed", safeUrl("https://example.com/a.jpg")?.startsWith("https://") === true);
+  check("numeric bikes only", validate("3; drop table", { ...RULES.bikes, required: true }).ok === false);
+
+  const leadCheck = validateLead({ Name: "Kofi Mensah", Phone: "055 894 1297", Notes: "Please call after 3pm" }, { Name: RULES.name, Phone: RULES.phone, Notes: RULES.notes });
+  check("a whole lead is validated", leadCheck.ok === true, leadCheck.ok ? "" : leadCheck.error);
+  check("lead values come back clean", leadCheck.ok && !leadCheck.data.Name.includes("<"));
+  const filthy = validateLead({ Name: "<img src=x onerror=alert(1)>", Phone: "0558941297" }, { Name: RULES.name, Phone: RULES.phone });
+  check("a lead with markup is refused", filthy.ok === false);
+
+  check("honeypot filled in is blocked", botCheck({ honeypot: "http://spam.example", elapsedMs: 9000, source: "/contact" }).ok === false);
+  check("instant submission is blocked", botCheck({ elapsedMs: 10, source: "/contact" }).ok === false);
+  check("a normal submission is allowed", botCheck({ elapsedMs: 9000, source: "/contact" }).ok === true);
+  check("the rate window reports a budget", typeof submitBudget().left === "number");
+
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");
   const { default: Overview } = await vite.ssrLoadModule("/src/components/admin/Overview.tsx");

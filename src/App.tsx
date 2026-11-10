@@ -16,7 +16,9 @@ import Gallery from "./pages/Gallery";
 import { Privacy, Terms } from "./pages/Legal";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import NotFound from "./pages/NotFound";
 import { useAdmin } from "./lib/auth";
+import { clearLegacySession } from "./lib/supabase";
 
 /**
  * Route changes go to the top of the page, unless the URL points at a section
@@ -85,7 +87,8 @@ function Shell() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminGuard />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/faqs" element={<Navigate to="/#faqs" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       {!standalone && <Footer />}
@@ -95,6 +98,10 @@ function Shell() {
 }
 
 export default function App() {
+  // a deployment from before Supabase Auth trusted a localStorage flag; make
+  // sure no browser can still present it
+  clearLegacySession();
+
   return (
     <BrowserRouter>
       <Shell />

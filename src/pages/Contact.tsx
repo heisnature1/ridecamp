@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CalendarCheck, Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import { BUSINESS, dispatchLead, WA_DEFAULT } from "../lib/leads";
+import { RULES } from "../lib/validate";
 import { formatGhanaPhone, type LeadKind } from "../lib/leadKinds";
 
 const CITIES = ["Accra", "Tema", "Kumasi", "Takoradi", "Cape Coast", "Tamale", "Other"];
@@ -29,8 +30,13 @@ export default function Contact() {
     riderType: RIDER_TYPES[0],
     interest: intent,
     notes: "",
+    website: "",
   });
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
+  const mountedAt = useRef(Date.now());
+
 
   useEffect(() => {
     setForm((f) => ({ ...f, interest: intent }));
@@ -62,22 +68,56 @@ export default function Contact() {
               </div>
             ) : (
               <form
-                className="rounded-3xl border border-line bg-cloud p-8 md:p-10"
-                onSubmit={(e) => {
+                className="relative rounded-3xl border border-line bg-cloud p-8 md:p-10"
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  setSent(true);
-                  dispatchLead(KIND_BY_INTENT[form.interest as (typeof INTENTS)[number]] ?? "quote", {
-                    Name: form.name,
-                    Phone: formatGhanaPhone(form.phone),
-                    Email: form.email,
-                    City: form.city,
-                    "Preferred date": form.date || "Flexible",
-                    "Rider type": form.riderType,
-                    Interest: form.interest,
-                    Notes: form.notes,
-                  });
+                  setSending(true);
+                  setError("");
+                  try {
+                    await dispatchLead(
+                      KIND_BY_INTENT[form.interest as (typeof INTENTS)[number]] ?? "quote",
+                      {
+                        Name: form.name,
+                        Phone: formatGhanaPhone(form.phone),
+                        Email: form.email,
+                        City: form.city,
+                        "Preferred date": form.date || "Flexible",
+                        "Rider type": form.riderType,
+                        Interest: form.interest,
+                        Notes: form.notes,
+                      },
+                      undefined,
+                      {
+                        honeypot: form.website,
+                        elapsedMs: Date.now() - mountedAt.current,
+                        rules: {
+                          Name: { ...RULES.name, required: true },
+                          Phone: { ...RULES.phone, label: "Phone number" },
+                          Email: { ...RULES.email, required: true },
+                          City: RULES.city,
+                          Notes: RULES.notes,
+                          "Preferred date": { label: "Preferred date", max: 40 },
+                        },
+                      },
+                    );
+                    setSent(true);
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Could not send that. Please try again.");
+                  } finally {
+                    setSending(false);
+                  }
                 }}
               >
+        <input
+          type="text"
+          name="company_website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          value={form.website}
+          onChange={(e) => setForm({ ...form, website: e.target.value })}
+          className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+        />
                 <div className="flex flex-wrap gap-2">
                   {INTENTS.map((o) => (
                     <button
@@ -122,9 +162,21 @@ export default function Contact() {
                     className="rounded-xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-brand sm:col-span-2"
                   />
                 </div>
-                <button className="mt-6 w-full rounded-full bg-brand py-4 text-sm font-bold text-white hover:bg-brand-dark">
-                  {form.interest === "Get a quote" ? "Request Quote" : "Confirm Booking"}
+                <button
+                  disabled={sending}
+                  className="mt-6 w-full rounded-full bg-brand py-4 text-sm font-bold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {sending
+                    ? "Sending…"
+                    : form.interest === "Get a quote"
+                      ? "Request Quote"
+                      : "Confirm Booking"}
                 </button>
+                {error && (
+                  <p role="alert" className="mt-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 ring-1 ring-red-200">
+                    {error}
+                  </p>
+                )}
                 <p className="mt-3 text-[11px] text-slate">
                   Your details go straight to our sales team by email and WhatsApp.
                 </p>
