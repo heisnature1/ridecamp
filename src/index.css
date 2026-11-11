@@ -583,6 +583,8 @@ body {
   --py: 0;
   --spin: 0deg;
   --shine: 50%;
+  /* the colour swatch writes this; every glow on the stage reads it */
+  --ekon-glow: #16a34a;
   /* the diagonal sheen is a pseudo layer so React never re-renders on move */
   isolation: isolate;
 }
@@ -612,10 +614,11 @@ body {
 .ekon-halo {
   background: radial-gradient(
     46% 46% at 50% 56%,
-    rgba(74, 222, 128, 0.28),
-    rgba(22, 163, 74, 0.1) 45%,
+    color-mix(in srgb, var(--ekon-glow) 32%, transparent),
+    color-mix(in srgb, var(--ekon-glow) 12%, transparent) 45%,
     transparent 72%
   );
+  transition: background 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   filter: blur(6px);
   transform: translate3d(calc(var(--px) * 8px), calc(var(--py) * 6px), 0);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
@@ -675,8 +678,10 @@ body {
 .ekon-bay {
   position: absolute;
   border-radius: 8px;
-  border: 1px solid rgba(74, 222, 128, 0.55);
-  box-shadow: 0 0 24px rgba(22, 163, 74, 0.45), inset 0 0 18px rgba(22, 163, 74, 0.35);
+  border: 1px solid color-mix(in srgb, var(--ekon-glow) 65%, transparent);
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--ekon-glow) 50%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--ekon-glow) 40%, transparent);
   transform: translate3d(calc(var(--px) * -4px), calc(var(--py) * -3px), 40px);
   pointer-events: none;
   transition: opacity 0.2s linear;
@@ -737,8 +742,12 @@ body {
 }
 
 .ekon-battery-cell.is-full {
-  background: linear-gradient(90deg, #16a34a, #4ade80);
-  box-shadow: 0 0 12px rgba(74, 222, 128, 0.75);
+  background: linear-gradient(
+    90deg,
+    var(--ekon-glow),
+    color-mix(in srgb, var(--ekon-glow) 40%, white)
+  );
+  box-shadow: 0 0 12px color-mix(in srgb, var(--ekon-glow) 80%, transparent);
 }
 
 .ekon-battery-bolt {
@@ -778,8 +787,10 @@ body {
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.18), 0 0 14px rgba(74, 222, 128, 0.9);
+  background: var(--ekon-glow);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--ekon-glow) 20%, transparent),
+    0 0 14px color-mix(in srgb, var(--ekon-glow) 90%, transparent);
   flex: none;
 }
 
@@ -998,8 +1009,12 @@ input[type="range"].ekon-range::-webkit-slider-thumb {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #16a34a, #4ade80);
-  box-shadow: 0 0 12px rgba(74, 222, 128, 0.8);
+  background: linear-gradient(
+    90deg,
+    var(--ekon-glow),
+    color-mix(in srgb, var(--ekon-glow) 40%, white)
+  );
+  box-shadow: 0 0 12px color-mix(in srgb, var(--ekon-glow) 80%, transparent);
   transition: width 0.25s linear;
 }
 
@@ -1016,6 +1031,106 @@ input[type="range"].ekon-range::-webkit-slider-thumb {
   line-height: 1.45;
   color: var(--stage-dim);
   min-height: 2.1em;
+}
+
+/* ---- the action bar that replaced the old sticky card ---- */
+.ekon-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 18px;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.ekon-colours {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ekon-colours-label,
+.ekon-colour-name {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6ee7b7;
+}
+
+.ekon-colour-name {
+  letter-spacing: 0.08em;
+  color: rgba(236, 253, 245, 0.72);
+  min-width: 3.6em;
+}
+
+.ekon-swatches {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.ekon-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+.ekon-swatch:hover {
+  transform: scale(1.12);
+}
+
+.ekon-swatch.is-on {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+  transform: scale(1.1);
+}
+
+.ekon-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ekon-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: transform 0.2s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.ekon-cta:hover {
+  transform: translateY(-1px);
+}
+
+.ekon-cta.is-primary {
+  background: linear-gradient(120deg, #16a34a, #4ade80);
+  color: #04231a;
+  box-shadow: 0 10px 24px -12px rgba(74, 222, 128, 0.9);
+}
+
+.ekon-cta.is-whatsapp {
+  background: #25d366;
+  color: #04231a;
+}
+
+.ekon-cta.is-quiet {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ecfdf5;
+}
+
+.ekon-cta.is-quiet:hover {
+  background: rgba(255, 255, 255, 0.13);
 }
 
 /* ---- the readable figures under the stage ---- */

@@ -415,6 +415,8 @@ try {
   check("the marks render at a usable size", /className="size-\[18px\]/.test(footerSrc));
 
   const ekonSrc = await read("../src/pages/Ekon.tsx");
+  check("the old sticky try it card is gone", !ekonSrc.includes("Try it yourself"));
+  check("the page is a single column again", !ekonSrc.includes("lg:grid-cols-[1fr_380px]"));
   check(
     "the spec section sets its figures in type",
     ekonSrc.includes("<EkonStage") && (await read("../src/components/motion/EkonStage.tsx")).includes("HOTSPOTS"),
@@ -423,7 +425,10 @@ try {
 
   console.log("\n1k. The Ekon spec stage is interactive but never hides its figures");
   const { default: EkonStage } = await vite.ssrLoadModule("/src/components/motion/EkonStage.tsx");
-  const stageHtml = renderToStaticMarkup(React.createElement(EkonStage));
+  // the stage carries the conversion links, so it needs a router in scope
+  const stageHtml = renderToStaticMarkup(
+    React.createElement(MemoryRouter, null, React.createElement(EkonStage)),
+  );
 
   check("the stage renders", stageHtml.includes("ekon-stage"));
   check("the figures are a real definition list", /<dl class="ekon-facts"/.test(stageHtml));
@@ -447,6 +452,18 @@ try {
     (stageHtml.match(/aria-label="(Top speed|Peak torque|Range per swap|Warranty):/g) ?? []).length === 4,
   );
   check("the swap status is announced politely", /aria-live="polite"/.test(stageHtml));
+
+  check("the stage owns the conversion actions", stageHtml.includes("ekon-actions"));
+  check(
+    "all three actions survive without the old card",
+    ["Book a Test Ride", "Chat on WhatsApp", "Download Spec Sheet"].every((a) => stageHtml.includes(a)),
+  );
+  check("the colour choice is a labelled group", /role="group" aria-label="Available colours"/.test(stageHtml));
+  check("all five colours are offered", (stageHtml.match(/class="ekon-swatch( |")/g) ?? []).length === 5);
+  check(
+    "the chosen colour drives a custom property",
+    stageHtml.includes("--ekon-glow") && stageHtml.includes("#16a34a"),
+  );
 
   const stageCss = await read("../src/index.css");
   check("the stage is a 3D perspective plane", /\.ekon-stage \{[^}]*perspective:/s.test(stageCss));
