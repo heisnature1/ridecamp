@@ -389,10 +389,12 @@ try {
   check("the FAQ explains the range honestly", FAQS.some(([q, a]) => /one battery/i.test(q) && /80 to 100 km/.test(a)));
   check("the FAQ answers where the nearest station is", FAQS.some(([q, a]) => /nearest swap/i.test(q) && /Accra/.test(a)));
 
-  check("instagram handle is the real one", SOCIAL.instagramHandle === "Futurerideghana_", SOCIAL.instagramHandle);
+  check("instagram handle is the real one", SOCIAL.instagramHandle === "futurerideghana._", SOCIAL.instagramHandle);
   check("facebook page is named", SOCIAL.facebookHandle === "Future Ride Ltd", SOCIAL.facebookHandle);
-  check("tiktok handle is the real one", SOCIAL.tiktokHandle === "Future.ride.ltd", SOCIAL.tiktokHandle);
+  check("tiktok handle is the real one", SOCIAL.tiktokHandle === "future.ride.ltd", SOCIAL.tiktokHandle);
   check("every social link is an https url", [SOCIAL.instagram, SOCIAL.facebook, SOCIAL.tiktok].every((u) => u.startsWith("https://")));
+  check("social links carry no share tracking parameters", [SOCIAL.instagram, SOCIAL.facebook, SOCIAL.tiktok].every((u) => !/[?&](srtk|_r|_t)=/.test(u)));
+  check("the facebook link is the page, not a search", !SOCIAL.facebook.includes("/search"));
 
   const ekonSrc = await read("../src/pages/Ekon.tsx");
   check("the spec section sets its figures in type", ekonSrc.includes("EKON_FACTS"));

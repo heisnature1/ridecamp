@@ -38,19 +38,15 @@ export function waLink(message?: string): string {
 export const WA_DEFAULT = BUSINESS.whatsappLink;
 
 /**
- * Social accounts.
- *
- * Instagram and TikTok handles given as `Futurerideghana_` and `Future.ride.ltd`.
- * A handle with no "official" style match is easy to typo, so both the display
- * handle and the URL are kept here in one place — the footer, the contact page
- * and the structured data all read from this object.
+ * Social accounts. Confirmed profile URLs, stripped of the share tracking
+ * parameters (the `?srtk=` and `?_t=` suffixes are per share, not per account).
  */
 export const SOCIAL = {
-  instagramHandle: "Futurerideghana_",
-  instagram: "https://www.instagram.com/futurerideghana_/",
+  instagramHandle: "futurerideghana._",
+  instagram: "https://www.instagram.com/futurerideghana._/",
   facebookHandle: "Future Ride Ltd",
-  facebook: "https://www.facebook.com/search/top?q=Future%20Ride%20Ltd",
-  tiktokHandle: "Future.ride.ltd",
+  facebook: "https://www.facebook.com/profile.php?id=61596235653289",
+  tiktokHandle: "future.ride.ltd",
   tiktok: "https://www.tiktok.com/@future.ride.ltd",
 };
 

@@ -21,7 +21,7 @@ const QUICK = [
 const SOCIAL_LINKS = [
   { icon: Globe, href: SOCIAL.facebook, label: "Facebook", handle: SOCIAL.facebookHandle },
   { icon: Camera, href: SOCIAL.instagram, label: "Instagram", handle: SOCIAL.instagramHandle },
-  { icon: Music, href: SOCIAL.tiktok, label: "TikTok", handle: SOCIAL.tiktokHandle },
+  { icon: Music, href: SOCIAL.tiktok, label: "TikTok", handle: `@${SOCIAL.tiktokHandle}` },
 ];
 
 export default function Footer() {
