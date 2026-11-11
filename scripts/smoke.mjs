@@ -436,7 +436,7 @@ try {
     "all four figures are readable without any animation",
     ["90 km/h", "260+ Nm", "120 km", "2 years"].every((v) => stageHtml.includes(v)),
   );
-  check("the motorcycle photograph is the studio shot", stageHtml.includes("/images/bike-studio.jpg"));
+  check("the stage shows the real Spiro Ekon, not the render", stageHtml.includes("/images/ekon-stage.webp"));
   check("the bike image is decorative, the figures carry the meaning", /alt=""/.test(stageHtml));
   check(
     "there is a battery bay and two packs",
@@ -469,7 +469,7 @@ try {
   check("the stage is a 3D perspective plane", /\.ekon-stage \{[^}]*perspective:/s.test(stageCss));
   check("the depth layers are real translateZ planes", stageCss.includes("preserve-3d") && /\.ekon-pin[^}]*translate3d/s.test(stageCss));
   check("reduced motion flattens the stage instead of animating it", /\.ekon-scene,\s*\n\s*\.ekon-bike-layer/.test(stageCss));
-  check("the sheen is removed for reduced motion", /\.ekon-shine,\s*\n\s*\.ekon-bay-ring \{\s*\n\s*display: none/.test(stageCss));
+  check("the sheen is removed for reduced motion", /\.ekon-shine \{\s*\n\s*display: none/.test(stageCss));
 
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");
