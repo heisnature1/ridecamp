@@ -573,7 +573,7 @@ body {
   position: relative;
   border-radius: 22px;
   overflow: hidden;
-  aspect-ratio: 1408 / 768;
+  aspect-ratio: 760 / 692;
   min-height: 240px;
   perspective: 1100px;
   background: radial-gradient(70% 70% at 50% 55%, #1b2b33 0%, #08131b 70%);
@@ -648,13 +648,17 @@ body {
   transition-duration: 0.05s;
 }
 
-/* the photograph is dark, so lift it a little and let the green carry */
+/*
+ * The cutout of the real Ekon. Its studio background has been knocked out and
+ * the turntable replaced by a shadow, so it sits on the stage rather than in a
+ * grey box. Kept contained, never cropped, so no part of the bike is cut off.
+ */
 .ekon-bike {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 50% 52%;
-  filter: brightness(1.16) contrast(1.06) saturate(1.05);
+  object-fit: contain;
+  object-position: 50% 48%;
+  filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.55));
   -webkit-user-drag: none;
   user-select: none;
 }
@@ -665,14 +669,44 @@ body {
  * patch over it would read as a smudge.
  */
 
+/* contact shadow, so the cutout is standing on something */
+.ekon-ground {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 9%;
+  height: 16%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.62), transparent 78%);
+  filter: blur(14px);
+  transform: translate3d(calc(var(--px) * -4px), 0, 0);
+  pointer-events: none;
+}
+
 .ekon-bay,
 .ekon-battery {
-  /* the battery housing in the studio frame: about 41 to 53 percent across,
-     45 to 67 percent down. Both the empty bay and the pack share it. */
-  left: 40.6%;
-  top: 44.5%;
-  width: 10.4%;
-  height: 19.5%;
+  /*
+   * The real Ekon's battery is the flat slab with the glowing power symbol on
+   * its side, about 35 to 50 percent across and 51 to 67 percent down in the
+   * cutout. The pack that slides out is that slab.
+   */
+  left: 35%;
+  top: 51%;
+  width: 15%;
+  height: 16%;
+}
+
+/* on the real bike there is no visible bay outline, just the cradle */
+.ekon-bay {
+  border: 0;
+  box-shadow: none;
+  border-radius: 10px;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--ekon-glow) 45%, transparent),
+    transparent 80%
+  );
+  filter: blur(6px);
 }
 
 .ekon-bay {
@@ -1206,8 +1240,7 @@ input[type="range"].ekon-range::-webkit-slider-thumb {
   .ekon-pin {
     transform: none !important;
   }
-  .ekon-shine,
-  .ekon-bay-ring {
+  .ekon-shine {
     display: none !important;
   }
   .ekon-stage {

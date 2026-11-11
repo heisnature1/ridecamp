@@ -51,8 +51,8 @@ const HOTSPOTS = [
     value: "90 km/h",
     note: "Normal mode, flat road, no headwind.",
     icon: Gauge,
-    x: 27,
-    y: 26,
+    x: 63,
+    y: 27,
   },
   {
     key: "torque",
@@ -60,8 +60,8 @@ const HOTSPOTS = [
     value: "260+ Nm",
     note: "Pulls a 300 kg load away from a standstill without straining.",
     icon: Zap,
-    x: 52,
-    y: 46,
+    x: 54,
+    y: 56,
   },
   {
     key: "range",
@@ -69,8 +69,8 @@ const HOTSPOTS = [
     value: "120 km",
     note: "Eco mode, ideal conditions. 80 to 100 km is a realistic working day.",
     icon: BatteryCharging,
-    x: 36.5,
-    y: 67,
+    x: 40,
+    y: 57,
   },
   {
     key: "warranty",
@@ -78,8 +78,8 @@ const HOTSPOTS = [
     value: "2 years",
     note: "Or 30,000 km, depending on the component.",
     icon: ShieldCheck,
-    x: 65,
-    y: 33,
+    x: 25,
+    y: 42,
   },
 ] as const;
 
@@ -135,7 +135,6 @@ export default function EkonStage() {
   const outPackRef = useRef<HTMLDivElement | null>(null);
   const inPackRef = useRef<HTMLDivElement | null>(null);
   const bayRef = useRef<HTMLDivElement | null>(null);
-  const ringRef = useRef<HTMLSpanElement | null>(null);
   const chargeBarRef = useRef<HTMLSpanElement | null>(null);
   const chargeNumRef = useRef<HTMLSpanElement | null>(null);
   const sliderRef = useRef<HTMLInputElement | null>(null);
@@ -178,8 +177,7 @@ export default function EkonStage() {
     })`;
     incoming.style.opacity = String(ramp(v, 0.56, 0.7));
 
-    if (bayRef.current) bayRef.current.style.opacity = String(0.25 + empty * 0.75);
-    if (ringRef.current) ringRef.current.style.opacity = String(empty);
+    if (bayRef.current) bayRef.current.style.opacity = String(0.15 + empty * 0.85);
 
     // the slider follows the animation without a React render per frame
     if (sliderRef.current) sliderRef.current.value = String(Math.round(v * 100));
@@ -338,21 +336,20 @@ export default function EkonStage() {
           <div className="ekon-plane ekon-halo" aria-hidden="true" />
 
           <div className="ekon-scene">
+            <div className="ekon-ground" aria-hidden="true" />
             <div className="ekon-bike-layer" aria-hidden="true">
               <img
-                src="/images/bike-studio.jpg"
+                src="/images/ekon-stage.webp"
                 alt=""
                 className="ekon-bike"
-                width={1408}
-                height={768}
+                width={760}
+                height={692}
                 loading="lazy"
                 decoding="async"
               />
             </div>
 
-            <div className="ekon-bay" ref={bayRef} aria-hidden="true">
-              <span className="ekon-bay-ring" ref={ringRef} />
-            </div>
+            <div className="ekon-bay" ref={bayRef} aria-hidden="true" />
 
             {/* the pack on its way out, spent */}
             <div className="ekon-battery" ref={outPackRef} data-state="spent" aria-hidden="true">
