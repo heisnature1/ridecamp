@@ -4,7 +4,6 @@ import Reveal from "../components/Reveal";
 import TiltCard from "../components/motion/TiltCard";
 import { useParallax } from "../lib/scrollFx";
 import SplitHeading from "../components/SplitHeading";
-import CtaRow from "../components/CtaRow";
 import Calculator from "../components/Calculator";
 import { EKON_FEATURES } from "../data/site";
 import EkonStage from "../components/motion/EkonStage";
@@ -31,7 +30,7 @@ export default function Ekon() {
             </div>
           </Reveal>
 
-          <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_380px]">
+          <div className="mt-14">
             <div>
           <Reveal>
             <EkonStage />
@@ -94,25 +93,7 @@ export default function Ekon() {
               </div>
             </div>
 
-            <aside className="lg:sticky lg:top-24 lg:self-start">
-              <Reveal delay={0.1}>
-                <div className="rounded-3xl bg-navy p-8 text-white">
-                  <h3 className="font-display text-2xl font-bold">Try it yourself.</h3>
-                  <p className="mt-3 text-sm text-white/75">
-                    Thirty minutes on real Ghanaian roads says more than any spec sheet. Colours:
-                    green, black, yellow, red and blue.
-                  </p>
-                  <div className="mt-5 flex gap-2" aria-label="Available colours">
-                    {["#16a34a", "#111111", "#eab308", "#dc2626", "#2563eb"].map((c) => (
-                      <span key={c} className="size-7 rounded-full ring-2 ring-white/30" style={{ background: c }} />
-                    ))}
-                  </div>
-                  <div className="mt-7 flex flex-col gap-3">
-                    <CtaRow specSheet />
-                  </div>
-                </div>
-              </Reveal>
-            </aside>
+
           </div>
         </div>
       </section>

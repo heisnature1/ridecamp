@@ -22,8 +22,22 @@
  *    pack are `aria-hidden`, because the `<dl>` already says all of it.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BatteryCharging, Gauge, Move3d, Pause, Play, RotateCcw, ShieldCheck, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  BatteryCharging,
+  FileDown,
+  Gauge,
+  MessageCircle,
+  Move3d,
+  Pause,
+  Play,
+  RotateCcw,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
 import { useCalmMotion, useFinePointer } from "../../lib/motion";
+import { WA_DEFAULT } from "../../lib/leads";
 
 /**
  * The figures from the manufacturer sheet, placed on the machine itself.
@@ -67,6 +81,15 @@ const HOTSPOTS = [
     x: 65,
     y: 33,
   },
+] as const;
+
+/** The five colours the bike ships in. Picking one tints the whole stage. */
+const COLOURS = [
+  { name: "Green", hex: "#16a34a" },
+  { name: "Black", hex: "#111111" },
+  { name: "Yellow", hex: "#eab308" },
+  { name: "Red", hex: "#dc2626" },
+  { name: "Blue", hex: "#2563eb" },
 ] as const;
 
 const MODES = [
@@ -125,6 +148,7 @@ export default function EkonStage() {
   const [playing, setPlaying] = useState(false);
   const [mode, setMode] = useState<(typeof MODES)[number]["key"]>("eco");
   const [active, setActive] = useState<string>("range");
+  const [colour, setColour] = useState<(typeof COLOURS)[number]>(COLOURS[0]);
 
   const rangeKm = MODES.find((m) => m.key === mode)?.range ?? 120;
 
@@ -308,6 +332,7 @@ export default function EkonStage() {
           onPointerLeave={onPointerUp}
           data-interactive={interactive ? "true" : "false"}
           data-dragging="false"
+          style={{ "--ekon-glow": colour.hex } as React.CSSProperties}
         >
           <div className="ekon-plane ekon-grid-floor" aria-hidden="true" />
           <div className="ekon-plane ekon-halo" aria-hidden="true" />
@@ -438,6 +463,44 @@ export default function EkonStage() {
             </p>
           </div>
         </aside>
+      </div>
+
+      <div className="ekon-actions">
+        <div className="ekon-colours" role="group" aria-label="Available colours">
+          <span className="ekon-colours-label">Colour</span>
+          <div className="ekon-swatches">
+            {COLOURS.map((c) => (
+              <button
+                key={c.name}
+                type="button"
+                onClick={() => setColour(c)}
+                aria-pressed={colour.name === c.name}
+                aria-label={c.name}
+                title={c.name}
+                className={`ekon-swatch ${colour.name === c.name ? "is-on" : ""}`}
+                style={{ background: c.hex }}
+              />
+            ))}
+          </div>
+          <span className="ekon-colour-name">{colour.name}</span>
+        </div>
+
+        <div className="ekon-ctas">
+          <Link to="/contact" className="ekon-cta is-primary">
+            Book a Test Ride <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+          <a
+            href={WA_DEFAULT}
+            target="_blank"
+            rel="noreferrer"
+            className="ekon-cta is-whatsapp"
+          >
+            <MessageCircle className="size-4" aria-hidden="true" /> Chat on WhatsApp
+          </a>
+          <Link to="/spec-sheet" className="ekon-cta is-quiet">
+            <FileDown className="size-4" aria-hidden="true" /> Download Spec Sheet
+          </Link>
+        </div>
       </div>
 
       {/* The readable figures. Always present, never dependent on the animation. */}
