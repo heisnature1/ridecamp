@@ -151,6 +151,7 @@ Two engines, split by what each is actually good at, with one shared vocabulary 
 | Scrubbed parallax and the scroll progress bar | GSAP `ScrollTrigger` | `lib/scrollFx.ts` |
 | Infinite proof ribbon | CSS animation on a duplicated track | `components/motion/Marquee.tsx` |
 | Link click cover: logo + orbiting lines, held until the page has loaded | Framer Motion overlay + `lib/cover.ts` store | `components/motion/PageTransition.tsx` |
+| Interactive specification stage: turn the bike, run a battery swap | Layered `translateZ` planes + a hand written `requestAnimationFrame` loop | `components/motion/EkonStage.tsx` |
 
 The tilt is real 3D, not a scale: `TiltCard` writes `--tilt-x`, `--tilt-y`, `--tilt-z` and the
 glare position to the host element on `pointermove` (coalesced with `requestAnimationFrame`), and
@@ -158,6 +159,15 @@ the surface transforms with `rotateX/rotateY/translateZ`. Children opt into dept
 `.depth-1/2/3`. The hero scene works the same way: one listener writes `--px`/`--py` and every
 layer reads them at its own strength, so the photograph, the light blooms and the grid floor move
 past each other.
+
+`EkonStage` is the deepest scene on the site. A studio shot of the bike sits on a stage with
+`perspective`, and the floor grid, the photograph, the pins and the battery pack each sit at a
+different `translateZ`, so one pointer drifts them by different amounts. The swap is a single
+progress value `0…1`: the spent pack's transform, the bay glow, the incoming pack, the charge bar
+and the slider are all derived from it, and written straight to the DOM inside one animation
+frame. React state only changes when the spoken phase or the charge figure actually changes, so
+playing the swap costs no renders. On touch devices there is no drag (it would fight the page
+scroll); the slider, the play and reset buttons and the one shot autoplay carry it instead.
 
 Accessibility is not an afterthought:
 

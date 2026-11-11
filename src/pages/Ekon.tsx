@@ -7,19 +7,7 @@ import SplitHeading from "../components/SplitHeading";
 import CtaRow from "../components/CtaRow";
 import Calculator from "../components/Calculator";
 import { EKON_FEATURES } from "../data/site";
-
-/**
- * The headline figures from the manufacturer's poster, set in type so they stay
- * crisp at every size. Source: Spiro Ekon 450 M1 V3 specification sheet.
- */
-const EKON_FACTS = [
-  { label: "Range per swap", value: "Up to 120 km (Eco)" },
-  { label: "Ground clearance", value: "Up to 200 mm" },
-  { label: "Brakes", value: "130 mm drum" },
-  { label: "Tyres", value: "Hybrid tubeless" },
-  { label: "Torque", value: "260+ Nm" },
-  { label: "Running cost", value: "35% less than petrol" },
-];
+import EkonStage from "../components/motion/EkonStage";
 
 export default function Ekon() {
   useParallax();
@@ -46,58 +34,37 @@ export default function Ekon() {
           <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_380px]">
             <div>
           <Reveal>
-            <SplitHeading
-              as="h2"
-              text="Key specifications"
-              className="font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
-            />
+            <EkonStage />
           </Reveal>
-          <Reveal delay={0.1}>
-            <div className="space-y-4">
-              {/*
-               * The headline figures are set in type, not inside the poster: the
-               * supplied artwork is a 673px marketing flyer, so at the width of
-               * this column its small print turns to mush and is unreadable on a
-               * phone. The type below is sharp at every size and is the same data.
-               */}
-              <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {EKON_FACTS.map((fact) => (
-                  <div key={fact.label} className="rounded-2xl border border-line bg-cloud p-4">
-                    <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate">{fact.label}</dt>
-                    <dd className="mt-1 font-display text-xl font-bold text-navy">{fact.value}</dd>
-                  </div>
-                ))}
-              </dl>
 
-              <details className="group rounded-2xl border border-line bg-white">
-                <summary className="cursor-pointer list-none px-4 py-3 text-sm font-bold text-navy">
-                  <span className="flex items-center justify-between gap-3">
-                    See the manufacturer poster
-                    <span className="text-xs font-semibold text-slate group-open:hidden">Open</span>
-                    <span className="hidden text-xs font-semibold text-slate group-open:inline">Close</span>
-                  </span>
-                </summary>
-                <div className="border-t border-line p-4">
-                  <img
-                    src="/images/specification.jpg"
-                    alt="Spiro Ekon 450 M1 V3 manufacturer specification poster"
-                    className="mx-auto w-full max-w-md rounded-xl"
-                    loading="lazy"
-                  />
-                  <p className="mt-3 text-[11px] leading-relaxed text-slate">
-                    Manufacturer artwork, reproduced at its supplied resolution. The figures above are
-                    the readable version of the same data.
-                  </p>
-                </div>
-              </details>
-
-              <p className="mt-3 text-[11px] text-slate">
-                *Coverage varies by component. Terms, mileage limits and exclusions apply.
-                Specifications are indicative and tested under standard test conditions.
-              </p>
-            </div>
+          <Reveal delay={0.05}>
+            <details className="group mt-4 rounded-2xl border border-line bg-white">
+              <summary className="cursor-pointer list-none px-4 py-3 text-sm font-bold text-navy">
+                <span className="flex items-center justify-between gap-3">
+                  See the manufacturer poster
+                  <span className="text-xs font-semibold text-slate group-open:hidden">Open</span>
+                  <span className="hidden text-xs font-semibold text-slate group-open:inline">Close</span>
+                </span>
+              </summary>
+              <div className="border-t border-line p-4">
+                <img
+                  src="/images/specification.jpg"
+                  alt="Spiro Ekon 450 M1 V3 manufacturer specification poster"
+                  className="mx-auto w-full max-w-md rounded-xl"
+                  loading="lazy"
+                />
+                <p className="mt-3 text-[11px] leading-relaxed text-slate">
+                  Manufacturer artwork, reproduced at its supplied resolution. The stage above carries
+                  the readable version of the same data.
+                </p>
+              </div>
+            </details>
+            <p className="mt-3 text-[11px] text-slate">
+              *Coverage varies by component. Terms, mileage limits and exclusions apply. Specifications
+              are indicative and tested under standard test conditions.
+            </p>
           </Reveal>
-          
+
           <Reveal delay={0.05}>
             <div className="mt-8">
               <Calculator />

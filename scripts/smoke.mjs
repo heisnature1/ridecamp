@@ -415,8 +415,44 @@ try {
   check("the marks render at a usable size", /className="size-\[18px\]/.test(footerSrc));
 
   const ekonSrc = await read("../src/pages/Ekon.tsx");
-  check("the spec section sets its figures in type", ekonSrc.includes("EKON_FACTS"));
+  check(
+    "the spec section sets its figures in type",
+    ekonSrc.includes("<EkonStage") && (await read("../src/components/motion/EkonStage.tsx")).includes("HOTSPOTS"),
+  );
   check("the low resolution poster is not the primary spec presentation", ekonSrc.includes("<details"));
+
+  console.log("\n1k. The Ekon spec stage is interactive but never hides its figures");
+  const { default: EkonStage } = await vite.ssrLoadModule("/src/components/motion/EkonStage.tsx");
+  const stageHtml = renderToStaticMarkup(React.createElement(EkonStage));
+
+  check("the stage renders", stageHtml.includes("ekon-stage"));
+  check("the figures are a real definition list", /<dl class="ekon-facts"/.test(stageHtml));
+  check(
+    "all four figures are readable without any animation",
+    ["90 km/h", "260+ Nm", "120 km", "2 years"].every((v) => stageHtml.includes(v)),
+  );
+  check("the motorcycle photograph is the studio shot", stageHtml.includes("/images/bike-studio.jpg"));
+  check("the bike image is decorative, the figures carry the meaning", /alt=""/.test(stageHtml));
+  check(
+    "there is a battery bay and two packs",
+    stageHtml.includes('class="ekon-bay"') &&
+      (stageHtml.match(/class="ekon-battery" data-state="(spent|charged)"/g) ?? []).length === 2,
+  );
+  check("the swap has a real slider", /type="range"/.test(stageHtml) && stageHtml.includes('id="ekon-swap"'));
+  check("the swap has play and reset buttons", stageHtml.includes("Pause the swap") || stageHtml.includes("Play the swap"));
+  check("the ride mode switch is a labelled group", /role="group" aria-label="Ride mode"/.test(stageHtml));
+  check("hotspots are buttons with spoken labels", (stageHtml.match(/class="ekon-pin /g) ?? []).length === 4);
+  check(
+    "each hotspot explains itself to assistive tech",
+    (stageHtml.match(/aria-label="(Top speed|Peak torque|Range per swap|Warranty):/g) ?? []).length === 4,
+  );
+  check("the swap status is announced politely", /aria-live="polite"/.test(stageHtml));
+
+  const stageCss = await read("../src/index.css");
+  check("the stage is a 3D perspective plane", /\.ekon-stage \{[^}]*perspective:/s.test(stageCss));
+  check("the depth layers are real translateZ planes", stageCss.includes("preserve-3d") && /\.ekon-pin[^}]*translate3d/s.test(stageCss));
+  check("reduced motion flattens the stage instead of animating it", /\.ekon-scene,\s*\n\s*\.ekon-bike-layer/.test(stageCss));
+  check("the sheen is removed for reduced motion", /\.ekon-shine,\s*\n\s*\.ekon-bay-ring \{\s*\n\s*display: none/.test(stageCss));
 
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");
