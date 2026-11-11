@@ -42,7 +42,7 @@ export function ghanaDots(w: number, h: number, stepDeg = 0.22): { x: number; y:
 
 export const GHANA_CITIES = [
   { name: "Accra", lon: -0.19, lat: 5.6, status: "Launch city" },
-  { name: "Tema", lon: 0.01, lat: 5.67, status: "Launch city" },
+  { name: "Tema", lon: 0.01, lat: 5.67, status: "Coming soon" },
   { name: "Kumasi", lon: -1.62, lat: 6.69, status: "Coming soon" },
   { name: "Takoradi", lon: -1.76, lat: 4.93, status: "Coming soon" },
   { name: "Cape Coast", lon: -1.25, lat: 5.1, status: "Coming soon" },

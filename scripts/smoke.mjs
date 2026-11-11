@@ -361,6 +361,45 @@ try {
   check("the cost per km is stated for both bikes", /Petrol cost per km/.test(calcText) && /Electric cost per km/.test(calcText));
   check("a loss would not be labelled as a saving", calcText.includes("Your estimated monthly saving") === saving > 0);
 
+  console.log("\n1j. Copy claims only what is true today");
+  const { BUSINESS, SOCIAL } = await vite.ssrLoadModule("/src/lib/leads.ts");
+  const { TESTIMONIALS, GLANCE, FAQS, TRUST_STRIP } = await vite.ssrLoadModule("/src/data/site.ts");
+  const { GHANA_CITIES } = await vite.ssrLoadModule("/src/lib/geo.ts");
+
+  check("the contact email is the confirmed inbox", BUSINESS.email === "info@futurerideafrica.com", BUSINESS.email);
+
+  const live = GHANA_CITIES.filter((c) => c.status === "Launch city").map((c) => c.name);
+  check("only Accra is live for swapping", live.length === 1 && live[0] === "Accra", live.join(", "));
+
+  // a testimonial must not come from a city we cannot serve yet
+  const servedCities = new Set([...live, "Accra", "East Legon"]);
+  const strayTestimonials = TESTIMONIALS.filter((t) => {
+    const city = (t.role.split(",").pop() ?? "").trim();
+    return !servedCities.has(city);
+  });
+  check(
+    "every testimonial comes from a city we serve",
+    strayTestimonials.length === 0,
+    strayTestimonials.map((t) => `${t.name} (${t.role})`).join(" | "),
+  );
+
+  check("no range claim says 100 km as the headline", !GLANCE.some((g) => g.value === 100 && /range/i.test(g.label)));
+  check("the glance card labels the mode the range is quoted in", GLANCE.some((g) => /Eco/.test(g.label)));
+  check("the trust strip points at stations, not a range figure", TRUST_STRIP.some((t) => /swap points/i.test(t)));
+  check("the FAQ explains the range honestly", FAQS.some(([q, a]) => /one battery/i.test(q) && /80 to 100 km/.test(a)));
+  check("the FAQ answers where the nearest station is", FAQS.some(([q, a]) => /nearest swap/i.test(q) && /Accra/.test(a)));
+
+  check("instagram handle is the real one", SOCIAL.instagramHandle === "futurerideghana._", SOCIAL.instagramHandle);
+  check("facebook page is named", SOCIAL.facebookHandle === "Future Ride Ltd", SOCIAL.facebookHandle);
+  check("tiktok handle is the real one", SOCIAL.tiktokHandle === "future.ride.ltd", SOCIAL.tiktokHandle);
+  check("every social link is an https url", [SOCIAL.instagram, SOCIAL.facebook, SOCIAL.tiktok].every((u) => u.startsWith("https://")));
+  check("social links carry no share tracking parameters", [SOCIAL.instagram, SOCIAL.facebook, SOCIAL.tiktok].every((u) => !/[?&](srtk|_r|_t)=/.test(u)));
+  check("the facebook link is the page, not a search", !SOCIAL.facebook.includes("/search"));
+
+  const ekonSrc = await read("../src/pages/Ekon.tsx");
+  check("the spec section sets its figures in type", ekonSrc.includes("EKON_FACTS"));
+  check("the low resolution poster is not the primary spec presentation", ekonSrc.includes("<details"));
+
   console.log("\n2. Dashboard components render the captured data");
   const { default: LeadsTable } = await vite.ssrLoadModule("/src/components/admin/LeadsTable.tsx");
   const { default: Overview } = await vite.ssrLoadModule("/src/components/admin/Overview.tsx");

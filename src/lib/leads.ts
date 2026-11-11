@@ -14,7 +14,7 @@ export const BUSINESS = {
    * number based link so visitors reach the business inbox directly.
    */
   whatsappLink: "https://wa.me/message/P3GMWJXUIXIEC1",
-  email: "hello@futureride.gh",
+  email: "info@futurerideafrica.com",
   /** Street address, used where the location is shown in running copy. */
   address: "Adjetey, Kwabla Ave, East Legon, Accra, Ghana",
   /** Single line address for cards, the footer and schema.org. */
@@ -36,6 +36,20 @@ export function waLink(message?: string): string {
 }
 
 export const WA_DEFAULT = BUSINESS.whatsappLink;
+
+/**
+ * Social accounts. Confirmed profile URLs, stripped of the share tracking
+ * parameters (the `?srtk=` and `?_t=` suffixes are per share, not per account).
+ */
+export const SOCIAL = {
+  instagramHandle: "futurerideghana._",
+  instagram: "https://www.instagram.com/futurerideghana._/",
+  facebookHandle: "Future Ride Ltd",
+  facebook: "https://www.facebook.com/profile.php?id=61596235653289",
+  tiktokHandle: "future.ride.ltd",
+  tiktok: "https://www.tiktok.com/@future.ride.ltd",
+};
+
 
 export function mailtoLink(subject: string, body: string): string {
   return `mailto:${BUSINESS.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

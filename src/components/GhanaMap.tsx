@@ -68,8 +68,8 @@ export default function GhanaMap() {
           </div>
           <p className="mt-3 text-sm text-slate">
             {current.status === "Launch city"
-              ? "First swap points open here. Addresses and opening hours will be published at launch."
-              : "On the rollout plan. Join the waitlist and we'll message you when swapping goes live."}
+              ? "Swap points are live here, across the city. Ask us for the point closest to your daily route when you book a test ride."
+              : "Not open yet. Book a test ride and we will message you as soon as swapping goes live here."}
           </p>
         </div>
 

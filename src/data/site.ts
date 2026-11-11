@@ -2,7 +2,7 @@
 
 export const TRUST_STRIP = [
   "Built for African roads",
-  "100 km range per battery swap",
+  "Swap points across Accra",
   "Up to 2 years warranty on key components*",
   "GPS tracking built in",
 ];
@@ -38,12 +38,12 @@ export const WHY_GHANA = [
   },
   {
     title: "Good for Ghana",
-    text: "Zero tailpipe emissions mean cleaner air in Accra, Kumasi, Takoradi, Tamale and every city we serve.",
+    text: "Zero tailpipe emissions mean cleaner air in Accra today, and in every city as the swap network reaches it.",
   },
 ];
 
 export const GLANCE = [
-  { value: 100, unit: "km", label: "Range per battery swap" },
+  { value: 120, unit: "km", label: "Range per swap (Eco)" },
   { value: 90, unit: "km/h", label: "Top speed" },
   { value: 12, unit: "kW", label: "Peak power" },
   { value: 300, unit: "kg", label: "Load capacity" },
@@ -70,18 +70,18 @@ export const TESTIMONIALS = [
   },
   {
     name: "Ama S.",
-    role: "Courier business owner, Kumasi",
+    role: "Courier business owner, Accra",
     quote: "Quiet, smooth and cheap to run. My riders are on the road more hours and the workshop sees them less.",
   },
   {
     name: "Yaw M.",
-    role: "Owner operator, Tema",
-    quote: "With 100 km on one battery I do more trips a day. The hills and traffic are no problem at all.",
+    role: "Owner operator, East Legon, Accra",
+    quote: "With a swap point close by I do more trips a day. The hills and the traffic are no problem at all.",
   },
 ];
 
 export const EKON_SPECS: [string, string][] = [
-  ["Range", "Up to 100 km per battery swap"],
+  ["Range", "Up to 120 km per battery swap (Eco mode, ideal conditions)"],
   ["Top speed", "90 km/h"],
   ["Peak power", "12 kW"],
   ["Load capacity", "300 kg"],
@@ -111,7 +111,7 @@ export const EKON_FEATURES = [
 export const WHY_ELECTRIC = [
   { title: "The money argument", text: "Petrol is a daily expense you cannot avoid and cannot control. Electricity from a swap is cheaper per kilometre and more stable. Use the calculator to see your own numbers." },
   { title: "The maintenance argument", text: "A petrol motorcycle has an engine with hundreds of moving parts. An electric motor has very few. That means fewer repairs, fewer surprises and more days working." },
-  { title: "The income argument", text: "A rider who spends less on running costs and loses less time to breakdowns keeps more of every cedi earned. One Spiro rider put it simply: with 100 km on a single battery, he can do more trips and earn more." },
+  { title: "The income argument", text: "A rider who spends less on running costs and loses less time to breakdowns keeps more of every cedi earned. One Spiro rider put it simply: with a swap point near his route, he spends minutes refuelling instead of hours, and does more trips in a day." },
   { title: "The comfort argument", text: "No vibration and no engine roar. Riders report that long days feel easier, and that it is a better experience for passengers and women riders." },
   { title: "The reliability argument", text: "A reinforced frame and tuned suspension, designed and tested for African conditions." },
   { title: "The security argument", text: "GPS tracking and in app monitoring help protect your bike and your livelihood." },
@@ -167,7 +167,7 @@ export const FLEET_AUDIENCE = [
 ];
 
 export const SERVICE_ITEMS = [
-  { title: "Authorised service", text: "Ghana service centre locations will be listed here at launch. Accra first, then Kumasi and Takoradi." },
+  { title: "Authorised service", text: "Servicing runs from our Accra workshop today. Tema, Kumasi and Takoradi follow as the swap network opens." },
   { title: "Genuine spare parts", text: "Authorised components available at our service centres." },
   { title: "In app support", text: "Report an issue and follow its resolution from the app." },
   { title: "Warranty", text: "Up to 2 years on key components (motor, controller, frame and other key parts) depending on part and mileage, up to 30,000 km. Terms, mileage limits and exclusions apply." },
@@ -183,7 +183,14 @@ export const ABOUT_PROMISE = [
 ];
 
 export const FAQS: [string, string][] = [
-  ["How far can it go on one battery?", "Up to 100 km per swap under standard test conditions. Real range depends on load, speed, terrain and ride mode. Eco mode gives the longest range."],
+  [
+    "How far can it go on one battery?",
+    "Spiro quotes up to 120 km per swap in Eco mode under ideal conditions. A working day in Accra traffic, with a load, is realistically 80 to 100 km, and Sport mode shortens that further. You rarely ride a battery flat: swap points sit across Accra, so you trade a low battery for a full one in minutes and keep earning.",
+  ],
+  [
+    "Where is my nearest swap station?",
+    "Our launch network covers Accra. The Battery Swap page shows the live map, and our team will point you to the closest point when you book a test ride. Tema, Kumasi and Takoradi follow as the network opens.",
+  ],
   ["How do I charge it?", "You do not wait for charging. You swap your battery for a charged one at a swap point in minutes."],
   ["Is it cheaper than a petrol motorcycle?", "For riders who ride every day, running costs are much lower because you do not buy petrol or engine oil and have fewer parts to repair. Use our calculator to estimate your own savings."],
   ["Can I buy on instalments?", "Yes. Lease to own options are available, subject to approval by our financing partners. No large upfront payment is required."],

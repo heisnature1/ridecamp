@@ -65,9 +65,38 @@ export default function BatterySwap() {
                 className="font-display text-2xl font-bold leading-[1.15] text-navy md:text-3xl"
               />
               <p className="mt-2 max-w-2xl text-sm text-slate">
-                We are rolling out swap points city by city. Addresses, opening hours and cost per
-                swap will be published here at launch — starting with Accra and Tema.
+                Where you swap matters more than a headline range figure: a swap point on your route
+                turns a 40 minute charge into a two minute stop. Our live network is in{" "}
+                <strong className="font-semibold text-navy">Accra</strong> today. Tema, Kumasi,
+                Takoradi, Cape Coast and Tamale are on the rollout.
               </p>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="mt-6 grid gap-4 md:grid-cols-3">
+                {[
+                  {
+                    figure: "120 km",
+                    label: "Spiro's quoted range",
+                    detail: "Eco mode, ideal conditions, no load. The headline on the spec sheet.",
+                  },
+                  {
+                    figure: "80 to 100 km",
+                    label: "A working day in Accra",
+                    detail: "Loaded, stop start traffic, Normal mode. Plan your swaps around this.",
+                  },
+                  {
+                    figure: "2 minutes",
+                    label: "Time to swap",
+                    detail: "The number that actually decides your day, not the range.",
+                  },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-2xl border border-line bg-cloud p-6">
+                    <p className="font-display text-2xl font-bold text-brand">{item.figure}</p>
+                    <p className="mt-1 text-sm font-bold text-navy">{item.label}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
             </Reveal>
             <div className="mt-8">
               <GhanaMap />
