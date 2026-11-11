@@ -573,7 +573,7 @@ body {
   position: relative;
   border-radius: 22px;
   overflow: hidden;
-  aspect-ratio: 880 / 809;
+  aspect-ratio: 1100 / 785;
   min-height: 240px;
   perspective: 1100px;
   background: radial-gradient(70% 70% at 50% 55%, #1b2b33 0%, #08131b 70%);
@@ -658,9 +658,11 @@ body {
   height: 100%;
   object-fit: contain;
   object-position: 50% 48%;
-  filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 1px rgba(6, 17, 28, 0.9));
-  /* a very slow breathing drift: enough that the stage never reads as a still */
-  animation: ekon-idle 11s ease-in-out infinite;
+  /*
+   * No drop shadow any more: this is a framed studio shot, not a cutout, so a
+   * shadow on the image element would draw a rectangle around it. The artwork
+   * carries its own floor and a vignette into the stage colour.
+   */
   -webkit-user-drag: none;
   user-select: none;
 }
@@ -671,21 +673,17 @@ body {
  * patch over it would read as a smudge.
  */
 
-@keyframes ekon-idle {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(0, -0.7%, 0) scale(1.006); }
-}
-
 /* contact shadow, so the cutout is standing on something */
 .ekon-ground {
+  display: none; /* the photograph carries its own floor */
   position: absolute;
-  left: 12%;
-  right: 12%;
-  bottom: 10%;
-  height: 12%;
+  left: 8%;
+  right: 8%;
+  bottom: 9%;
+  height: 16%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.5), transparent 80%);
-  filter: blur(16px);
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.62), transparent 78%);
+  filter: blur(14px);
   transform: translate3d(calc(var(--px) * -4px), 0, 0);
   pointer-events: none;
 }
@@ -697,10 +695,10 @@ body {
    * its side, about 35 to 50 percent across and 51 to 67 percent down in the
    * cutout. The pack that slides out is that slab.
    */
-  left: 35%;
-  top: 51%;
-  width: 15%;
-  height: 16%;
+  left: 36.9%;
+  top: 53.4%;
+  width: 13.1%;
+  height: 20.6%;
 }
 
 /* on the real bike there is no visible bay outline, just the cradle */
@@ -1241,7 +1239,6 @@ input[type="range"].ekon-range::-webkit-slider-thumb {
   }
   /* the spec stage reads as a still photograph rather than a moving scene */
   .ekon-scene,
-  .ekon-bike,
   .ekon-bike-layer,
   .ekon-halo,
   .ekon-grid-floor,

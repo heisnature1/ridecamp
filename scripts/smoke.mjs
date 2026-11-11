@@ -468,7 +468,7 @@ try {
   const stageCss = await read("../src/index.css");
   check("the stage is a 3D perspective plane", /\.ekon-stage \{[^}]*perspective:/s.test(stageCss));
   check("the depth layers are real translateZ planes", stageCss.includes("preserve-3d") && /\.ekon-pin[^}]*translate3d/s.test(stageCss));
-  check("reduced motion flattens the stage instead of animating it", /\.ekon-scene,\s*\n\s*\.ekon-bike,\s*\n\s*\.ekon-bike-layer/.test(stageCss));
+  check("reduced motion flattens the stage instead of animating it", /\.ekon-scene,\s*\n\s*\.ekon-bike-layer/.test(stageCss));
   check("the sheen is removed for reduced motion", /\.ekon-shine \{\s*\n\s*display: none/.test(stageCss));
 
   console.log("\n2. Dashboard components render the captured data");
