@@ -3,7 +3,7 @@ import { CalendarCheck, Clock, Mail, MapPin, MessageCircle, Phone } from "lucide
 import { useSearchParams } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
-import { BUSINESS, dispatchLead, WA_DEFAULT } from "../lib/leads";
+import { BUSINESS, dispatchLead, SOCIAL, WA_DEFAULT } from "../lib/leads";
 import { RULES } from "../lib/validate";
 import { formatGhanaPhone, type LeadKind } from "../lib/leadKinds";
 
@@ -16,6 +16,21 @@ const KIND_BY_INTENT: Record<(typeof INTENTS)[number], LeadKind> = {
   "Get a quote": "quote",
   "Apply for financing": "financing",
 };
+
+/** One social chip. Reads the real handles from `SOCIAL`, never hard coded. */
+function SocialLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3.5 py-2 text-xs font-bold text-navy transition hover:border-brand hover:text-brand-dark"
+    >
+      {children}
+    </a>
+  );
+}
 
 export default function Contact() {
   const [params] = useSearchParams();
@@ -207,6 +222,20 @@ export default function Contact() {
                   <span className="text-xs text-slate">Email</span>
                 </span>
               </a>
+              <div className="rounded-3xl border border-line bg-cloud p-6">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate">Follow us</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <SocialLink href={SOCIAL.instagram} label={`Instagram, ${SOCIAL.instagramHandle}`}>
+                    {SOCIAL.instagramHandle}
+                  </SocialLink>
+                  <SocialLink href={SOCIAL.facebook} label={`Facebook, ${SOCIAL.facebookHandle}`}>
+                    {SOCIAL.facebookHandle}
+                  </SocialLink>
+                  <SocialLink href={SOCIAL.tiktok} label={`TikTok, ${SOCIAL.tiktokHandle}`}>
+                    {SOCIAL.tiktokHandle}
+                  </SocialLink>
+                </div>
+              </div>
               <div className="rounded-3xl bg-navy p-6 text-white">
                 <a
                   href={BUSINESS.mapsUrl}

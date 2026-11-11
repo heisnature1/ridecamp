@@ -60,8 +60,9 @@ export default function Calculator() {
     const monthly = petrolCost + maintenance - (evCost + CALC.evMaintenancePerMonth);
     const saving = monthly > 0;
     
-    // Calculate range based on riding mode
-    const baseRangeKm = 100; // Base range from specs
+    // Range per swap by mode. Spiro quotes up to 120 km in Eco; Normal and
+    // Sport trade range for response, so the figure moves with the mode.
+    const baseRangeKm = 120;
     const rangeMultiplier = ridingMode === 'eco' ? 1.2 : ridingMode === 'sport' ? 0.8 : 1.0;
     const actualRangeKm = baseRangeKm * rangeMultiplier;
     
@@ -199,7 +200,7 @@ export default function Calculator() {
           <div className="mt-6 space-y-2 text-xs text-white/80">
             <div className="flex items-center space-x-3">
               <Activity className="size-5 text-brand-bright" />
-              <span>Estimated range per charge: <span className="font-bold">{Math.round(r.actualRangeKm)} km</span></span>
+              <span>Range per swap: <span className="font-bold">{Math.round(r.actualRangeKm)} km</span></span>
             </div>
             <div className="flex items-center space-x-3">
               <Zap className="size-5 text-brand-bright" />

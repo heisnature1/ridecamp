@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, Mail, MapPin, Phone, Globe, Camera, Music } from "lucide-react";
 import Logo from "./Logo";
-import { BUSINESS, WA_DEFAULT } from "../lib/leads";
+import { BUSINESS, SOCIAL, WA_DEFAULT } from "../lib/leads";
 
 const QUICK = [
   { to: "/", label: "Home" },
@@ -17,10 +17,11 @@ const QUICK = [
   { to: "/contact", label: "Contact / Book a Test Ride" },
 ];
 
+/** The real accounts. Handles live in `SOCIAL` so every link site wide matches. */
 const SOCIAL_LINKS = [
-  { icon: Globe, href: "https://www.facebook.com", label: "Facebook", color: "#1877F2" },
-  { icon: Camera, href: "https://www.instagram.com", label: "Instagram", color: "#E4405F" },
-  { icon: Music, href: "https://www.tiktok.com", label: "TikTok", color: "#000000" },
+  { icon: Globe, href: SOCIAL.facebook, label: "Facebook", handle: SOCIAL.facebookHandle },
+  { icon: Camera, href: SOCIAL.instagram, label: "Instagram", handle: SOCIAL.instagramHandle },
+  { icon: Music, href: SOCIAL.tiktok, label: "TikTok", handle: SOCIAL.tiktokHandle },
 ];
 
 export default function Footer() {
@@ -57,7 +58,7 @@ export default function Footer() {
               >
                 <s.icon className="size-5 text-white/70 group-hover:text-white transition-colors" />
                 <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 text-[10px] font-medium text-white bg-navy-deep rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                  {s.label}
+                  {s.handle || s.label}
                 </span>
               </motion.a>
             ))}
