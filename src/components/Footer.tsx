@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Clock, Mail, MapPin, Phone, Globe, Camera, Music } from "lucide-react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { FacebookMark, InstagramMark, TikTokMark } from "./SocialIcons";
 import Logo from "./Logo";
 import { BUSINESS, SOCIAL, WA_DEFAULT } from "../lib/leads";
 
@@ -19,9 +20,9 @@ const QUICK = [
 
 /** The real accounts. Handles live in `SOCIAL` so every link site wide matches. */
 const SOCIAL_LINKS = [
-  { icon: Globe, href: SOCIAL.facebook, label: "Facebook", handle: SOCIAL.facebookHandle },
-  { icon: Camera, href: SOCIAL.instagram, label: "Instagram", handle: SOCIAL.instagramHandle },
-  { icon: Music, href: SOCIAL.tiktok, label: "TikTok", handle: `@${SOCIAL.tiktokHandle}` },
+  { icon: FacebookMark, href: SOCIAL.facebook, label: "Facebook", handle: SOCIAL.facebookHandle, tint: "#1877F2" },
+  { icon: InstagramMark, href: SOCIAL.instagram, label: "Instagram", handle: SOCIAL.instagramHandle, tint: "#E1306C" },
+  { icon: TikTokMark, href: SOCIAL.tiktok, label: "TikTok", handle: `@${SOCIAL.tiktokHandle}`, tint: "#000000" },
 ];
 
 export default function Footer() {
@@ -52,11 +53,14 @@ export default function Footer() {
                 href={s.href}
                 target="_blank"
                 rel="noreferrer"
-                className="group relative inline-flex items-center justify-center size-10 rounded-full bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-110 hover:rotate-3"
-                aria-label={s.label}
+                className="group relative inline-flex items-center justify-center size-10 rounded-full bg-white/5 border border-white/10 transition-all duration-300 hover:scale-110 hover:border-white/20 hover:bg-white"
+                aria-label={`${s.label}, ${s.handle}`}
                 whileTap={{ scale: 0.9 }}
               >
-                <s.icon className="size-5 text-white/70 group-hover:text-white transition-colors" />
+                <s.icon
+                  className="size-[18px] text-white/75 transition-colors duration-300 group-hover:text-[var(--tint)]"
+                  style={{ "--tint": s.tint } as React.CSSProperties}
+                />
                 <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 text-[10px] font-medium text-white bg-navy-deep rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                   {s.handle || s.label}
                 </span>

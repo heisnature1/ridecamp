@@ -396,6 +396,24 @@ try {
   check("social links carry no share tracking parameters", [SOCIAL.instagram, SOCIAL.facebook, SOCIAL.tiktok].every((u) => !/[?&](srtk|_r|_t)=/.test(u)));
   check("the facebook link is the page, not a search", !SOCIAL.facebook.includes("/search"));
 
+  // the social row must use the real platform marks, not a generic stand in
+  const socialIcons = await read("../src/components/SocialIcons.tsx");
+  check("a real facebook mark is vendored", socialIcons.includes("FACEBOOK_PATH") && socialIcons.includes("FacebookMark"));
+  check("a real instagram mark is vendored", socialIcons.includes("INSTAGRAM_PATH"));
+  check("a real tiktok mark is vendored", socialIcons.includes("TIKTOK_PATH"));
+  check("the marks are attributed to simple icons", /simple icons/i.test(socialIcons) && /CC0/i.test(socialIcons));
+  check("the marks are decorative for assistive tech", socialIcons.includes('aria-hidden="true"'));
+
+  const footerSrc = await read("../src/components/Footer.tsx");
+  check("the footer imports the real marks", /FacebookMark, InstagramMark, TikTokMark/.test(footerSrc));
+  check("the footer no longer fakes facebook with a globe", !/Globe/.test(footerSrc));
+  check("the footer no longer fakes instagram with a camera", !/Camera/.test(footerSrc));
+  check("the footer no longer fakes tiktok with a music note", !/Music/.test(footerSrc));
+
+  const contactSrc = await read("../src/pages/Contact.tsx");
+  check("the contact page imports the real marks", /FacebookMark, InstagramMark, TikTokMark/.test(contactSrc));
+  check("the marks render at a usable size", /className="size-\[18px\]/.test(footerSrc));
+
   const ekonSrc = await read("../src/pages/Ekon.tsx");
   check("the spec section sets its figures in type", ekonSrc.includes("EKON_FACTS"));
   check("the low resolution poster is not the primary spec presentation", ekonSrc.includes("<details"));

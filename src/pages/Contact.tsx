@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
 import { BUSINESS, dispatchLead, SOCIAL, WA_DEFAULT } from "../lib/leads";
+import { FacebookMark, InstagramMark, TikTokMark } from "../components/SocialIcons";
 import { RULES } from "../lib/validate";
 import { formatGhanaPhone, type LeadKind } from "../lib/leadKinds";
 
@@ -18,15 +19,28 @@ const KIND_BY_INTENT: Record<(typeof INTENTS)[number], LeadKind> = {
 };
 
 /** One social chip. Reads the real handles from `SOCIAL`, never hard coded. */
-function SocialLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+function SocialLink({
+  href,
+  label,
+  icon: Icon,
+  tint,
+  children,
+}: {
+  href: string;
+  label: string;
+  icon: (props: React.SVGProps<SVGSVGElement>) => React.ReactElement;
+  tint: string;
+  children: React.ReactNode;
+}) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3.5 py-2 text-xs font-bold text-navy transition hover:border-brand hover:text-brand-dark"
+      className="group inline-flex items-center gap-2 rounded-full border border-line bg-white px-3.5 py-2 text-xs font-bold text-navy transition hover:border-brand hover:text-brand-dark"
     >
+      <Icon className="size-4 shrink-0 transition-colors" style={{ color: tint }} />
       {children}
     </a>
   );
@@ -225,14 +239,29 @@ export default function Contact() {
               <div className="rounded-3xl border border-line bg-cloud p-6">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate">Follow us</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <SocialLink href={SOCIAL.instagram} label={`Instagram, ${SOCIAL.instagramHandle}`}>
+                  <SocialLink
+                    href={SOCIAL.instagram}
+                    label={`Instagram, ${SOCIAL.instagramHandle}`}
+                    icon={InstagramMark}
+                    tint="#E1306C"
+                  >
                     {SOCIAL.instagramHandle}
                   </SocialLink>
-                  <SocialLink href={SOCIAL.facebook} label={`Facebook, ${SOCIAL.facebookHandle}`}>
+                  <SocialLink
+                    href={SOCIAL.facebook}
+                    label={`Facebook, ${SOCIAL.facebookHandle}`}
+                    icon={FacebookMark}
+                    tint="#1877F2"
+                  >
                     {SOCIAL.facebookHandle}
                   </SocialLink>
-                  <SocialLink href={SOCIAL.tiktok} label={`TikTok, ${SOCIAL.tiktokHandle}`}>
-                    {SOCIAL.tiktokHandle}
+                  <SocialLink
+                    href={SOCIAL.tiktok}
+                    label={`TikTok, @${SOCIAL.tiktokHandle}`}
+                    icon={TikTokMark}
+                    tint="#000000"
+                  >
+                    @{SOCIAL.tiktokHandle}
                   </SocialLink>
                 </div>
               </div>
