@@ -51,8 +51,8 @@ const HOTSPOTS = [
     value: "90 km/h",
     note: "Normal mode, flat road, no headwind.",
     icon: Gauge,
-    x: 63,
-    y: 27,
+    x: 69.8,
+    y: 26.8,
   },
   {
     key: "torque",
@@ -60,8 +60,8 @@ const HOTSPOTS = [
     value: "260+ Nm",
     note: "Pulls a 300 kg load away from a standstill without straining.",
     icon: Zap,
-    x: 54,
-    y: 56,
+    x: 59.9,
+    y: 61.6,
   },
   {
     key: "range",
@@ -69,8 +69,8 @@ const HOTSPOTS = [
     value: "120 km",
     note: "Eco mode, ideal conditions. 80 to 100 km is a realistic working day.",
     icon: BatteryCharging,
-    x: 40,
-    y: 57,
+    x: 43,
+    y: 61.6,
   },
   {
     key: "warranty",
@@ -78,8 +78,8 @@ const HOTSPOTS = [
     value: "2 years",
     note: "Or 30,000 km, depending on the component.",
     icon: ShieldCheck,
-    x: 25,
-    y: 42,
+    x: 16,
+    y: 35,
   },
 ] as const;
 
@@ -342,8 +342,8 @@ export default function EkonStage() {
                 src="/images/ekon-stage.webp"
                 alt=""
                 className="ekon-bike"
-                width={760}
-                height={692}
+                width={1100}
+                height={785}
                 loading="lazy"
                 decoding="async"
               />
