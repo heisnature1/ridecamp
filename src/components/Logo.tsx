@@ -20,13 +20,13 @@ export default function Logo({ light = false }: { light?: boolean }) {
       <img
         src={src}
         alt="Future Ride Ltd mark"
-        className="size-12 shrink-0"
+        className={`size-12 shrink-0 ${light ? "brightness-0 invert" : ""}`}
         loading="eager"
         decoding="async"
       />
       <span className="leading-none">
         <span
-          className={`block font-display text-xl font-bold tracking-tight ${light ? "text-white" : "text-navy"}`}
+          className={`block font-ethnocentric text-[18px] tracking-tight ${light ? "text-white" : "text-navy"}`}
         >
           Future Ride Ltd
         </span>

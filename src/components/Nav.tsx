@@ -1,32 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import Logo from "./Logo";
 import { pointerPosition, useMotionAllowed } from "../lib/motion";
 
-/*
- * Ownership & financing lives on the Fleet & Business page (/#financing) and
- * Why Go Electric lives on the Service page (/#why electric), so the tab bar
- * stays short. The old /ownership and /why electric URLs still redirect.
- */
 const LINKS = [
   { to: "/", label: "Home" },
-  { to: "/ekon", label: "Ekon 450 M1" },
-  { to: "/battery-swap", label: "Battery Swap" },
-  { to: "/gallery", label: "Gallery" },
-  { to: "/fleet", label: "Fleet & Business" },
-  { to: "/service", label: "Service" },
   { to: "/about", label: "About" },
+  { 
+    label: "Product/Service", 
+    children: [
+      { to: "/ekon", label: "Ekon 450 M1" },
+      { to: "/battery-swap", label: "Battery Swap" }
+    ]
+  },
+  { to: "/fleet", label: "Fleet & Business" },
+  { to: "/gallery", label: "Gallery" },
 ];
 
-/**
- * MagneticButton — the call to action leans toward the pointer as it nears.
- *
- * Small displacements (max 6px) only; the point is that the button feels alive
- * under the cursor, not that it runs away from it. Skipped on touch and under
- * reduced motion.
- */
 function MagneticCta({ className, children }: { className: string; children: React.ReactNode }) {
   const allowed = useMotionAllowed();
   const ref = useRef<HTMLAnchorElement | null>(null);
@@ -56,6 +48,84 @@ function MagneticCta({ className, children }: { className: string; children: Rea
   );
 }
 
+function DropdownMenu({ item, isActive }: { item: any, isActive: boolean }) {
+  const [open, setOpen] = useState(false);
+  let timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setOpen(false);
+    }, 150);
+  };
+
+  return (
+    <div 
+      className="relative flex items-center h-full"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <button 
+        className={`relative px-4 py-2 whitespace-nowrap text-[13px] font-semibold transition-all duration-300 z-10 flex items-center gap-1 nav-link-3d ${
+          isActive || open ? "text-brand" : "text-navy/70 hover:text-brand"
+        }`}
+      >
+        {isActive && (
+          <motion.div
+            layoutId="navbar-active"
+            className="absolute inset-0 rounded-full bg-gradient-to-r from-brand/20 to-brand-bright/10 -z-10"
+            transition={{ type: "spring", stiffness: 400, damping: 28 }}
+          />
+        )}
+        {open && !isActive && (
+          <motion.div
+            layoutId="navbar-hover"
+            className="absolute inset-0 rounded-full bg-brand/10 -z-10"
+            transition={{ type: "spring", stiffness: 400, damping: 28 }}
+          />
+        )}
+        <span className="relative z-10">{item.label}</span>
+        <ChevronDown className={`size-3 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full left-1/2 -translate-x-1/2 pt-2"
+          >
+            <div className="bg-white rounded-2xl shadow-xl border border-line/50 p-2 min-w-[200px] flex flex-col gap-1 backdrop-blur-lg">
+              {item.children.map((child: any) => (
+                <NavLink
+                  key={child.to}
+                  to={child.to}
+                  className={({ isActive }) => 
+                    `px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
+                      isActive 
+                        ? "bg-brand/10 text-brand" 
+                        : "text-navy hover:bg-brand/10 hover:text-brand"
+                    }`
+                  }
+                  onClick={() => setOpen(false)}
+                >
+                  {child.label}
+                </NavLink>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -71,6 +141,8 @@ export default function Nav() {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  const isProductServiceActive = pathname === "/ekon" || pathname === "/battery-swap";
+
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
@@ -81,16 +153,19 @@ export default function Nav() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-8">
         <Logo />
-        <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary" onMouseLeave={() => setHoveredPath(null)}>
-          {LINKS.map((l) => {
+        <nav className="hidden items-stretch h-12 gap-1 xl:flex" aria-label="Primary" onMouseLeave={() => setHoveredPath(null)}>
+          {LINKS.map((l, index) => {
+            if (l.children) {
+              return <DropdownMenu key={index} item={l} isActive={isProductServiceActive} />;
+            }
             const isActive = pathname === l.to;
             return (
               <NavLink 
                 key={l.to} 
-                to={l.to}
-                onMouseEnter={() => setHoveredPath(l.to)}
-                className={`relative px-4 py-2 whitespace-nowrap text-[13px] font-semibold transition-all duration-300 z-10 nav-link-3d ${
-                  isActive ? "text-brand" : "text-navy/70 hover:text-navy"
+                to={l.to!}
+                onMouseEnter={() => setHoveredPath(l.to!)}
+                className={`relative px-4 py-2 whitespace-nowrap text-[13px] font-semibold transition-all duration-300 z-10 flex items-center nav-link-3d ${
+                  isActive ? "text-brand" : "text-navy/70 hover:text-brand"
                 }`}
                 data-text={l.label}
               >
@@ -104,7 +179,7 @@ export default function Nav() {
                 {hoveredPath === l.to && !isActive && (
                   <motion.div
                     layoutId="navbar-hover"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-brand/10 to-cyan-500/10 -z-10"
+                    className="absolute inset-0 rounded-full bg-brand/10 -z-10"
                     transition={{ type: "spring", stiffness: 400, damping: 28 }}
                   />
                 )}
@@ -114,9 +189,9 @@ export default function Nav() {
           })}
         </nav>
         <div className="flex items-center gap-3">
-          <MagneticCta className="group relative hidden overflow-hidden rounded-full bg-gradient-to-r from-brand via-brand-bright to-cyan-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-brand/30 transition-[box-shadow,transform] duration-300 hover:shadow-xl hover:shadow-brand/40 sm:inline-flex">
+          <MagneticCta className="group relative hidden overflow-hidden rounded-full bg-gradient-to-r from-brand to-navy-deep px-6 py-3 text-sm font-bold text-white shadow-lg shadow-brand/30 transition-[box-shadow,transform] duration-300 hover:shadow-xl hover:shadow-brand/40 sm:inline-flex">
             <span className="relative z-10">Book Test Ride</span>
-            <motion.div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-brand-bright to-brand opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <motion.div className="absolute inset-0 bg-gradient-to-r from-brand-bright to-navy opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           </MagneticCta>
           <button
             className="rounded-xl border border-line p-2.5 text-navy xl:hidden transition-all duration-300 hover:bg-cloud hover:scale-105 active:scale-95"
@@ -152,27 +227,48 @@ export default function Nav() {
               }}
               className="flex flex-col gap-1 px-4 py-4"
             >
-              {LINKS.map((l) => (
+              {LINKS.map((l, idx) => (
                 <motion.div
-                  key={l.to}
+                  key={idx}
                   variants={{
                     open: { opacity: 1, x: 0, rotateY: 0 },
                     closed: { opacity: 0, x: -20, rotateY: 15 }
                   }}
                 >
-                  <NavLink
-                    to={l.to}
-                    end={l.to === "/"}
-                    className={({ isActive }) =>
-                      `block rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-                        isActive 
-                          ? "bg-gradient-to-r from-brand/10 to-brand-bright/10 text-brand" 
-                          : "text-navy hover:bg-cloud hover:text-brand hover:translate-x-1"
-                      }`
-                    }
-                  >
-                    {l.label}
-                  </NavLink>
+                  {l.children ? (
+                    <div className="flex flex-col gap-1 pl-2 border-l-2 border-brand/20 my-2">
+                      <span className="text-xs font-bold text-slate uppercase tracking-wider px-2 py-1">{l.label}</span>
+                      {l.children.map((child) => (
+                        <NavLink
+                          key={child.to}
+                          to={child.to}
+                          className={({ isActive }) =>
+                            `block rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
+                              isActive 
+                                ? "bg-gradient-to-r from-brand/10 to-brand-bright/10 text-brand" 
+                                : "text-navy hover:bg-cloud hover:text-brand"
+                            }`
+                          }
+                        >
+                          {child.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  ) : (
+                    <NavLink
+                      to={l.to!}
+                      end={l.to === "/"}
+                      className={({ isActive }) =>
+                        `block rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
+                          isActive 
+                            ? "bg-gradient-to-r from-brand/10 to-brand-bright/10 text-brand" 
+                            : "text-navy hover:bg-cloud hover:text-brand hover:translate-x-1"
+                        }`
+                      }
+                    >
+                      {l.label}
+                    </NavLink>
+                  )}
                 </motion.div>
               ))}
               <motion.div
@@ -183,7 +279,7 @@ export default function Nav() {
               >
                 <Link
                   to="/contact"
-                  className="mt-2 block w-full rounded-full bg-gradient-to-r from-brand via-brand-bright to-cyan-500 px-5 py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-brand/30 transition-all duration-300 hover:shadow-xl hover:shadow-brand/40 hover:scale-[1.02] active:scale-[0.98] btn-3d"
+                  className="mt-2 block w-full rounded-full bg-gradient-to-r from-brand to-navy-deep px-5 py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-brand/30 transition-all duration-300 hover:shadow-xl hover:shadow-brand/40 hover:scale-[1.02] active:scale-[0.98] btn-3d"
                 >
                   Book Test Ride
                 </Link>

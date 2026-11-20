@@ -7,15 +7,10 @@ import { BUSINESS, SOCIAL, WA_DEFAULT } from "../lib/leads";
 
 const QUICK = [
   { to: "/", label: "Home" },
-  { to: "/ekon", label: "Ekon 450 M1" },
-  { to: "/battery-swap", label: "Battery Swap" },
-  { to: "/gallery", label: "Gallery" },
+  { to: "/about", label: "About" },
+  { to: "/ekon", label: "Product/Service" },
   { to: "/fleet", label: "Fleet & Business" },
-  { to: "/fleet#financing", label: "Ownership & Financing" },
-  { to: "/service", label: "Service & Warranty" },
-  { to: "/service#why-electric", label: "Why Go Electric" },
-  { to: "/about", label: "About Future Ride Ltd" },
-  { to: "/contact", label: "Contact / Book a Test Ride" },
+  { to: "/gallery", label: "Gallery" },
 ];
 
 /** The real accounts. Handles live in `SOCIAL` so every link site wide matches. */
