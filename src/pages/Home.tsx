@@ -108,10 +108,10 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.5, ease: EASE_OUT }}
           className="mt-8 flex flex-wrap items-center gap-4"
         >
-          <CtaRow />
+          <CtaRow light />
           <Link
             to="/gallery"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-md transition-all duration-300 hover:border-white/35 hover:bg-white/20"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-[13px] text-sm font-bold text-white backdrop-blur-md transition-all duration-300 hover:border-white/35 hover:bg-white/20"
           >
             <Sparkles className="size-4 transition-transform duration-500 group-hover:rotate-[18deg]" />
             View Gallery
@@ -636,7 +636,7 @@ function Faqs() {
                 transition={{ duration: 0.5, delay: 0.2, type: "spring", stiffness: 300, damping: 20 }}
                 className="mt-6 flex justify-center"
               >
-                <CtaRow />
+                <CtaRow light />
               </motion.div>
               <motion.div
                 className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-brand to-brand-bright scale-x-0 origin-center group-hover:scale-x-100 transition-transform duration-700"
