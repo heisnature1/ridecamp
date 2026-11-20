@@ -70,7 +70,7 @@ function DropdownMenu({ item, isActive }: { item: any, isActive: boolean }) {
       onMouseLeave={handleMouseLeave}
     >
       <button 
-        className={`relative px-4 py-2 whitespace-nowrap text-[13px] font-semibold transition-all duration-300 z-10 flex items-center gap-1 nav-link-3d ${
+        className={`relative px-4 py-2 whitespace-nowrap text-[13px] font-semibold transition-all duration-300 z-10 flex items-center gap-1 ${
           isActive || open ? "text-brand" : "text-navy/70 hover:text-brand"
         }`}
       >
@@ -164,10 +164,10 @@ export default function Nav() {
                 key={l.to} 
                 to={l.to!}
                 onMouseEnter={() => setHoveredPath(l.to!)}
-                className={`relative px-4 py-2 whitespace-nowrap text-[13px] font-semibold transition-all duration-300 z-10 flex items-center nav-link-3d ${
+                className={`relative px-4 py-2 whitespace-nowrap text-[13px] font-semibold transition-all duration-300 z-10 flex items-center ${
                   isActive ? "text-brand" : "text-navy/70 hover:text-brand"
                 }`}
-                data-text={l.label}
+                
               >
                 {isActive && (
                   <motion.div
