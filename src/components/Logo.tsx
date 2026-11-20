@@ -13,14 +13,15 @@ import { Link } from "react-router-dom";
  * readable at every breakpoint.
  */
 export default function Logo({ light = false }: { light?: boolean }) {
-  const src = light ? "/brand/logo-mark-only-white.png" : "/brand/logo-mark-only.png";
+  // Always use the colored mark so it shows the actual logo, not just white.
+  const src = "/brand/logo-mark-only.png";
 
   return (
     <Link to="/" className="flex items-center gap-3" aria-label="Future Ride Ltd home">
       <img
         src={src}
         alt="Future Ride Ltd mark"
-        className={`size-12 shrink-0 ${light ? "brightness-0 invert" : ""}`}
+        className="size-12 shrink-0"
         loading="eager"
         decoding="async"
       />
