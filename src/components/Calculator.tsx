@@ -214,7 +214,7 @@ export default function Calculator() {
           <div className="my-4 h-px bg-white/15" />
           <div className="mt-5 space-y-1.5 text-xs text-white/70">
             <p>Petrol bike: GH₵ {fmtInt(r.petrolCost)} fuel + GH₵ {fmtInt(maintenance)} care / month</p>
-            <p>Ekon 450 M1: GH₵ {fmtInt(r.evCost)} energy + GH₵ {fmtInt(CALC.evMaintenancePerMonth)} care / month</p>
+            <p>Ekon 450 M1 V3: GH₵ {fmtInt(r.evCost)} energy + GH₵ {fmtInt(CALC.evMaintenancePerMonth)} care / month</p>
             <p className="pt-1 text-white/50">
               Petrol cost per km: GH₵ {kmPerLitre > 0 ? (petrolPrice / kmPerLitre).toFixed(2) : "—"} ·
               Electric cost per km: GH₵ {CALC.evCostPerKm.toFixed(2)}

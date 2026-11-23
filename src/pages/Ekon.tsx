@@ -15,7 +15,7 @@ export default function Ekon() {
       <PageHero
         kicker="The motorcycle"
         title="Africa's most capable boda, now in Ghana."
-        sub="The Ekon 450 M1 is the electric motorcycle designed by Spiro for the realities of African roads: rough surfaces, heavy loads, long hours and tight budgets. It is built to work as hard as you do, and cost far less to keep working."
+        sub="The Ekon 450 M1 V3 is the electric motorcycle designed by Spiro for the realities of African roads: rough surfaces, heavy loads, long hours and tight budgets. It is built to work as hard as you do, and cost far less to keep working."
       />
 
       <section className="bg-white pb-16 md:pb-24">
@@ -24,7 +24,7 @@ export default function Ekon() {
             <div className="relative overflow-hidden rounded-3xl bg-navy">
               <img
                 src="/images/motor.jpg"
-                alt="Spiro Ekon 450 M1 on the road"
+                alt="Spiro Ekon 450 M1 V3 on the road"
                 className="max-h-[560px] w-full object-cover"
               />
             </div>
