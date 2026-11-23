@@ -75,7 +75,7 @@ export function sourceLabel(source: string): string {
     "/ownership": "Ownership & financing",
     "/fleet": "Fleet & business",
     "/calculator": "Savings calculator",
-    "/ekon": "Ekon 450 M1",
+    "/ekon": "Ekon 450 M1 V3",
     "/battery-swap": "Battery swap",
     "/why-electric": "Why electric",
     "/service": "Service & warranty",

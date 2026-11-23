@@ -57,7 +57,7 @@ export default function NotFound() {
         </div>
         <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-semibold text-white/60">
           {[
-            { to: "/ekon", label: "Ekon 450 M1" },
+            { to: "/ekon", label: "Ekon 450 M1 V3" },
             { to: "/battery-swap", label: "Battery swap" },
             { to: "/fleet", label: "Fleet and business" },
             { to: "/gallery", label: "Gallery" },

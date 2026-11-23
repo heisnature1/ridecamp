@@ -8,10 +8,10 @@ export default function SpecSheet() {
     <div className="mx-auto max-w-3xl px-4 py-10 print:p-0">
       <div className="flex items-end justify-between border-b-2 border-navy pb-4">
         <Logo />
-        <p className="text-xs text-slate">Spiro Ekon 450 M1 — Specification Sheet (Ghana)</p>
+        <p className="text-xs text-slate">Spiro Ekon 450 M1 V3 — Specification Sheet (Ghana)</p>
       </div>
 
-      <h1 className="mt-6 font-display text-3xl font-bold text-navy">Ekon 450 M1</h1>
+      <h1 className="mt-6 font-display text-3xl font-bold text-navy">Ekon 450 M1 V3</h1>
       <p className="mt-2 text-sm text-slate">
         The electric motorcycle designed for African roads and commercial use. Distributed in
         Ghana by Future Ride Ltd.

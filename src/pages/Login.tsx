@@ -48,7 +48,7 @@ export default function Login() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy px-4 py-16">
-      {/* Same Ekon 450 M1 hero photograph as the landing page, used as a backdrop. */}
+      {/* Same Ekon 450 M1 V3 hero photograph as the landing page, used as a backdrop. */}
       <div className="absolute inset-0" aria-hidden="true">
         <img
           src="/images/motor.jpg"

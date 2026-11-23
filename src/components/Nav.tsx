@@ -11,7 +11,7 @@ const LINKS = [
   { 
     label: "Product/Service", 
     children: [
-      { to: "/ekon", label: "Ekon 450 M1" },
+      { to: "/ekon", label: "Ekon 450 M1 V3" },
       { to: "/battery-swap", label: "Battery Swap" }
     ]
   },

@@ -245,10 +245,10 @@ export async function seedGallery(): Promise<GalleryPost[]> {
   if (existing.length) return [];
   const seeds = [
     {
-      title: "Ekon 450 M1, road tested in Accra",
+      title: "Ekon 450 M1 V3, road tested in Accra",
       image: "/images/motor.jpg",
       caption:
-        "The Spiro Ekon 450 M1 on Ghanaian roads. Reinforced frame, tuned suspension, 300 kg load capacity.",
+        "The Spiro Ekon 450 M1 V3 on Ghanaian roads. Reinforced frame, tuned suspension, 300 kg load capacity.",
     },
     {
       title: "Swap point, East Legon",

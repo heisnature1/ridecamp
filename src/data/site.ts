@@ -50,7 +50,7 @@ export const GLANCE = [
 ];
 
 export const HOW_IT_WORKS = [
-  { title: "Choose your bike", text: "Pick your colour and ownership option." },
+  { title: "Choose your bike", text: "Choose your ownership option." },
   { title: "Ride", text: "Use the app to track your battery, bike and nearby swap points." },
   { title: "Swap and go", text: "When the battery runs low, swap it for a fully charged one in minutes instead of waiting hours to charge." },
 ];

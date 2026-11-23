@@ -210,11 +210,11 @@ function Glance() {
             <TiltCard max={10} lift={20} className="rounded-2xl" surfaceClassName="rounded-2xl">
               <img
                 src="/images/motor.jpg"
-                alt="Spiro Ekon 450 M1 electric motorcycle"
+                alt="Spiro Ekon 450 M1 V3 electric motorcycle"
                 className="w-full rounded-2xl object-cover"
               />
               <span className="depth-3 absolute left-4 top-4 rounded-full bg-gradient-to-r from-brand to-brand-bright px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-brand/30">
-                Ekon 450 M1
+                Ekon 450 M1 V3
               </span>
               <div className="depth-2 absolute bottom-4 right-4 flex gap-2">
                 <motion.div
@@ -243,7 +243,7 @@ function Glance() {
           >
             <SplitHeading
               as="h2"
-              text="The Ekon 450 M1 at a glance."
+              text="The Ekon 450 M1 V3 at a glance."
               className="font-display text-3xl font-bold leading-[1.1] md:text-5xl"
             />
             <motion.div
